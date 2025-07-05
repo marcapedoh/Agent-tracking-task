@@ -11,6 +11,7 @@ import { FooterComponent } from './component/footer/footer.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { DailyTrackingComponent } from './component/daily-tracking/daily-tracking.component';
 import { FormsModule } from '@angular/forms';
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { FormsModule } from '@angular/forms';
   imports: [
     BrowserModule,
     AppRoutingModule,
+    NgApexchartsModule,
     LeafletModule,
     FormsModule
   ],

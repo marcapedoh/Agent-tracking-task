@@ -23,3 +23,11 @@
   border-bottom: 1px solid #e5e7eb !important;
   font-weight: 600 !important;
 }
+
+
+/* daily-tracking-stats.component.css */
+apx-chart {
+  display: block;
+  width: 100%;
+  min-height: 350px;
+}
