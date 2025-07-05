@@ -1,0 +1,36 @@
+/* dashboard.component.css */
+/* Custom styles that can't be easily done with Tailwind */
+
+/* Animation for the counter */
+.counter {
+  transition: all 0.5s ease;
+}
+
+/* Custom scrollbar for tables */
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Hexagonal background pattern for sidebar */
+.hexagon-pattern {
+  background-color: #3498db;
+  opacity: 0.1;
+  background-image:
+    radial-gradient(circle at center center, #2c3e50, #3498db),
+    repeating-radial-gradient(circle at center center, #2c3e50, #2c3e50, 10px, transparent 20px, transparent 10px);
+  background-blend-mode: multiply;
+}
