@@ -1,79 +1,45 @@
 <div class="min-h-screen p-6 bg-gray-50">
-  <!-- Header with filters -->
+  <!-- Header with date -->
   <div
     class="flex flex-col items-start justify-between mb-8 md:flex-row md:items-center">
     <div>
-      <h1 class="text-2xl font-bold text-[#002c6b]">Daily Tracking
-        Statistics</h1>
+      <h1 class="text-2xl font-bold text-[#002c6b] inline-block mr-2">Daily
+        Tracking Statistics</h1>
+      <span class="text-sm text-[#002c6b]">{{ today | date:'fullDate' }}</span>
       <p class="text-gray-600">Monitor cash flow and agent performance</p>
     </div>
 
     <div class="flex flex-col gap-4 mt-4 sm:flex-row md:mt-0">
       <div class="relative">
-        <button id="filterBtn"
-          class="flex items-center gap-2 px-4 py-2 transition-colors bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600"
-            viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd"
-              d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-              clip-rule="evenodd" />
-          </svg>
-          <span class="font-medium">Filters</span>
-        </button>
 
-        <!-- Filter Dropdown -->
-        <div id="filterDropdown"
-          class="absolute right-0 z-10 hidden p-4 mt-2 bg-white border border-gray-200 rounded-md shadow-lg w-72">
-          <div class="space-y-4">
-            <div>
-              <label class="block mb-1 text-sm font-medium text-gray-700">Date
-                Range</label>
-              <input type="date" [(ngModel)]="selectedDate"
-                (change)="applyFilters()"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-            </div>
+        <div
+          class="flex flex-col w-full space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 md:w-auto">
 
-            <div>
-              <label class="block mb-1 text-sm font-medium text-gray-700">View
-                By</label>
-              <div class="flex gap-2">
-                <button (click)="setTimeRange('day')"
-                  [class.bg-blue-600]="timeRange === 'day'"
-                  [class.text-white]="timeRange === 'day'"
-                  class="px-3 py-1 text-sm transition-colors border border-gray-300 rounded-md hover:bg-gray-100">
-                  Day
-                </button>
-                <button (click)="setTimeRange('month')"
-                  [class.bg-blue-600]="timeRange === 'month'"
-                  [class.text-white]="timeRange === 'month'"
-                  class="px-3 py-1 text-sm transition-colors border border-gray-300 rounded-md hover:bg-gray-100">
-                  Month
-                </button>
-                <button (click)="setTimeRange('year')"
-                  [class.bg-blue-600]="timeRange === 'year'"
-                  [class.text-white]="timeRange === 'year'"
-                  class="px-3 py-1 text-sm transition-colors border border-gray-300 rounded-md hover:bg-gray-100">
-                  Year
-                </button>
-              </div>
-            </div>
+          <!-- Status Filter -->
+          <select [(ngModel)]="selectedStatus" (change)="applyFilters()"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
+            <option *ngFor="let option of statusOptions"
+              [value]="option.value">{{option.label}}</option>
+          </select>
 
-            <div>
-              <label
-                class="block mb-1 text-sm font-medium text-gray-700">Zone</label>
-              <select [(ngModel)]="selectedZone" (change)="applyFilters()"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                <option value>All Zones</option>
-                <option *ngFor="let zone of zones"
-                  [value]="zone">{{zone}}</option>
-              </select>
-            </div>
-          </div>
+          <!-- Zone Filter -->
+          <select [(ngModel)]="selectedZone" (change)="applyFilters()"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
+            <option value>All Zones</option>
+            <option *ngFor="let zone of zones" [value]="zone">{{zone}}</option>
+          </select>
+
+          <!-- Date Filter -->
+          <input type="date" [(ngModel)]="selectedDate"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
+
         </div>
+
       </div>
 
       <button
-        class="flex items-center gap-2 px-4 py-2 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
+        class="flex items-center gap-2 px-4 py-2 text-white transition-colors bg-[#FF6600] rounded-lg hover:bg-[#FF6614]">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
           viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd"
@@ -85,323 +51,304 @@
     </div>
   </div>
 
-  <!-- Charts Section -->
-  <div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-2">
-    <!-- Cash Flow Chart -->
-    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-[#002c6b]">Cash Flow Analysis</h3>
-        <div class="flex items-center gap-2 text-sm">
-          <span class="w-3 h-3 rounded-full bg-[#2ecc71]"></span>
-          <span>Cash In</span>
-          <span class="w-3 h-3 rounded-full bg-[#e74c3c] ml-2"></span>
-          <span>Cash Out</span>
+  <!-- Stats Cards (existing code remains unchanged) -->
+  <div class="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-5">
+    <!-- Recharge Alert Count -->
+    <div
+      class="p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-orange-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-blue-600 bg-blue-100 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-[#002c6b]">Cashing required</p>
+          <h3 class="text-2xl font-bold text-[#002c6b] counter"
+            data-target="24">0</h3>
         </div>
       </div>
-      <apx-chart
-        [series]="cashFlowChartOptions.series!"
-        [chart]="cashFlowChartOptions.chart!"
-        [colors]="cashFlowChartOptions.colors!"
-        [dataLabels]="cashFlowChartOptions.dataLabels!"
-        [stroke]="cashFlowChartOptions.stroke!"
-        [xaxis]="cashFlowChartOptions.xaxis!"
-        [yaxis]="cashFlowChartOptions.yaxis!"
-        [legend]="cashFlowChartOptions.legend!"
-        [tooltip]="cashFlowChartOptions.tooltip!">
-      </apx-chart>
     </div>
 
-    <!-- Amount Estimation Chart -->
-    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-[#002c6b]">Amount Estimation</h3>
-        <span class="text-sm text-gray-600">XAF <span class="font-bold counter"
-            data-target="2450000">0</span></span>
+    <!-- Cashout Alert Count -->
+    <div
+      class="p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-orange-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-[#002c6b]">Cashout required</p>
+          <h3 class="text-2xl font-bold text-[#002c6b] counter"
+            data-target="18">0</h3>
+        </div>
       </div>
-      <apx-chart
-        [series]="amountEstimationChartOptions.series!"
-        [chart]="amountEstimationChartOptions.chart!"
-        [colors]="amountEstimationChartOptions.colors!"
-        [dataLabels]="amountEstimationChartOptions.dataLabels!"
-        [stroke]="amountEstimationChartOptions.stroke!"
-        [xaxis]="amountEstimationChartOptions.xaxis!"
-        [yaxis]="amountEstimationChartOptions.yaxis!"
-        [tooltip]="amountEstimationChartOptions.tooltip!">
-      </apx-chart>
+    </div>
+
+    <!-- Inactive Resellers Card -->
+    <div
+      class="p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-orange-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-yellow-600 bg-yellow-100 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-[#002c6b]">Inactive Resellers</p>
+          <h3 class="text-2xl font-bold text-[#002c6b] counter"
+            data-target="9">0</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auto Transfer Alert Count -->
+    <div
+      class="p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-orange-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-green-600 bg-green-100 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-[#002c6b]">Auto Transfer</p>
+          <h3 class="text-2xl font-bold text-[#002c6b] counter"
+            data-target="7">0</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dormant Resellers Card -->
+    <div
+      class="p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-orange-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-orange-600 bg-orange-100 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-[#002c6b]">Dormant Resellers</p>
+          <h3 class="text-2xl font-bold text-[#002c6b]"><span class="counter"
+              data-target="12">0</span></h3>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Mixed Chart -->
-  <div class="p-6 mb-8 bg-white border border-gray-100 shadow-sm rounded-xl">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-[#002c6b]">Zone Performance
-        Overview</h3>
-      <div class="flex items-center gap-2 text-sm">
-        <span class="w-3 h-3 rounded-full bg-[#3498db]"></span>
-        <span>Retailers</span>
-        <span class="w-3 h-3 rounded-full bg-[#9b59b6] ml-2"></span>
-        <span>Amount (XAF 1000)</span>
+  <!-- Retailers Table Section -->
+  <div class="p-6 mb-8 bg-white border border-gray-100 rounded-lg shadow-sm">
+    <!-- Status Legend -->
+    <div
+      class="flex flex-wrap items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
+      <span class="text-sm font-medium text-white">Reseller status:</span>
+      <div class="flex items-center">
+        <span class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
+        <span class="text-sm text-white">Need Cash In</span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
+        <span class="text-sm text-white">Need Cash Out</span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
+        <span class="text-sm text-white">Available for Transfer</span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
+        <span class="text-sm text-white">Inactive</span>
+      </div>
+      <div class="flex items-center">
+        <span class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
+        <span class="text-sm text-white">Dormant</span>
       </div>
     </div>
-    <apx-chart
-      [series]="mixedChartOptions.series!"
-      [chart]="mixedChartOptions.chart!"
-      [colors]="mixedChartOptions.colors!"
-      [stroke]="mixedChartOptions.stroke!"
-      [dataLabels]="mixedChartOptions.dataLabels!"
-      [xaxis]="mixedChartOptions.xaxis!"
-      [yaxis]="mixedChartOptions.yaxis!"
-      [tooltip]="mixedChartOptions.tooltip!">
-    </apx-chart>
-  </div>
 
-  <!-- Aggregators Ranking -->
-  <div class="p-6 mb-8 bg-white border border-gray-100 shadow-sm rounded-xl">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-[#002c6b]">Aggregators Ranking</h3>
-      <button class="text-sm font-bold text-blue-600 hover:text-blue-800">View
-        All</button>
+    <!-- Table Header with Filters -->
+    <div
+      class="flex flex-col items-start justify-between mb-4 space-y-4 md:flex-row md:items-center md:space-y-0">
+      <h3 class="text-lg font-semibold text-[#002c6b]">Resellers Status
+        List: {{ selectedZone?selectedZone:"All Zone" }} / {{
+        selectedDate?selectedDate: today |
+        date:'fullDate' }}</h3>
+
+      <div
+        class="flex flex-col w-full space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 md:w-auto">
+        <!-- Items per page filter -->
+        <select [(ngModel)]="itemsPerPage" (change)="applyFilters()"
+          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-24">
+          <option *ngFor="let option of itemsPerPageOptions"
+            [value]="option">{{option}}</option>
+        </select>
+
+        <!-- Bulk SMS Button -->
+        <button *ngIf="selectedRetailers.length > 0"
+          (click)="openBulkSMSModal()"
+          class="flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+          Send SMS ({{selectedRetailers.length}})
+        </button>
+      </div>
     </div>
+
+    <!-- Retailers Table -->
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+        <thead class="bg-[#004080]">
           <tr>
+            <th scope="col" class="relative px-3 py-3 text-center">
+              <input type="checkbox"
+                [checked]="allSelected"
+                (change)="toggleSelectAll($event)"
+                class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+            </th>
             <th scope="col"
-              class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Rank</th>
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+              Zone
+            </th>
             <th scope="col"
-              class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Name</th>
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+              Status
+            </th>
             <th scope="col"
-              class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Zone</th>
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+              Reseller Code
+            </th>
             <th scope="col"
-              class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Score</th>
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+              Full Name
+            </th>
             <th scope="col"
-              class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Trend</th>
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+              Message Status
+            </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let aggregator of sortedAggregators; let i = index"
-            class="transition-all duration-300 cursor-pointer hover:bg-gray-50"
-            [class.animate-pulse]="aggregator.isNewTop"
-            [class.bg-blue-50]="aggregator.isNewTop"
-            (click)="openAggregatorModal(aggregator)">
-            <td
-              class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-              {{i + 1}}
-              <span *ngIf="i === 0" class="ml-1 text-yellow-500">★</span>
+          <tr *ngFor="let retailer of paginatedRetailers"
+            class="transition-colors duration-150 cursor-pointer hover:bg-gray-50"
+            (click)="openRetailerModal(retailer)">
+            <td class="px-3 py-4 text-center whitespace-nowrap"
+              (click)="$event.stopPropagation()">
+              <input type="checkbox"
+                [checked]="isSelected(retailer)"
+                (change)="toggleRetailerSelection(retailer, $event)"
+                class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500">
             </td>
             <td
-              class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{aggregator.firstName}}
-              {{aggregator.lastName}}</td>
+              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+              {{retailer.zone}}
+            </td>
+            <td class="px-3 py-4 text-center whitespace-nowrap">
+              <div class="flex items-center justify-center gap-2">
+                <span *ngIf="retailer.statusDetails.needCashIn"
+                  class="inline-block w-5 h-5 bg-blue-500 rounded-full"
+                  title="Need Cash In"></span>
+                <span *ngIf="retailer.statusDetails.needCashOut"
+                  class="inline-block w-5 h-5 bg-purple-500 rounded-full"
+                  title="Need Cash Out"></span>
+                <span *ngIf="retailer.statusDetails.availableForTransfer"
+                  class="inline-block w-5 h-5 bg-green-500 rounded-full"
+                  title="Available for Transfer"></span>
+                <span *ngIf="retailer.statusDetails.inactive"
+                  class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
+                  title="Inactive"></span>
+                <span *ngIf="retailer.statusDetails.dormant"
+                  class="inline-block w-5 h-5 bg-red-500 rounded-full"
+                  title="Dormant"></span>
+              </div>
+            </td>
             <td
-              class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{aggregator.zone}}</td>
+              class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
+              {{retailer.code}}
+            </td>
             <td
-              class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{aggregator.score}}</td>
-            <td class="px-6 py-4 text-sm whitespace-nowrap">
-              <span *ngIf="aggregator.trend === 'up'"
-                class="flex items-center text-green-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                </svg>
-                +{{aggregator.points}}pts
-              </span>
-              <span *ngIf="aggregator.trend === 'down'"
-                class="flex items-center text-red-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-                -{{aggregator.points}}pts
-              </span>
+              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+              {{retailer.fullName}}
+            </td>
+            <td class="px-3 py-4 text-center whitespace-nowrap">
+              <div class="flex justify-center">
+                <span *ngIf="retailer.messageReceived" class="text-green-500"
+                  title="Message received">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+                    viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </span>
+                <span *ngIf="!retailer.messageReceived" class="text-gray-400"
+                  title="No message received">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+                    viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </span>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
 
-  <!-- Retailers Alert Ranking -->
-  <div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-2">
-    <!-- Cash In Alerts -->
-    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-[#002c6b]">Cash In Alerts
-          Ranking</h3>
-        <div class="flex items-center space-x-4">
-          <!-- <div class="relative">
-            <button (click)="toggleColumn('principal')"
-              class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              <span>Columns</span>
-              <svg class="w-5 h-5 ml-2 -mr-1" xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div> -->
-          <button
-            class="text-sm font-bold text-blue-600 hover:text-blue-800">View
-            All</button>
-        </div>
+    <!-- Pagination -->
+    <div
+      class="flex items-center justify-between px-6 py-3 bg-white border-t border-gray-200">
+      <div class="text-sm text-gray-500">
+        Showing <span class="font-medium">{{(currentPage - 1) * itemsPerPage +
+          1}}</span> to
+        <span class="font-medium">{{Math.min(currentPage * itemsPerPage,
+          filteredRetailers.length)}}</span> of
+        <span class="font-medium">{{filteredRetailers.length}}</span> results
       </div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Rank</th>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Name</th>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Alerts</th>
-              <th *ngIf="showPrincipalColumn" scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Principal</th>
-              <th *ngIf="showWithdrawalColumn" scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Withdrawal</th>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Status</th>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Last
-                Alert</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let retailer of sortedCashInRetailers; let i = index"
-              class="transition-all duration-300 cursor-pointer hover:bg-gray-50"
-              [class.animate-pulse]="retailer.isNewTop"
-              [class.bg-blue-50]="retailer.isNewTop"
-              (click)="openRetailerModal(retailer)">
-              <td
-                class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                {{i + 1}}
-                <span *ngIf="i === 0" class="ml-1 text-yellow-500">★</span>
-              </td>
-              <td
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{retailer.name}}</td>
-              <td
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{retailer.cashInAlerts}}</td>
-              <td *ngIf="showPrincipalColumn"
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">XAF
-                {{retailer.principal | number}}</td>
-              <td *ngIf="showWithdrawalColumn"
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">XAF
-                {{retailer.withdrawal | number}}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span *ngIf="retailer.cashInStatus === 'green'"
-                  class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
-                  Stable
-                </span>
-                <span *ngIf="retailer.cashInStatus === 'orange'"
-                  class="inline-flex px-2 text-xs font-semibold leading-5 text-orange-800 bg-orange-100 rounded-full">
-                  Warning
-                </span>
-                <span *ngIf="retailer.cashInStatus === 'red'"
-                  class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
-                  Critical
-                </span>
-              </td>
-              <td
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{retailer.lastCashInAlert}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Cash Out Alerts -->
-    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-[#002c6b]">Cash Out Alerts
-          Ranking</h3>
-        <div class="flex items-center space-x-4">
-          <!-- <div class="relative">
-            <button (click)="toggleColumn('principal')"
-              class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              <span>Columns</span>
-              <svg class="w-5 h-5 ml-2 -mr-1" xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div> -->
-          <button
-            class="text-sm font-bold text-blue-600 hover:text-blue-800">View
-            All</button>
-        </div>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Rank</th>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Name</th>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Alerts</th>
-              <th *ngIf="showPrincipalColumn" scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Principal</th>
-              <th *ngIf="showWithdrawalColumn" scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Withdrawal</th>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Status</th>
-              <th scope="col"
-                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-700 uppercase bg-gray-100">Last
-                Alert</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let retailer of sortedCashOutRetailers; let i = index"
-              class="transition-all duration-300 cursor-pointer hover:bg-gray-50"
-              [class.animate-pulse]="retailer.isNewTop"
-              [class.bg-blue-50]="retailer.isNewTop"
-              (click)="openRetailerModal(retailer)">
-              <td
-                class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                {{i + 1}}
-                <span *ngIf="i === 0" class="ml-1 text-yellow-500">★</span>
-              </td>
-              <td
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{retailer.name}}</td>
-              <td
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{retailer.cashOutAlerts}}</td>
-              <td *ngIf="showPrincipalColumn"
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">XAF
-                {{retailer.principal | number}}</td>
-              <td *ngIf="showWithdrawalColumn"
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">XAF
-                {{retailer.withdrawal | number}}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span *ngIf="retailer.cashOutStatus === 'green'"
-                  class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
-                  Stable
-                </span>
-                <span *ngIf="retailer.cashOutStatus === 'orange'"
-                  class="inline-flex px-2 text-xs font-semibold leading-5 text-orange-800 bg-orange-100 rounded-full">
-                  Warning
-                </span>
-                <span *ngIf="retailer.cashOutStatus === 'red'"
-                  class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
-                  Critical
-                </span>
-              </td>
-              <td
-                class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{retailer.lastCashOutAlert}}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="flex space-x-2">
+        <button (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+          class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50">
+          Previous
+        </button>
+        <button *ngFor="let page of getPageNumbers()" (click)="changePage(page)"
+          [class.bg-[#FF6600]]="page === currentPage"
+          [class.text-white]="page === currentPage"
+          class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+          {{page}}
+        </button>
+        <button (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+          class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50">
+          Next
+        </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Aggregator Modal -->
-<div id="aggregatorModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+<!-- Retailer Details Modal -->
+<div *ngIf="selectedRetailer" class="fixed inset-0 z-50 overflow-y-auto">
   <div
     class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
     <!-- Background overlay -->
@@ -411,14 +358,13 @@
 
     <!-- Modal content -->
     <div
-      class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+      class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
       <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
         <div class="sm:flex sm:items-start">
           <div class="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-medium leading-6 text-gray-900"
-                id="modal-title">
-                Aggregator Details
+              <h3 class="text-lg font-medium leading-6 text-gray-900">
+                Reseller Details - {{selectedRetailer.code}}
               </h3>
               <button (click)="closeModal()"
                 class="text-gray-400 hover:text-gray-500">
@@ -434,127 +380,274 @@
               <!-- Tabs -->
               <div class="border-b border-gray-200">
                 <nav class="flex -mb-px space-x-8">
-                  <button (click)="activeTab = 'notification'"
-                    [class.border-blue-500]="activeTab === 'notification'"
-                    [class.text-blue-600]="activeTab === 'notification'"
+                  <button (click)="activeTab = 'retailer'; initChart()"
+                    [class.border-blue-500]="activeTab === 'retailer'"
+                    [class.text-blue-600]="activeTab === 'retailer'"
                     class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap hover:text-gray-700 hover:border-gray-300">
-                    Send Notification
+                    Reseller Info
                   </button>
-                  <button (click)="activeTab = 'details'"
-                    [class.border-blue-500]="activeTab === 'details'"
-                    [class.text-blue-600]="activeTab === 'details'"
+                  <button (click)="activeTab = 'aggregator'"
+                    [class.border-blue-500]="activeTab === 'aggregator'"
+                    [class.text-blue-600]="activeTab === 'aggregator'"
                     class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap hover:text-gray-700 hover:border-gray-300">
-                    Personal Details
+                    Aggregator Info
                   </button>
                 </nav>
               </div>
 
-              <!-- Notification Tab -->
-              <div *ngIf="activeTab === 'notification'" class="mt-4 space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Select
-                    Predefined Message</label>
-                  <select [(ngModel)]="selectedMessage"
-                    class="block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <option *ngFor="let msg of predefinedMessages"
-                      [value]="msg">{{msg}}</option>
-                  </select>
+              <!-- Retailer Info Tab -->
+              <div *ngIf="activeTab === 'retailer'" class="mt-4">
+                <!-- Balances Section -->
+                <div
+                  class="grid grid-cols-1 gap-4 p-4 rounded-lg bg-gray-50 sm:grid-cols-3">
+                  <div class="text-center">
+                    <p class="text-sm font-medium text-gray-500">Principal
+                      Balance</p>
+                    <p class="mt-1 text-lg font-semibold text-gray-900">
+                      XAF {{selectedRetailer.principalBalance | number}}
+                    </p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-sm font-medium text-gray-500">Withdrawal
+                      Balance</p>
+                    <p class="mt-1 text-lg font-semibold text-gray-900">
+                      XAF {{selectedRetailer.withdrawalBalance | number}}
+                    </p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-sm font-medium text-gray-500">Auto Transfer
+                      Amount</p>
+                    <p class="mt-1 text-lg font-semibold text-gray-900">
+                      XAF {{ selectedRetailer?.autoTransferAmount != null ?
+                      (selectedRetailer.autoTransferAmount | number) : '0' }}
+                    </p>
+
+                  </div>
                 </div>
 
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Or
-                    Write Custom Message</label>
-                  <textarea rows="3" [(ngModel)]="customMessage"
-                    class="block w-full mt-1 border border-gray-300 rounded-md shadow-sm sm:text-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+                <!-- Status Details Section -->
+                <div
+                  class="grid grid-cols-1 gap-4 p-4 mt-4 rounded-lg bg-gray-50 sm:grid-cols-2">
+                  <!--  Status Display -->
+                  <div class="mt-4">
+                    <p class="mb-2 text-sm font-medium text-gray-500">
+                      Status:</p>
+
+                    <div class="flex flex-wrap items-center gap-4">
+
+                      <div *ngIf="selectedRetailer.statusDetails.needCashIn"
+                        class="flex items-center">
+                        <span
+                          class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
+                        <span class="text-sm text-gray-700">Need Cash In</span>
+                      </div>
+
+                      <div *ngIf="selectedRetailer.statusDetails.needCashOut"
+                        class="flex items-center">
+                        <span
+                          class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
+                        <span class="text-sm text-gray-700">Need Cash Out</span>
+                      </div>
+
+                      <div
+                        *ngIf="selectedRetailer.statusDetails.availableForTransfer"
+                        class="flex items-center">
+                        <span
+                          class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
+                        <span class="text-sm text-gray-700">Available for
+                          Transfer</span>
+                      </div>
+
+                      <div *ngIf="selectedRetailer.statusDetails.inactive"
+                        class="flex items-center">
+                        <span
+                          class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
+                        <span class="text-sm text-gray-700">Inactive</span>
+                      </div>
+
+                      <div *ngIf="selectedRetailer.statusDetails.dormant"
+                        class="flex items-center">
+                        <span
+                          class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
+                        <span class="text-sm text-gray-700">Dormant</span>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Type</p>
+                    <div class="mt-1">
+                      <span [ngClass]="{
+                        'bg-purple-100 text-purple-800': selectedRetailer.type === 'VIP',
+                        'bg-blue-100 text-blue-800': selectedRetailer.type === 'ordinary'
+                      }"
+                        class="inline-flex px-2 py-1 text-xs font-semibold leading-5 rounded-full">
+                        {{ selectedRetailer?.type ? (selectedRetailer.type |
+                        uppercase) : 'ORDINARY' }}
+
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="flex justify-end space-x-3">
-                  <button (click)="closeModal()" type="button"
-                    class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Cancel
-                  </button>
-                  <button (click)="sendNotification()" type="button"
-                    class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Send SMS
-                  </button>
+                <!-- General Info Section -->
+                <div
+                  class="grid grid-cols-1 gap-4 p-4 mt-4 rounded-lg bg-gray-50 sm:grid-cols-2">
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Full Name</p>
+                    <p
+                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.fullName}}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Zone</p>
+                    <p
+                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.zone}}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Last
+                      Activity</p>
+                    <p class="mt-1 text-sm text-gray-900">
+                      {{ selectedRetailer?.lastActivityDate ?
+                      (selectedRetailer.lastActivityDate | date:'medium') :
+                      'N/A' }}
+                    </p>
+
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Top
+                      Aggregator</p>
+                    <p
+                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregatorCode}}</p>
+                  </div>
+                </div>
+
+                <!-- Balance Evolution Chart with ApexCharts -->
+                <div class="p-4 mt-4 rounded-lg bg-gray-50">
+                  <p class="text-sm font-medium text-gray-500">Balance Evolution
+                    (Last 30 days)</p>
+                  <div class="mt-4">
+                    <div class="min-h-[300px]">
+                      <apx-chart
+                        [series]="chartOptions.series!"
+                        [chart]="chartOptions.chart!"
+                        [xaxis]="chartOptions.xaxis!"
+                        [yaxis]="chartOptions.yaxis!"
+                        [stroke]="chartOptions.stroke!"
+                        [colors]="chartOptions.colors!"
+                        [tooltip]="chartOptions.tooltip!"
+                        [legend]="chartOptions.legend!">
+                      </apx-chart>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Status Details Expanded -->
+                <div class="p-4 mt-4 rounded-lg bg-gray-50">
+                  <p class="text-sm font-medium text-gray-500">Status
+                    Details</p>
+                  <div class="grid grid-cols-2 gap-4 mt-2 sm:grid-cols-3">
+                    <div class="flex items-center">
+                      <span [ngClass]="{
+                        'text-green-500': !selectedRetailer.statusDetails.needCashIn,
+                        'text-red-500': selectedRetailer.statusDetails.needCashIn
+                      }" class="mr-2">
+                        <svg class="w-4 h-4" fill="currentColor"
+                          viewBox="0 0 20 20">
+                          <path
+                            *ngIf="selectedRetailer.statusDetails.needCashIn"
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
+                          <path
+                            *ngIf="!selectedRetailer.statusDetails.needCashIn"
+                            fill-rule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clip-rule="evenodd" />
+                        </svg>
+                      </span>
+                      <span class="text-sm">Need Cash In</span>
+                    </div>
+                    <!-- Other status details items remain the same -->
+                  </div>
                 </div>
               </div>
 
-              <!-- Details Tab -->
-              <div *ngIf="activeTab === 'details'" class="mt-4">
-                <div class="p-4 rounded-lg bg-gray-50">
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Full Name</p>
-                      <p
-                        class="mt-1 text-sm text-gray-900">{{selectedAggregator?.firstName}}
-                        {{selectedAggregator?.lastName}}</p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Zone</p>
-                      <p
-                        class="mt-1 text-sm text-gray-900">{{selectedAggregator?.zone}}</p>
-                    </div>
-                    <div>
-                      <p
-                        class="text-sm font-medium text-gray-500">Performance</p>
-                      <p
-                        class="mt-1 text-sm text-gray-900">{{selectedAggregator?.performance}}</p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Last
-                        Activity</p>
-                      <p
-                        class="mt-1 text-sm text-gray-900">{{selectedAggregator?.lastActivity}}</p>
-                    </div>
+              <!-- Aggregator Info Tab (unchanged) -->
+              <div *ngIf="activeTab === 'aggregator'" class="mt-4">
+                <div *ngIf="selectedRetailer.topAggregator"
+                  class="grid grid-cols-1 gap-4 p-4 rounded-lg bg-gray-50 sm:grid-cols-2">
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Aggregator
+                      Code</p>
+                    <p
+                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.code}}</p>
                   </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Full Name</p>
+                    <p
+                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.fullName}}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Zone</p>
+                    <p
+                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.zone}}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Status</p>
+                    <p class="mt-1 text-sm text-gray-900">
+                      <span [ngClass]="{
+                        'bg-green-100 text-green-800': selectedRetailer.topAggregator.status === 'active',
+                        'bg-yellow-100 text-yellow-800': selectedRetailer.topAggregator.status === 'inactive'
+                      }"
+                        class="inline-flex px-2 py-1 text-xs font-semibold leading-5 rounded-full">
+                        {{selectedRetailer.topAggregator.status | uppercase}}
+                      </span>
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Phone
+                      Number</p>
+                    <p
+                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.phone}}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Email</p>
+                    <p
+                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.email
+                      || 'N/A'}}</p>
+                  </div>
+                </div>
+                <div *ngIf="!selectedRetailer.topAggregator"
+                  class="p-4 text-center text-gray-500 rounded-lg bg-gray-50">
+                  No aggregator information available
                 </div>
 
-                <div class="mt-4">
-                  <h4 class="text-sm font-medium text-gray-700">Recent
-                    Actions</h4>
-                  <div class="mt-2 space-y-2">
-                    <div *ngFor="let action of recentActions"
-                      class="flex items-start">
-                      <div [ngClass]="{
-                        'bg-green-100 text-green-600': action.type === 'recharge',
-                        'bg-blue-100 text-blue-600': action.type === 'visit',
-                        'bg-purple-100 text-purple-600': action.type === 'training'
-                      }" class="flex-shrink-0 p-2 mr-3 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                          fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path *ngIf="action.type === 'recharge'"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          <path *ngIf="action.type === 'visit'"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path *ngIf="action.type === 'training'"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p
-                          class="text-sm font-medium text-gray-900">{{action.title}}</p>
-                        <p class="text-sm text-gray-500">{{action.time}}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" (click)="sendSMS(selectedRetailer)"
+          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+          Send SMS to Aggregator
+        </button>
+        <button type="button" (click)="sendSMSDirect(selectedRetailer)"
+          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+          Send SMS to Reseller
+        </button>
+        <button type="button" (click)="closeModal()"
+          class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Close
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Retailer Modal -->
-<div id="retailerModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+<!-- Bulk SMS Modal -->
+<div *ngIf="showBulkSMSModal" class="fixed inset-0 z-50 overflow-y-auto">
   <div
     class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
     <!-- Background overlay -->
@@ -564,16 +657,15 @@
 
     <!-- Modal content -->
     <div
-      class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+      class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
       <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
         <div class="sm:flex sm:items-start">
           <div class="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-medium leading-6 text-gray-900"
-                id="modal-title">
-                Retailer Details
+              <h3 class="text-lg font-medium leading-6 text-gray-900">
+                Send Bulk SMS ({{selectedRetailers.length}} recipients)
               </h3>
-              <button (click)="closeModal()"
+              <button (click)="closeBulkSMSModal()"
                 class="text-gray-400 hover:text-gray-500">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
@@ -584,163 +676,36 @@
             </div>
 
             <div class="mt-4">
-              <!-- Tabs -->
-              <div class="border-b border-gray-200">
-                <nav class="flex -mb-px space-x-8">
-                  <button (click)="activeTab = 'details'"
-                    [class.border-blue-500]="activeTab === 'details'"
-                    [class.text-blue-600]="activeTab === 'details'"
-                    class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap hover:text-gray-700 hover:border-gray-300">
-                    Personal Details
-                  </button>
-                  <button (click)="activeTab = 'accounts'"
-                    [class.border-blue-500]="activeTab === 'accounts'"
-                    [class.text-blue-600]="activeTab === 'accounts'"
-                    class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap hover:text-gray-700 hover:border-gray-300">
-                    Account Balances
-                  </button>
-                </nav>
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Select
+                  Predefined Message</label>
+                <select [(ngModel)]="selectedBulkMessage"
+                  class="block w-full px-3 py-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  <option value>Custom message</option>
+                  <option *ngFor="let msg of bulkMessages"
+                    [value]="msg">{{msg}}</option>
+                </select>
               </div>
 
-              <!-- Details Tab -->
-              <div *ngIf="activeTab === 'details'" class="mt-4">
-                <div class="p-4 rounded-lg bg-gray-50">
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Name</p>
-                      <p
-                        class="mt-1 text-sm text-gray-900">{{selectedRetailer?.name}}</p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Status</p>
-                      <p class="mt-1 text-sm text-gray-900">
-                        <span *ngIf="selectedRetailer?.status === 'green'"
-                          class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
-                          Stable
-                        </span>
-                        <span *ngIf="selectedRetailer?.status === 'orange'"
-                          class="inline-flex px-2 text-xs font-semibold leading-5 text-orange-800 bg-orange-100 rounded-full">
-                          Warning
-                        </span>
-                        <span *ngIf="selectedRetailer?.status === 'red'"
-                          class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
-                          Critical
-                        </span>
-                      </p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Alerts
-                        Count</p>
-                      <p
-                        class="mt-1 text-sm text-gray-900">{{selectedRetailer?.alerts}}</p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Last
-                        Alert</p>
-                      <p
-                        class="mt-1 text-sm text-gray-900">{{selectedRetailer?.lastAlert}}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-4">
-                  <h4 class="text-sm font-medium text-gray-700">Recent
-                    Alerts</h4>
-                  <div class="mt-2 space-y-2">
-                    <div *ngFor="let alert of recentAlerts"
-                      class="flex items-start">
-                      <div [ngClass]="{
-                        'bg-red-100 text-red-600': alert.type === 'cashout',
-                        'bg-blue-100 text-blue-600': alert.type === 'recharge'
-                      }" class="flex-shrink-0 p-2 mr-3 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                          fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path *ngIf="alert.type === 'cashout'"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          <path *ngIf="alert.type === 'recharge'"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p
-                          class="text-sm font-medium text-gray-900">{{alert.title}}</p>
-                        <p class="text-sm text-gray-500">{{alert.time}}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Accounts Tab -->
-              <div *ngIf="activeTab === 'accounts'" class="mt-4">
-                <div class="p-4 rounded-lg bg-gray-50">
-                  <div class="grid grid-cols-2 gap-4">
-                    <div class="text-center">
-                      <p class="text-sm font-medium text-gray-500">Principal
-                        Account</p>
-                      <p class="mt-1 text-lg font-semibold text-gray-900">XAF
-                        <span class="counter"
-                          [attr.data-target]="selectedRetailer?.principal">0</span></p>
-                    </div>
-                    <div class="text-center">
-                      <p class="text-sm font-medium text-gray-500">Withdrawal
-                        Account</p>
-                      <p class="mt-1 text-lg font-semibold text-gray-900">XAF
-                        <span class="counter"
-                          [attr.data-target]="selectedRetailer?.withdrawal">0</span></p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-4">
-                  <h4 class="text-sm font-medium text-gray-700">Recent
-                    Transactions</h4>
-                  <div class="mt-2">
-                    <table class="min-w-full divide-y divide-gray-200">
-                      <thead class="bg-gray-50">
-                        <tr>
-                          <th scope="col"
-                            class="px-3 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Date</th>
-                          <th scope="col"
-                            class="px-3 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Type</th>
-                          <th scope="col"
-                            class="px-3 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Amount</th>
-                          <th scope="col"
-                            class="px-3 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody class="bg-white divide-y divide-gray-200">
-                        <tr *ngFor="let tx of recentTransactions">
-                          <td
-                            class="px-3 py-2 text-sm text-gray-500 whitespace-nowrap">{{tx.date}}</td>
-                          <td
-                            class="px-3 py-2 text-sm text-gray-500 whitespace-nowrap">{{tx.type}}</td>
-                          <td
-                            class="px-3 py-2 text-sm text-gray-500 whitespace-nowrap">XAF
-                            {{tx.amount}}</td>
-                          <td
-                            class="px-3 py-2 text-sm text-gray-500 whitespace-nowrap">
-                            <span [ngClass]="{
-                              'bg-green-100 text-green-800': tx.status === 'completed',
-                              'bg-yellow-100 text-yellow-800': tx.status === 'pending',
-                              'bg-red-100 text-red-800': tx.status === 'failed'
-                            }"
-                              class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full">
-                              {{tx.status}}
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Message
+                  Content</label>
+                <textarea rows="4" [(ngModel)]="bulkMessageContent"
+                  class="block w-full px-3 py-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" (click)="sendBulkSMS()"
+          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+          Send Messages
+        </button>
+        <button type="button" (click)="closeBulkSMSModal()"
+          class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Cancel
+        </button>
       </div>
     </div>
   </div>

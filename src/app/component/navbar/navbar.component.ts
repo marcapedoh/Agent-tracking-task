@@ -14,8 +14,8 @@ type UserRole = 'zone_manager' | 'admin' | 'analyst';
 export const MENU_ITEMS: Record<UserRole, MenuItem[]> = {
   zone_manager: [
     { label: 'Dashboard', route: 'dashboard' },
-    { label: 'Rapports', route: '/zone-manager/resellers' },
     { label: 'Daily Tracking', route: 'daily-tracking' },
+    { label: 'Rapports', route: '/zone-manager/resellers' },
     { label: 'Communication', route: '/zone-manager/communication' },
   ],
   admin: [
@@ -53,11 +53,22 @@ export class NavbarComponent implements OnInit {
     this.displayedMenus = MENU_ITEMS[role] || [];
   }
 
+  isUserDropdownOpen = false;
+
+  toggleUserDropdown() {
+    this.isUserDropdownOpen = !this.isUserDropdownOpen;
+  }
+
+  logout() {
+    // Votre logique de déconnexion existante
+    this.isUserDropdownOpen = false;
+  }
+
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  logout() {
-    this.authService.logout();
-  }
+  // logout() {
+  //   this.authService.logout();
+  // }
 }

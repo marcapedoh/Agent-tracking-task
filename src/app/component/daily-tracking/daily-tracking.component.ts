@@ -1,35 +1,102 @@
 import { Component, OnInit } from '@angular/core';
+// import {
+//   ApexAxisChartSeries,
+//   ApexChart,
+//   ApexDataLabels,
+//   ApexPlotOptions,
+//   ApexYAxis,
+//   ApexXAxis,
+//   ApexFill,
+//   ApexStroke,
+//   ApexGrid,
+//   ApexLegend,
+//   ApexTooltip,
+//   ApexTitleSubtitle
+// } from "ng-apexcharts";
+
+// export type ChartOptions = {
+//   series: ApexAxisChartSeries;
+//   chart: ApexChart;
+//   dataLabels?: ApexDataLabels;
+//   plotOptions?: ApexPlotOptions;
+//   yaxis?: ApexYAxis | ApexYAxis[]; // Tableau ou objet accepté
+//   xaxis?: ApexXAxis;
+//   fill?: ApexFill;
+//   stroke?: ApexStroke;
+//   grid?: ApexGrid;
+//   legend?: ApexLegend;
+//   tooltip?: ApexTooltip;
+//   title?: ApexTitleSubtitle;
+//   colors?: string[];
+// };
+
 import {
   ApexAxisChartSeries,
   ApexChart,
-  ApexDataLabels,
-  ApexPlotOptions,
-  ApexYAxis,
   ApexXAxis,
-  ApexFill,
+  ApexYAxis,
+  ApexTitleSubtitle,
   ApexStroke,
-  ApexGrid,
-  ApexLegend,
   ApexTooltip,
-  ApexTitleSubtitle
-} from "ng-apexcharts";
+  ApexLegend
+} from 'ng-apexcharts';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
-  dataLabels?: ApexDataLabels;
-  plotOptions?: ApexPlotOptions;
-  yaxis?: ApexYAxis | ApexYAxis[]; // Tableau ou objet accepté
-  xaxis?: ApexXAxis;
-  fill?: ApexFill;
-  stroke?: ApexStroke;
-  grid?: ApexGrid;
-  legend?: ApexLegend;
-  tooltip?: ApexTooltip;
-  title?: ApexTitleSubtitle;
-  colors?: string[];
+  xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
+  stroke: ApexStroke;
+  tooltip: ApexTooltip;
+  legend: ApexLegend;
+  colors: string[];
 };
 
+interface Retailer {
+  id: number;
+  code: string;
+  fullName: string;
+  zone: string;
+  status: 'active' | 'inactive' | 'critical';
+  type: 'VIP' | 'ordinary';
+  principalBalance: number;
+  withdrawalBalance: number;
+  autoTransferAmount: number;
+  lastActivityDate: Date;
+  topAggregatorCode: string;
+  messageReceived: string;
+
+  statusDetails: {
+    needCashIn: boolean;
+    needCashOut: boolean;
+    availableForTransfer: boolean;
+    dormant: boolean;
+    inactive: boolean;
+  };
+
+  topAggregator: {
+    code: string;
+    fullName: string;
+    zone: string;
+    status: 'active' | 'inactive';
+    phone: string;
+    email: string;
+  };
+
+  balanceHistory?: {
+    date: Date;
+    principalBalance: number;
+    withdrawalBalance: number;
+    autoTransferAmount: number;
+  }[];
+
+  // Optionnel - pour les statistiques supplémentaires
+  statistics?: {
+    totalTransactions?: number;
+    monthlyAverage?: number;
+    lastTransactionAmount?: number;
+  };
+}
 @Component({
   selector: 'app-daily-tracking',
   templateUrl: './daily-tracking.component.html',
@@ -37,575 +104,388 @@ export type ChartOptions = {
 })
 export class DailyTrackingComponent implements OnInit {
 
-  cashFlowChartOptions!: Partial<ChartOptions>;
-  amountEstimationChartOptions!: Partial<ChartOptions>;
-  mixedChartOptions!: Partial<ChartOptions>;
-
+  chartOptions!: Partial<ChartOptions>;
+  Math = Math;
+  today: Date = new Date();
   timeRange = 'day';
   selectedDate = '';  // Pas de filtre initial
   selectedZone = '';
-  zones = ['Libreville', 'Port-Gentil', 'Franceville', 'Oyem', 'Mouila'];
-
-  predefinedMessages = [
-    "Urgent: Please recharge retailers in your zone",
-    "Reminder: Visit critical retailers today",
-    "New campaign: Promote mobile money deposits",
-    "Alert: High cashout demand in your area"
+  zones: string[] = ['Libreville', 'Port-Gentil', 'Franceville', 'Oyem', 'Mouila'];
+  filteredRetailers: Retailer[] = [];
+  selectedRetailers: Retailer[] = [];
+  allSelected: boolean = false;
+  // Modal related properties
+  selectedRetailer: Retailer | null = null;
+  showBulkSMSModal: boolean = false;
+  activeTab: 'retailer' | 'aggregator' = 'retailer';
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  selectedStatus: string = '';
+  itemsPerPageOptions = [10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100];
+  statusOptions = [
+    { value: '', label: 'All Statuses' },
+    { value: 'needCashIn', label: 'Need Cash In' },
+    { value: 'needCashOut', label: 'Need Cash Out' },
+    { value: 'availableForTransfer', label: 'Available for Transfer' },
+    { value: 'dormant', label: 'Dormant' },
+    { value: 'inactive', label: 'Inactive' }
   ];
-
-  selectedMessage = this.predefinedMessages[0];
-  customMessage = '';
-  activeTab = 'notification';
-
-  selectedAggregator: any = null;
-  selectedRetailer: any = null;
-
-  sortedAggregators: any[] = [];
-  previousTopAggregator: any = null;
-
-  sortedCashInRetailers: any[] = [];
-  sortedCashOutRetailers: any[] = [];
-  previousTopCashInRetailer: any = null;
-  previousTopCashOutRetailer: any = null;
-
-  showPrincipalColumn = true;
-  showWithdrawalColumn = true;
-
-  aggregators = [
-    { id: 1, firstName: 'Paul', lastName: 'Mba', zone: 'Libreville', score: 245, trend: 'up', points: 12, performance: 'high', lastActivity: '2 hours ago' },
-    { id: 2, firstName: 'Marie', lastName: 'Nkoghe', zone: 'Port-Gentil', score: 218, trend: 'up', points: 8, performance: 'medium', lastActivity: '1 hour ago' },
-    { id: 3, firstName: 'Jean', lastName: 'Dupont', zone: 'Franceville', score: 198, trend: 'down', points: 5, performance: 'low', lastActivity: '30 minutes ago' },
-    { id: 4, firstName: 'Luc', lastName: 'Owono', zone: 'Oyem', score: 185, trend: 'up', points: 15, performance: 'high', lastActivity: '3 hours ago' },
-    { id: 5, firstName: 'Alice', lastName: 'Minko', zone: 'Mouila', score: 172, trend: 'down', points: 3, performance: 'medium', lastActivity: '45 minutes ago' }
+  // Bulk SMS properties
+  bulkMessages: string[] = [
+    'Your account needs attention. Please check your balances.',
+    'Your principal balance is low. Please recharge soon.',
+    'Thank you for your recent transactions.'
   ];
-  retailers = [
+  selectedBulkMessage: string = '';
+  bulkMessageContent: string = '';
+  retailers: Retailer[] = [
+    // 1-10: Libreville VIP
     {
-      id: 1,
-      name: "Revendeur Mont-Bouët",
-      zone: "Libreville",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 5,
-      cashInStatus: "orange",
-      cashInTrend: "up",
-      lastCashInAlert: "2h ago",
-      cashOutAlerts: 3,
-      cashOutStatus: "green",
-      cashOutTrend: "stable",
-      principal: 85000,
-      withdrawal: 32000,
-      profit: 5300
+      id: 1, code: 'RTL-001', fullName: 'Jean Okou', zone: 'Libreville', status: 'active', type: 'VIP',
+      principalBalance: 1250000, withdrawalBalance: 320000, autoTransferAmount: 150000, lastActivityDate: new Date('2023-05-20'),
+      topAggregatorCode: 'AGG-LB-01', messageReceived: "Veuillez effectuer un retrait urgent",
+      statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-LB-01', fullName: 'Marc Ondo', zone: 'Libreville', status: 'active', phone: '+24101234567', email: 'm.ondo@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(1000000, 300000, 200000, 150000, 100000, 80000)
     },
     {
-      id: 2,
-      name: "Revendeur Nzeng-Ayong",
-      zone: "Libreville",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 8,
-      cashInStatus: "red",
-      cashInTrend: "up",
-      lastCashInAlert: "45m ago",
-      cashOutAlerts: 2,
-      cashOutStatus: "green",
-      cashOutTrend: "down",
-      principal: 62000,
-      withdrawal: 28000,
-      profit: 4200
+      id: 2, code: 'RTL-002', fullName: 'Sarah Nguema', zone: 'Libreville', status: 'active', type: 'ordinary',
+      principalBalance: 850000, withdrawalBalance: 210000, autoTransferAmount: 80000, lastActivityDate: new Date('2023-05-18'),
+      topAggregatorCode: 'AGG-LB-02', messageReceived: "Approvisionnement nécessaire",
+      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-LB-02', fullName: 'Pauline Mba', zone: 'Libreville', status: 'active', phone: '+24102345678', email: 'p.mba@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(700000, 200000, 150000, 100000, 50000, 50000)
     },
     {
-      id: 3,
-      name: "Revendeur Port-Gentil Centre",
-      zone: "Port-Gentil",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 3,
-      cashInStatus: "green",
-      cashInTrend: "stable",
-      lastCashInAlert: "5h ago",
-      cashOutAlerts: 7,
-      cashOutStatus: "red",
-      cashOutTrend: "up",
-      principal: 78000,
-      withdrawal: 45000,
-      profit: 6100
+      id: 3, code: 'RTL-003', fullName: 'David Minko', zone: 'Libreville', status: 'critical', type: 'ordinary',
+      principalBalance: 150000, withdrawalBalance: 95000, autoTransferAmount: 20000, lastActivityDate: new Date('2023-05-15'),
+      topAggregatorCode: 'AGG-LB-03', messageReceived: "Solde critique - approvisionnement immédiat",
+      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-LB-03', fullName: 'Lucie Benga', zone: 'Libreville', status: 'active', phone: '+24103456789', email: 'l.benga@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(100000, 100000, 50000, 60000, 10000, 15000)
     },
     {
-      id: 4,
-      name: "Revendeur Akanda",
-      zone: "Libreville",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 6,
-      cashInStatus: "orange",
-      cashInTrend: "up",
-      lastCashInAlert: "1h ago",
-      cashOutAlerts: 4,
-      cashOutStatus: "orange",
-      cashOutTrend: "up",
-      principal: 92000,
-      withdrawal: 38000,
-      profit: 6700
+      id: 4, code: 'RTL-004', fullName: 'Grace Ndong', zone: 'Libreville', status: 'inactive', type: 'ordinary',
+      principalBalance: 50000, withdrawalBalance: 20000, autoTransferAmount: 0, lastActivityDate: new Date('2023-04-10'),
+      topAggregatorCode: 'AGG-LB-01', messageReceived: "Compte inactif - contactez support",
+      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: false, dormant: true, inactive: true },
+      topAggregator: { code: 'AGG-LB-01', fullName: 'Marc Ondo', zone: 'Libreville', status: 'active', phone: '+24101234567', email: 'm.ondo@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(80000, 30000, 30000, 20000, 0, 0)
     },
     {
-      id: 5,
-      name: "Revendeur Franceville Centre",
-      zone: "Franceville",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 2,
-      cashInStatus: "green",
-      cashInTrend: "down",
-      lastCashInAlert: "8h ago",
-      cashOutAlerts: 1,
-      cashOutStatus: "green",
-      cashOutTrend: "down",
-      principal: 45000,
-      withdrawal: 15000,
-      profit: 2800
+      id: 5, code: 'RTL-005', fullName: 'Kevin Mbina', zone: 'Libreville', status: 'active', type: 'VIP',
+      principalBalance: 750000, withdrawalBalance: 180000, autoTransferAmount: 120000, lastActivityDate: new Date('2023-05-19'),
+      topAggregatorCode: 'AGG-LB-04', messageReceived: "Transfert disponible",
+      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-LB-04', fullName: 'Alain Sounga', zone: 'Libreville', status: 'inactive', phone: '+24104567890', email: 'a.sounga@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(600000, 200000, 120000, 80000, 80000, 60000)
     },
     {
-      id: 6,
-      name: "Revendeur Owendo",
-      zone: "Libreville",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 9,
-      cashInStatus: "red",
-      cashInTrend: "up",
-      lastCashInAlert: "30m ago",
-      cashOutAlerts: 5,
-      cashOutStatus: "orange",
-      cashOutTrend: "up",
-      principal: 105000,
-      withdrawal: 52000,
-      profit: 7800
+      id: 6, code: 'RTL-006', fullName: 'Marie-Louise Engonga', zone: 'Port-Gentil', status: 'active', type: 'VIP',
+      principalBalance: 920000, withdrawalBalance: 310000, autoTransferAmount: 180000, lastActivityDate: new Date('2023-05-20'),
+      topAggregatorCode: 'AGG-PG-01', messageReceived: "Retrait demandé",
+      statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-PG-01', fullName: 'Pierre Moussavou', zone: 'Port-Gentil', status: 'active', phone: '+24105678901', email: 'p.moussavou@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(800000, 250000, 250000, 120000, 120000, 90000)
     },
     {
-      id: 7,
-      name: "Revendeur Lambaréné",
-      zone: "Moyen-Ogooué",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 4,
-      cashInStatus: "orange",
-      cashInTrend: "up",
-      lastCashInAlert: "3h ago",
-      cashOutAlerts: 3,
-      cashOutStatus: "green",
-      cashOutTrend: "stable",
-      principal: 68000,
-      withdrawal: 25000,
-      profit: 3900
+      id: 7, code: 'RTL-007', fullName: 'Roger Ndong Obiang', zone: 'Port-Gentil', status: 'active', type: 'ordinary',
+      principalBalance: 680000, withdrawalBalance: 250000, autoTransferAmount: 90000, lastActivityDate: new Date('2023-05-18'),
+      topAggregatorCode: 'AGG-PG-02', messageReceived: "Solde disponible pour transfert",
+      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-PG-02', fullName: 'Christine Mbina', zone: 'Port-Gentil', status: 'active', phone: '+24106789012', email: 'c.mbina@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(550000, 200000, 180000, 100000, 60000, 50000)
     },
     {
-      id: 8,
-      name: "Revendeur Tchibanga",
-      zone: "Nyanga",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 1,
-      cashInStatus: "green",
-      cashInTrend: "down",
-      lastCashInAlert: "12h ago",
-      cashOutAlerts: 6,
-      cashOutStatus: "red",
-      cashOutTrend: "up",
-      principal: 38000,
-      withdrawal: 42000,
-      profit: 3100
+      id: 8, code: 'RTL-008', fullName: 'Patricia Nzeng', zone: 'Port-Gentil', status: 'critical', type: 'ordinary',
+      principalBalance: 120000, withdrawalBalance: 85000, autoTransferAmount: 15000, lastActivityDate: new Date('2023-05-16'),
+      topAggregatorCode: 'AGG-PG-03', messageReceived: "URGENT: Approvisionnement requis",
+      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-PG-03', fullName: 'Gérard Oyoubi', zone: 'Port-Gentil', status: 'inactive', phone: '+24107890123', email: 'g.oyoubi@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(150000, 50000, 60000, 40000, 10000, 10000)
     },
     {
-      id: 9,
-      name: "Revendeur Mouila",
-      zone: "Ngounié",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 7,
-      cashInStatus: "red",
-      cashInTrend: "stable",
-      lastCashInAlert: "1h ago",
-      cashOutAlerts: 2,
-      cashOutStatus: "green",
-      cashOutTrend: "down",
-      principal: 74000,
-      withdrawal: 29000,
-      profit: 5200
+      id: 9, code: 'RTL-009', fullName: 'Albert Bivigou', zone: 'Port-Gentil', status: 'active', type: 'ordinary',
+      principalBalance: 430000, withdrawalBalance: 190000, autoTransferAmount: 50000, lastActivityDate: new Date('2023-05-17'),
+      topAggregatorCode: 'AGG-PG-01', messageReceived: "Besoin de retrait",
+      statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-PG-01', fullName: 'Pierre Moussavou', zone: 'Port-Gentil', status: 'active', phone: '+24105678901', email: 'p.moussavou@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(350000, 150000, 120000, 90000, 30000, 30000)
     },
     {
-      id: 10,
-      name: "Revendeur Oyem",
-      zone: "Woleu-Ntem",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 3,
-      cashInStatus: "green",
-      cashInTrend: "stable",
-      lastCashInAlert: "6h ago",
-      cashOutAlerts: 4,
-      cashOutStatus: "orange",
-      cashOutTrend: "up",
-      principal: 55000,
-      withdrawal: 33000,
-      profit: 4100
+      id: 10, code: 'RTL-010', fullName: 'Sylvie Mba', zone: 'Port-Gentil', status: 'inactive', type: 'ordinary',
+      principalBalance: 80000, withdrawalBalance: 30000, autoTransferAmount: 0, lastActivityDate: new Date('2023-03-25'),
+      topAggregatorCode: 'AGG-PG-04', messageReceived: "Compte dormant - réactivation nécessaire",
+      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: false, dormant: true, inactive: true },
+      topAggregator: { code: 'AGG-PG-04', fullName: 'Jacques Ndong', zone: 'Port-Gentil', status: 'active', phone: '+24108901234', email: 'j.ndong@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(120000, 50000, 40000, 20000, 0, 0)
+    },
+
+    // 11-20: Franceville
+    {
+      id: 11, code: 'RTL-011', fullName: 'Daniel Meye', zone: 'Franceville', status: 'active', type: 'VIP',
+      principalBalance: 760000, withdrawalBalance: 220000, autoTransferAmount: 140000, lastActivityDate: new Date('2023-05-19'),
+      topAggregatorCode: 'AGG-FV-01', messageReceived: "Transfert possible",
+      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-FV-01', fullName: 'Martine Obame', zone: 'Franceville', status: 'active', phone: '+24109012345', email: 'm.obame@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(600000, 200000, 150000, 100000, 100000, 60000)
     },
     {
-      id: 11,
-      name: "Revendeur Bitam",
-      zone: "Woleu-Ntem",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 5,
-      cashInStatus: "orange",
-      cashInTrend: "up",
-      lastCashInAlert: "2h ago",
-      cashOutAlerts: 3,
-      cashOutStatus: "green",
-      cashOutTrend: "stable",
-      principal: 63000,
-      withdrawal: 27000,
-      profit: 4500
+      id: 12, code: 'RTL-012', fullName: 'Julie Ndoutoume', zone: 'Franceville', status: 'active', type: 'ordinary',
+      principalBalance: 540000, withdrawalBalance: 180000, autoTransferAmount: 70000, lastActivityDate: new Date('2023-05-18'),
+      topAggregatorCode: 'AGG-FV-02', messageReceived: "Besoin d'approvisionnement",
+      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-FV-02', fullName: 'Patrick Mba', zone: 'Franceville', status: 'active', phone: '+24110123456', email: 'p.mba@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(450000, 150000, 120000, 80000, 40000, 40000)
     },
     {
-      id: 12,
-      name: "Revendeur Port-Gentil Sud",
-      zone: "Port-Gentil",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 8,
-      cashInStatus: "red",
-      cashInTrend: "up",
-      lastCashInAlert: "40m ago",
-      cashOutAlerts: 5,
-      cashOutStatus: "orange",
-      cashOutTrend: "up",
-      principal: 97000,
-      withdrawal: 51000,
-      profit: 7200
+      id: 13, code: 'RTL-013', fullName: 'Olivier Mintsa', zone: 'Franceville', status: 'critical', type: 'ordinary',
+      principalBalance: 95000, withdrawalBalance: 45000, autoTransferAmount: 10000, lastActivityDate: new Date('2023-05-14'),
+      topAggregatorCode: 'AGG-FV-03', messageReceived: "Solde très bas - approvisionnez",
+      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false },
+      topAggregator: { code: 'AGG-FV-03', fullName: 'Gisèle Minko', zone: 'Franceville', status: 'inactive', phone: '+24111234567', email: 'g.minko@aggregator.ga' },
+      balanceHistory: generateBalanceHistory(120000, 40000, 30000, 20000, 5000, 10000)
     },
-    {
-      id: 13,
-      name: "Revendeur Koulamoutou",
-      zone: "Ogooué-Lolo",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 2,
-      cashInStatus: "green",
-      cashInTrend: "down",
-      lastCashInAlert: "9h ago",
-      cashOutAlerts: 1,
-      cashOutStatus: "green",
-      cashOutTrend: "down",
-      principal: 41000,
-      withdrawal: 18000,
-      profit: 2900
-    },
-    {
-      id: 14,
-      name: "Revendeur Makokou",
-      zone: "Ogooué-Ivindo",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 6,
-      cashInStatus: "orange",
-      cashInTrend: "up",
-      lastCashInAlert: "1h ago",
-      cashOutAlerts: 4,
-      cashOutStatus: "orange",
-      cashOutTrend: "up",
-      principal: 58000,
-      withdrawal: 35000,
-      profit: 4700
-    },
-    {
-      id: 15,
-      name: "Revendeur Libreville Quartsier Louis",
-      zone: "Libreville",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 4,
-      cashInStatus: "orange",
-      cashInTrend: "up",
-      lastCashInAlert: "3h ago",
-      cashOutAlerts: 7,
-      cashOutStatus: "red",
-      cashOutTrend: "up",
-      principal: 89000,
-      withdrawal: 47000,
-      profit: 6800
-    },
-    {
-      id: 16,
-      name: "Revendeur Moanda",
-      zone: "Haut-Ogooué",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 3,
-      cashInStatus: "green",
-      cashInTrend: "stable",
-      lastCashInAlert: "7h ago",
-      cashOutAlerts: 2,
-      cashOutStatus: "green",
-      cashOutTrend: "down",
-      principal: 52000,
-      withdrawal: 22000,
-      profit: 3700
-    },
-    {
-      id: 17,
-      name: "Revendeur Ntoum",
-      zone: "Estuaire",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 7,
-      cashInStatus: "red",
-      cashInTrend: "up",
-      lastCashInAlert: "50m ago",
-      cashOutAlerts: 3,
-      cashOutStatus: "green",
-      cashOutTrend: "stable",
-      principal: 76000,
-      withdrawal: 31000,
-      profit: 5400
-    },
-    {
-      id: 18,
-      name: "Revendeur Lastourville",
-      zone: "Ogooué-Lolo",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 1,
-      cashInStatus: "green",
-      cashInTrend: "down",
-      lastCashInAlert: "10h ago",
-      cashOutAlerts: 5,
-      cashOutStatus: "orange",
-      cashOutTrend: "up",
-      principal: 37000,
-      withdrawal: 39000,
-      profit: 3300
-    },
-    {
-      id: 19,
-      name: "Revendeur Gamba",
-      zone: "Ogooué-Maritime",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 5,
-      cashInStatus: "orange",
-      cashInTrend: "up",
-      lastCashInAlert: "2h ago",
-      cashOutAlerts: 2,
-      cashOutStatus: "green",
-      cashOutTrend: "down",
-      principal: 49000,
-      withdrawal: 21000,
-      profit: 3500
-    },
-    {
-      id: 20,
-      name: "Revendeur Fougamou",
-      zone: "Ngounié",
-      date: new Date().toISOString().split('T')[0],
-      cashInAlerts: 4,
-      cashInStatus: "orange",
-      cashInTrend: "up",
-      lastCashInAlert: "4h ago",
-      cashOutAlerts: 6,
-      cashOutStatus: "red",
-      cashOutTrend: "up",
-      principal: 67000,
-      withdrawal: 43000,
-      profit: 5500
+    // ... (Continuer jusqu'à 50 avec le même modèle)
+  ];
+  // Dans votre composant TypeScript
+  sendSMSDirect(retailer: Retailer): void {
+    if (!retailer?.topAggregator?.phone) {
+      console.error('Aucun numéro de téléphone disponible pour le revendeur');
+      return;
     }
-  ];
 
-  recentActions = [
-    { type: 'recharge', title: 'Recharged 3 retailers', time: '2 hours ago' },
-    { type: 'visit', title: 'Visited critical retailer', time: '4 hours ago' },
-    { type: 'training', title: 'Completed training', time: '1 day ago' }
-  ];
-  recentTransactions = [
-    { date: 'Today', type: 'Deposit', amount: '15,000', status: 'completed' },
-    { date: 'Today', type: 'Withdrawal', amount: '8,000', status: 'completed' },
-    { date: 'Yesterday', type: 'Deposit', amount: '12,000', status: 'completed' },
-    { date: 'Yesterday', type: 'Transfer', amount: '5,000', status: 'pending' }
-  ];
+    // Construction du message en fonction du statut
+    let messageContent: string;
 
-  recentAlerts = [
-    { type: 'cashout', title: 'High cashout demand', time: '15 minutes ago' },
-    { type: 'recharge', title: 'Low balance alert', time: '30 minutes ago' },
-    { type: 'cashout', title: 'Cashout request', time: '1 hour ago' }
-  ];
+    if (retailer.status === 'critical') {
+      messageContent = `URGENT: Votre solde est critique (${retailer.principalBalance} XAF). Veuillez approvisionner.`;
+    } else if (retailer.statusDetails.needCashOut) {
+      messageContent = `Rappel: Retrait demandé de ${retailer.withdrawalBalance} XAF disponible. Code: ${retailer.code}`;
+    } else {
+      messageContent = `Notification: Votre solde actuel est ${retailer.principalBalance} XAF.`;
+    }
 
+
+    // Exemple avec un service fictif
+    // this.smsService.send({
+    //   to: retailer.phone || retailer.topAggregator.phone,
+    //   message: messageContent,
+    //   retailerCode: retailer.code
+    // }).subscribe({
+    //   next: () => this.showSuccess('SMS envoyé au revendeur avec succès'),
+    //   error: (err) => this.showError(`Échec d'envoi: ${err.message}`)
+    // });
+  }
+
+  // Méthode pour envoyer à l'aggrégateur (existant)
+
+
+  // Méthodes utilitaires pour les notifications
 
   constructor() { }
 
   ngOnInit(): void {
-    this.initCharts();
     this.initCounterAnimation();
-    this.initRankingAnimation();
     this.initFilterToggle();
-    this.updateSortedAggregators();
-    this.updateRetailersRanking();
-
-    setInterval(() => this.updateAggregatorsRanking(), 5000);
-    setInterval(() => this.updateRetailersRanking(), 5000);
+    this.filteredRetailers = [...this.retailers];
   }
-  updateSortedAggregators(): void {
-    this.sortedAggregators = [...this.aggregators]
-      .sort((a, b) => b.score - a.score)
-      .map((agg, index) => ({
-        ...agg,
-        isNewTop: index === 0 && (!this.previousTopAggregator || agg.id !== this.previousTopAggregator.id)
-      }));
 
-    if (this.sortedAggregators.length > 0) {
-      this.previousTopAggregator = { ...this.sortedAggregators[0] };
+  initChart() {
+    this.chartOptions = {
+      series: [
+        {
+          name: "Principal Balance",
+          data: this.selectedRetailer?.balanceHistory?.map(item => item.principalBalance) || []
+        },
+        {
+          name: "Withdrawal Balance",
+          data: this.selectedRetailer?.balanceHistory?.map(item => item.withdrawalBalance) || []
+        },
+        {
+          name: "Auto Transfer",
+          data: this.selectedRetailer?.balanceHistory?.map(item => item.autoTransferAmount) || []
+        }
+      ],
+      chart: {
+        type: "line",
+        height: 300,
+        zoom: {
+          enabled: false
+        },
+        toolbar: {
+          show: false
+        }
+      },
+      colors: ["#3B82F6", "#10B981", "#8B5CF6"],
+      stroke: {
+        curve: "smooth",
+        width: 2
+      },
+      xaxis: {
+        categories: this.selectedRetailer?.balanceHistory?.map(item =>
+          new Date(item.date).toLocaleDateString()
+        ) || [],
+        labels: {
+          style: {
+            fontSize: '12px'
+          }
+        }
+      },
+      yaxis: {
+        labels: {
+          formatter: (value) => {
+            return `XAF ${value.toLocaleString()}`;
+          }
+        }
+      },
+      tooltip: {
+        y: {
+          formatter: (value) => {
+            return `XAF ${value.toLocaleString()}`;
+          }
+        }
+      },
+      legend: {
+        position: "top",
+        horizontalAlign: "right",
+        fontSize: "12px"
+      }
+    };
+
+
+  }
+
+  applyFilters(): void {
+    this.filteredRetailers = this.retailers.filter(retailer => {
+      const zoneMatch = !this.selectedZone || retailer.zone === this.selectedZone;
+      const statusMatch = !this.selectedStatus ||
+        (this.selectedStatus === 'needCashIn' && retailer.statusDetails.needCashIn) ||
+        (this.selectedStatus === 'needCashOut' && retailer.statusDetails.needCashOut) ||
+        (this.selectedStatus === 'availableForTransfer' && retailer.statusDetails.availableForTransfer) ||
+        (this.selectedStatus === 'dormant' && retailer.statusDetails.dormant) ||
+        (this.selectedStatus === 'inactive' && retailer.statusDetails.inactive);
+
+      return zoneMatch && statusMatch;
+    });
+    this.currentPage = 1; // Reset to first page when filters change
+  }
+  // get paginatedRetailers(): Retailer[] {
+  //   const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+  //   return this.filteredRetailers.slice(startIndex, startIndex + this.itemsPerPage);
+  // }
+
+  get paginatedRetailers(): Retailer[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredRetailers.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+  get totalPages(): number {
+    return Math.ceil(this.filteredRetailers.length / this.itemsPerPage);
+  }
+
+  changePage(page: number): void {
+    this.currentPage = page;
+  }
+
+  getPageNumbers(): number[] {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = startPage + maxVisiblePages - 1;
+
+    if (endPage > this.totalPages) {
+      endPage = this.totalPages;
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  }
+
+  toggleSelectAll(event: Event): void {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    this.allSelected = isChecked;
+    if (isChecked) {
+      this.selectedRetailers = [...this.filteredRetailers];
+    } else {
+      this.selectedRetailers = [];
+    }
+  }
+
+  toggleRetailerSelection(retailer: Retailer, event: Event): void {
+    event.stopPropagation();
+    const isChecked = (event.target as HTMLInputElement).checked;
+
+    if (isChecked) {
+      this.selectedRetailers.push(retailer);
+    } else {
+      this.selectedRetailers = this.selectedRetailers.filter(r => r.id !== retailer.id);
+    }
+
+    this.allSelected = this.selectedRetailers.length === this.filteredRetailers.length;
+  }
+
+  isSelected(retailer: Retailer): boolean {
+    return this.selectedRetailers.some(r => r.id === retailer.id);
+  }
+
+  openRetailerModal(retailer: Retailer): void {
+    this.selectedRetailer = retailer;
+    this.activeTab = 'retailer';
+    this.initChart();
+  }
+
+  closeModal(): void {
+    this.selectedRetailer = null;
+  }
+
+  openBulkSMSModal(): void {
+    this.showBulkSMSModal = true;
+    this.selectedBulkMessage = '';
+    this.bulkMessageContent = '';
+  }
+
+  closeBulkSMSModal(): void {
+    this.showBulkSMSModal = false;
+  }
+
+  sendSMS(retailer: Retailer): void {
+    // Implement SMS sending logic for single retailer
+    console.log('Sending SMS to', retailer.fullName);
+    this.closeModal();
+  }
+
+  sendBulkSMS(): void {
+    // Implement bulk SMS sending logic
+    console.log('Sending bulk SMS to', this.selectedRetailers.length, 'recipients');
+    console.log('Message:', this.bulkMessageContent);
+    this.closeBulkSMSModal();
+    this.selectedRetailers = [];
+    this.allSelected = false;
   }
 
   setTimeRange(range: string): void {
     this.timeRange = range;
-    this.initCharts();
   }
-  openAggregatorModal(aggregator: any): void {
-    this.selectedAggregator = aggregator;
-    this.activeTab = 'notification';
-    const modal = document.getElementById('aggregatorModal');
-    if (modal) {
-      modal.classList.remove('hidden');
-    }
-  }
+  initFilterToggle(): void {
+    const btn = document.getElementById('filterBtn');
+    const dropdown = document.getElementById('filterDropdown');
 
-  sendNotification(): void {
-    const message = this.customMessage || this.selectedMessage;
-    if (this.selectedAggregator) {
-      alert(`Notification sent to ${this.selectedAggregator.firstName}:\n\n${message}`);
-    }
-    this.closeModal();
-  }
-
-
-
-  updateAggregatorsRanking(): void {
-    this.aggregators = this.aggregators.map(agg => {
-      const change = Math.floor(Math.random() * 10) - 3;
-      const newScore = Math.max(0, agg.score + change);
-
-      return {
-        ...agg,
-        score: newScore,
-        trend: change > 0 ? 'up' : change < 0 ? 'down' : agg.trend,
-        points: Math.abs(change),
-        lastActivity: this.getRandomTimeAgo()
-      };
-    });
-
-    this.sortedAggregators = [...this.aggregators]
-      .sort((a, b) => b.score - a.score)
-      .map((agg, index) => ({
-        ...agg,
-        isNewTop: index === 0 && (!this.previousTopAggregator || agg.id !== this.previousTopAggregator.id)
-      }));
-
-    if (this.sortedAggregators.length > 0) {
-      this.previousTopAggregator = { ...this.sortedAggregators[0] };
-    }
-
-    setTimeout(() => {
-      this.sortedAggregators = this.sortedAggregators.map(agg => ({
-        ...agg,
-        isNewTop: false
-      }));
-    }, 3000);
-  }
-
-
-  applyFilters(): void {
-    this.updateRetailersRanking();
-  }
-
-  toggleColumn(column: string): void {
-    if (column === 'principal') {
-      this.showPrincipalColumn = !this.showPrincipalColumn;
-    } else if (column === 'withdrawal') {
-      this.showWithdrawalColumn = !this.showWithdrawalColumn;
-    }
-  }
-
-  initCharts(): void {
-    this.cashFlowChartOptions = {
-      series: [
-        { name: "Cash In Requests", data: [12, 15, 10, 18, 14, 20, 16] },
-        { name: "Cash Out Requests", data: [8, 10, 12, 9, 11, 15, 13] }
-      ],
-      chart: { height: 350, type: "line", toolbar: { show: false } },
-      colors: ["#2ecc71", "#e74c3c"],
-      dataLabels: { enabled: false },
-      stroke: { width: 3, curve: "smooth" },
-      xaxis: { categories: this.getXAxisCategories(), title: { text: this.getXAxisTitle() } },
-      yaxis: { title: { text: "Number of Retailers" } },
-      legend: { position: "top" },
-      tooltip: {
-        y: { formatter: val => `${val} retailers` }
-      }
-    };
-
-    this.amountEstimationChartOptions = {
-      series: [
-        { name: "Cash In Amount", data: [450000, 520000, 380000, 610000, 490000, 750000, 680000] },
-        { name: "Cash Out Amount", data: [280000, 310000, 350000, 290000, 330000, 450000, 390000] }
-      ],
-      chart: { height: 350, type: "area", stacked: false, toolbar: { show: false } },
-      colors: ["#3498db", "#9b59b6"],
-      dataLabels: { enabled: false },
-      stroke: { width: 2, curve: "smooth" },
-      xaxis: { categories: this.getXAxisCategories(), title: { text: this.getXAxisTitle() } },
-      yaxis: {
-        title: { text: "Amount (XAF)" },
-        labels: { formatter: val => `${val / 1000}K` }
-      },
-      tooltip: {
-        y: { formatter: val => `XAF ${val.toLocaleString()}` }
-      }
-    };
-
-    this.mixedChartOptions = {
-      series: [
-        { name: "Retailers", type: "column", data: [12, 15, 10, 18, 14, 20, 16] },
-        { name: "Amount Estimated (XAF 1000)", type: "line", data: [450, 520, 380, 610, 490, 750, 680] }
-      ],
-      chart: { height: 350, type: "line", toolbar: { show: false } },
-      colors: ["#3498db", "#9b59b6"],
-      stroke: { width: [0, 3] },
-      dataLabels: { enabled: false },
-      xaxis: { categories: this.getXAxisCategories(), title: { text: this.getXAxisTitle() } },
-      yaxis: [
-        { title: { text: "Retailers" } },
-        { opposite: true, title: { text: "Amount (XAF 1000)" } }
-      ],
-      tooltip: {
-        y: {
-          formatter: (val, { seriesIndex }) =>
-            seriesIndex === 0 ? `${val} retailers` : `XAF ${(val * 1000).toLocaleString()}`
+    if (btn && dropdown) {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+      });
+      document.addEventListener('click', e => {
+        if (!btn.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
+          dropdown.classList.add('hidden');
         }
-      }
-    };
+      });
+    }
   }
-
-  updateRetailersRanking(): void {
-    let filtered = [...this.retailers];
-    if (this.selectedZone) filtered = filtered.filter(r => r.zone === this.selectedZone);
-    if (this.selectedDate) filtered = filtered.filter(r => r.date === this.selectedDate);
-
-    filtered = filtered.map(r => {
-      const cashInChange = Math.floor(Math.random() * 3) - 1;
-      const cashOutChange = Math.floor(Math.random() * 3) - 1;
-
-      return {
-        ...r,
-        cashInAlerts: Math.max(0, r.cashInAlerts + cashInChange),
-        cashInStatus: this.getStatus(r.cashInAlerts + cashInChange),
-        cashInTrend: cashInChange > 0 ? 'up' : cashInChange < 0 ? 'down' : r.cashInTrend,
-        lastCashInAlert: this.getRandomTimeAgo(),
-
-        cashOutAlerts: Math.max(0, r.cashOutAlerts + cashOutChange),
-        cashOutStatus: this.getStatus(r.cashOutAlerts + cashOutChange),
-        cashOutTrend: cashOutChange > 0 ? 'up' : cashOutChange < 0 ? 'down' : r.cashOutTrend,
-        lastCashOutAlert: this.getRandomTimeAgo()
-      };
-    });
-
-    this.sortedCashInRetailers = [...filtered].sort((a, b) => b.cashInAlerts - a.cashInAlerts);
-    this.sortedCashOutRetailers = [...filtered].sort((a, b) => b.cashOutAlerts - a.cashOutAlerts);
-  }
-
-  getStatus(alerts: number): string {
-    return alerts <= 3 ? 'green' : alerts <= 6 ? 'orange' : 'red';
-  }
-
   initCounterAnimation(): void {
     const counters = document.querySelectorAll<HTMLElement>('.counter');
     const speed = 200;
@@ -627,62 +507,28 @@ export class DailyTrackingComponent implements OnInit {
     });
   }
 
-  initRankingAnimation(): void {
-    setInterval(() => {
-      this.aggregators = this.aggregators.map(agg => {
-        const change = Math.floor(Math.random() * 6) - 2;
-        return {
-          ...agg,
-          score: Math.max(100, agg.score + change),
-          trend: change > 0 ? 'up' : change < 0 ? 'down' : agg.trend,
-          points: Math.abs(change),
-          lastActivity: this.getRandomTimeAgo()
-        };
-      }).sort((a, b) => b.score - a.score);
-    }, 5000);
-  }
 
-  getRandomTimeAgo(): string {
-    const times = ['5 minutes ago', '15 minutes ago', '30 minutes ago', '1 hour ago', '2 hours ago'];
-    return times[Math.floor(Math.random() * times.length)];
-  }
 
-  initFilterToggle(): void {
-    const btn = document.getElementById('filterBtn');
-    const dropdown = document.getElementById('filterDropdown');
 
-    if (btn && dropdown) {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        dropdown.classList.toggle('hidden');
-      });
-      document.addEventListener('click', e => {
-        if (!btn.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
-          dropdown.classList.add('hidden');
-        }
-      });
-    }
-  }
+}
 
-  openRetailerModal(retailer: any): void {
-    this.selectedRetailer = retailer;
-    this.activeTab = 'details';
-    document.getElementById('retailerModal')?.classList.remove('hidden');
-    this.initCounterAnimation();
-  }
 
-  closeModal(): void {
-    document.getElementById('aggregatorModal')?.classList.add('hidden');
-    document.getElementById('retailerModal')?.classList.add('hidden');
-  }
 
-  getXAxisCategories(): string[] {
-    return this.timeRange === 'day' ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-      : this.timeRange === 'month' ? ["Week 1", "Week 2", "Week 3", "Week 4"]
-        : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
-  }
-
-  getXAxisTitle(): string {
-    return this.timeRange === 'day' ? 'Day' : this.timeRange === 'month' ? 'Week of Month' : 'Month';
-  }
+export function generateBalanceHistory(
+  principalBase: number,
+  principalVar: number,
+  withdrawalBase: number,
+  withdrawalVar: number,
+  autoTransferBase: number,
+  autoTransferVar: number
+) {
+  return Array.from({ length: 30 }, (_, i) => {
+    const dayProgress = i / 29; // Normalisé entre 0 et 1
+    return {
+      date: new Date(2023, 4, i + 1), // Mai 2023
+      principalBalance: Math.round(principalBase + (principalVar * dayProgress * (0.9 + Math.random() * 0.2))),
+      withdrawalBalance: Math.round(withdrawalBase + (withdrawalVar * dayProgress * (0.9 + Math.random() * 0.2))),
+      autoTransferAmount: Math.round(autoTransferBase + (autoTransferVar * dayProgress * (0.9 + Math.random() * 0.2)))
+    };
+  });
 }

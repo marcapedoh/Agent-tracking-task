@@ -32,6 +32,22 @@ export type ChartOptions = {
   colors?: string[];
 };
 
+export type ChartOptionsEl = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  dataLabels?: ApexDataLabels;
+  plotOptions?: ApexPlotOptions;
+  yaxis?: ApexYAxis | ApexYAxis[]; // Tableau ou objet accepté
+  xaxis?: ApexXAxis;
+  fill?: ApexFill;
+  stroke?: ApexStroke;
+  grid?: ApexGrid;
+  legend?: ApexLegend;
+  tooltip?: ApexTooltip;
+  title?: ApexTitleSubtitle;
+  colors?: string[];
+};
+
 
 @Component({
   selector: 'app-dashboard',
@@ -43,7 +59,12 @@ export class DashboardComponent implements OnInit {
   transactionsChartOptions!: Partial<ChartOptions>;
   alertsByZoneChartOptions!: Partial<ChartOptions>;
   performanceChartOptions!: Partial<ChartOptions>;
-
+  cashFlowChartOptions!: Partial<ChartOptionsEl>;
+  amountEstimationChartOptions!: Partial<ChartOptionsEl>;
+  mixedChartOptions!: Partial<ChartOptionsEl>;
+  timeRange = 'day';
+  selectedDate = '';  // Pas de filtre initial
+  selectedZone = '';
   recentActivities = [
     { type: 'alert', retailer: 'Jean Dupont', location: 'Libreville', time: '10 mins ago' },
     { type: 'cashout', retailer: 'Marie Nkoghe', location: 'Port-Gentil', time: '25 mins ago' },
@@ -257,6 +278,73 @@ export class DashboardComponent implements OnInit {
         }
       }
     };
+
+    this.cashFlowChartOptions = {
+      series: [
+        { name: "Cash In Requests", data: [12, 15, 10, 18, 14, 20, 16] },
+        { name: "Cash Out Requests", data: [8, 10, 12, 9, 11, 15, 13] }
+      ],
+      chart: { height: 350, type: "line", toolbar: { show: false } },
+      colors: ["#2ecc71", "#e74c3c"],
+      dataLabels: { enabled: false },
+      stroke: { width: 3, curve: "smooth" },
+      xaxis: { categories: this.getXAxisCategories(), title: { text: this.getXAxisTitle() } },
+      yaxis: { title: { text: "Number of Retailers" } },
+      legend: { position: "top" },
+      tooltip: {
+        y: { formatter: val => `${val} retailers` }
+      }
+    };
+
+    this.amountEstimationChartOptions = {
+      series: [
+        { name: "Cash In Amount", data: [450000, 520000, 380000, 610000, 490000, 750000, 680000] },
+        { name: "Cash Out Amount", data: [280000, 310000, 350000, 290000, 330000, 450000, 390000] }
+      ],
+      chart: { height: 350, type: "area", stacked: false, toolbar: { show: false } },
+      colors: ["#3498db", "#9b59b6"],
+      dataLabels: { enabled: false },
+      stroke: { width: 2, curve: "smooth" },
+      xaxis: { categories: this.getXAxisCategories(), title: { text: this.getXAxisTitle() } },
+      yaxis: {
+        title: { text: "Amount (XAF)" },
+        labels: { formatter: val => `${val / 1000}K` }
+      },
+      tooltip: {
+        y: { formatter: val => `XAF ${val.toLocaleString()}` }
+      }
+    };
+
+    this.mixedChartOptions = {
+      series: [
+        { name: "Retailers", type: "column", data: [12, 15, 10, 18, 14, 20, 16] },
+        { name: "Amount Estimated (XAF 1000)", type: "line", data: [450, 520, 380, 610, 490, 750, 680] }
+      ],
+      chart: { height: 350, type: "line", toolbar: { show: false } },
+      colors: ["#3498db", "#9b59b6"],
+      stroke: { width: [0, 3] },
+      dataLabels: { enabled: false },
+      xaxis: { categories: this.getXAxisCategories(), title: { text: this.getXAxisTitle() } },
+      yaxis: [
+        { title: { text: "Retailers" } },
+        { opposite: true, title: { text: "Amount (XAF 1000)" } }
+      ],
+      tooltip: {
+        y: {
+          formatter: (val, { seriesIndex }) =>
+            seriesIndex === 0 ? `${val} retailers` : `XAF ${(val * 1000).toLocaleString()}`
+        }
+      }
+    };
+  }
+  getXAxisCategories(): string[] {
+    return this.timeRange === 'day' ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+      : this.timeRange === 'month' ? ["Week 1", "Week 2", "Week 3", "Week 4"]
+        : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
+  }
+
+  getXAxisTitle(): string {
+    return this.timeRange === 'day' ? 'Day' : this.timeRange === 'month' ? 'Week of Month' : 'Month';
   }
 
   initCounterAnimation(): void {

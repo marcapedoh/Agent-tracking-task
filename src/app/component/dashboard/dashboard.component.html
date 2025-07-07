@@ -82,66 +82,7 @@
       </button>
     </div>
   </div>
-  <!-- Charts Section -->
-  <div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-2">
-    <!-- Transactions Chart -->
-    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-[#002c6b]">Daily Transactions</h3>
-        <div class="flex items-center text-sm">
-          <span class="mr-2 text-[#002c6b]">Period:</span>
-          <div class="relative">
-            <select
-              class="pl-3 pr-8 py-1.5 text-sm bg-gray-100 border-none rounded-md appearance-none focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer transition-all">
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-              <option>Last 90 days</option>
-            </select>
-            <div
-              class="absolute inset-y-0 flex items-center pointer-events-none right-2">
-              <svg class="w-4 h-4 text-gray-500" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="transactionsChart"></div>
-    </div>
 
-    <!-- Alerts by Zone Chart -->
-    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-[#002c6b]">Alerts by Zone</h3>
-        <div class="flex items-center text-sm">
-          <span class="mr-2 text-[#002c6b]">Type:</span>
-          <div class="relative">
-            <select
-              class="pl-3 pr-8 py-1.5 text-sm bg-gray-100 border-none rounded-md appearance-none focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer transition-all">
-              <option>All Alerts</option>
-              <option>Recharge</option>
-              <option>Cashout</option>
-              <option>Transfer</option>
-            </select>
-            <div
-              class="absolute inset-y-0 flex items-center pointer-events-none right-2">
-              <svg class="w-4 h-4 text-gray-500" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="alertsByZoneChart"></div>
-    </div>
-
-  </div>
   <!-- Stats Cards -->
   <div class="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-5">
     <!-- Recharge Alert Count -->
@@ -299,7 +240,151 @@
       </div>
     </div>
   </div>
+  <!-- Charts Section -->
+  <div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-2">
+    <!-- Transactions Chart -->
+    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-[#002c6b]">Daily Transactions</h3>
+        <div class="flex items-center text-sm">
+          <span class="mr-2 text-[#002c6b]">Period:</span>
+          <div class="relative">
+            <select
+              class="pl-3 pr-8 py-1.5 text-sm bg-gray-100 border-none rounded-md appearance-none focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer transition-all">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Last 90 days</option>
+            </select>
+            <div
+              class="absolute inset-y-0 flex items-center pointer-events-none right-2">
+              <svg class="w-4 h-4 text-gray-500" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <apx-chart
+        [series]="transactionsChartOptions.series!"
+        [chart]="transactionsChartOptions.chart!"
+        [colors]="transactionsChartOptions.colors!"
+        [dataLabels]="transactionsChartOptions.dataLabels!"
+        [stroke]="transactionsChartOptions.stroke!"
+        [xaxis]="transactionsChartOptions.xaxis!"
+        [tooltip]="transactionsChartOptions.tooltip!">
+      </apx-chart>
+    </div>
 
+    <!-- Alerts by Zone Chart -->
+    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-[#002c6b]">Alerts by Zone</h3>
+        <div class="flex items-center text-sm">
+          <span class="mr-2 text-[#002c6b]">Type:</span>
+          <div class="relative">
+            <select
+              class="pl-3 pr-8 py-1.5 text-sm bg-gray-100 border-none rounded-md appearance-none focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer transition-all">
+              <option>All Alerts</option>
+              <option>Recharge</option>
+              <option>Cashout</option>
+              <option>Transfer</option>
+            </select>
+            <div
+              class="absolute inset-y-0 flex items-center pointer-events-none right-2">
+              <svg class="w-4 h-4 text-gray-500" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <apx-chart
+        [series]="alertsByZoneChartOptions.series!"
+        [chart]="alertsByZoneChartOptions.chart!"
+        [colors]="alertsByZoneChartOptions.colors!"
+        [plotOptions]="alertsByZoneChartOptions.plotOptions!"
+        [dataLabels]="alertsByZoneChartOptions.dataLabels!"
+        [xaxis]="alertsByZoneChartOptions.xaxis!"
+        [tooltip]="alertsByZoneChartOptions.tooltip!">
+      </apx-chart>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-2">
+    <!-- Cash Flow Chart -->
+    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-[#002c6b]">Cash Flow Analysis</h3>
+        <div class="flex items-center gap-2 text-sm">
+          <span class="w-3 h-3 rounded-full bg-[#2ecc71]"></span>
+          <span>Cash In</span>
+          <span class="w-3 h-3 rounded-full bg-[#e74c3c] ml-2"></span>
+          <span>Cash Out</span>
+        </div>
+      </div>
+      <apx-chart
+        [series]="cashFlowChartOptions.series!"
+        [chart]="cashFlowChartOptions.chart!"
+        [colors]="cashFlowChartOptions.colors!"
+        [dataLabels]="cashFlowChartOptions.dataLabels!"
+        [stroke]="cashFlowChartOptions.stroke!"
+        [xaxis]="cashFlowChartOptions.xaxis!"
+        [yaxis]="cashFlowChartOptions.yaxis!"
+        [legend]="cashFlowChartOptions.legend!"
+        [tooltip]="cashFlowChartOptions.tooltip!">
+      </apx-chart>
+    </div>
+
+    <!-- Amount Estimation Chart -->
+    <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-[#002c6b]">Amount Estimation</h3>
+        <span class="text-sm text-gray-600">XAF <span class="font-bold counter"
+            data-target="2450000">0</span></span>
+      </div>
+      <apx-chart
+        [series]="amountEstimationChartOptions.series!"
+        [chart]="amountEstimationChartOptions.chart!"
+        [colors]="amountEstimationChartOptions.colors!"
+        [dataLabels]="amountEstimationChartOptions.dataLabels!"
+        [stroke]="amountEstimationChartOptions.stroke!"
+        [xaxis]="amountEstimationChartOptions.xaxis!"
+        [yaxis]="amountEstimationChartOptions.yaxis!"
+        [tooltip]="amountEstimationChartOptions.tooltip!">
+      </apx-chart>
+    </div>
+  </div>
+
+  <!-- Mixed Chart -->
+  <div class="p-6 mb-8 bg-white border border-gray-100 shadow-sm rounded-xl">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-[#002c6b]">Zone Performance
+        Overview</h3>
+      <div class="flex items-center gap-2 text-sm">
+        <span class="w-3 h-3 rounded-full bg-[#3498db]"></span>
+        <span>Retailers</span>
+        <span class="w-3 h-3 rounded-full bg-[#9b59b6] ml-2"></span>
+        <span>Amount (XAF 1000)</span>
+      </div>
+    </div>
+    <apx-chart
+      [series]="mixedChartOptions.series!"
+      [chart]="mixedChartOptions.chart!"
+      [colors]="mixedChartOptions.colors!"
+      [stroke]="mixedChartOptions.stroke!"
+      [dataLabels]="mixedChartOptions.dataLabels!"
+      [xaxis]="mixedChartOptions.xaxis!"
+      [yaxis]="mixedChartOptions.yaxis!"
+      [tooltip]="mixedChartOptions.tooltip!">
+    </apx-chart>
+  </div>
   <!-- Map and Recent Activities -->
   <div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-2">
     <!-- Gabon Map -->
