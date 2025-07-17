@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 // import {
 //   ApexAxisChartSeries,
 //   ApexChart,
@@ -57,9 +57,11 @@ interface Retailer {
   code: string;
   fullName: string;
   zone: string;
+  subZone: string;
   status: 'active' | 'inactive' | 'critical';
   type: 'VIP' | 'ordinary';
   principalBalance: number;
+  lastStatusChange?: string; // Ajout de cette propriété optionnelle
   withdrawalBalance: number;
   autoTransferAmount: number;
   lastActivityDate: Date;
@@ -102,15 +104,36 @@ interface Retailer {
   templateUrl: './daily-tracking.component.html',
   styleUrls: ['./daily-tracking.component.css']
 })
-export class DailyTrackingComponent implements OnInit {
-
+export class DailyTrackingComponent implements OnInit, OnDestroy {
+  selectedDays: number = 3;
+  showDaysDropdown: boolean = false;
+  isInactiveFilterActive: boolean = false;
+  selectedZone: string = '';
+  selectedSubzone: string = '';
   chartOptions!: Partial<ChartOptions>;
   Math = Math;
   today: Date = new Date();
   timeRange = 'day';
-  selectedDate = '';  // Pas de filtre initial
-  selectedZone = '';
-  zones: string[] = ['Libreville', 'Port-Gentil', 'Franceville', 'Oyem', 'Mouila'];
+  selectedDate = '';
+  alertInterval: any;
+  currentAlert?: Retailer;
+  showAlertModal = false;
+
+  // Messages
+  predefinedMessages = [
+    "URGENT: Votre solde est critique, merci de recharger",
+    "Rappel: Paiement en attente de validation",
+    "Notification: Transfert disponible sur votre compte",
+    "Alerte: Activité suspecte détectée"
+  ];
+  zones = [
+    { name: 'Libreville', subzones: ['Louis', 'Mont-Bouët', 'Glass', 'Akébé', 'Nombakélé'] },
+    { name: 'Port-Gentil', subzones: ['Industrielle', 'Louis', 'Balise'] },
+    { name: 'Franceville', subzones: ['Mvouli', 'Mikolongo'] },
+    { name: 'Oyem' },  // Sans sous-zones
+    { name: 'Mouila' }, // Sans sous-zones
+    { name: 'Lambaréné', subzones: ['Bikele'] }
+  ];
   filteredRetailers: Retailer[] = [];
   selectedRetailers: Retailer[] = [];
   allSelected: boolean = false;
@@ -118,9 +141,17 @@ export class DailyTrackingComponent implements OnInit {
   selectedRetailer: Retailer | null = null;
   showBulkSMSModal: boolean = false;
   activeTab: 'retailer' | 'aggregator' = 'retailer';
+  activeMainTab: 'list' | 'details' = 'list';
+  selectedPredefinedMessage = '';
+  customMessage = '';
+  selectedRetailerForDetails?: Retailer;
   currentPage: number = 1;
   itemsPerPage: number = 10;
   selectedStatus: string = '';
+  alertPaused = false;
+  alertTimeout: any;
+  lastAlertTime?: Date;
+  alertCooldown = 20 * 60 * 1000; // 20 minutes en millisecond
   itemsPerPageOptions = [10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100];
   statusOptions = [
     { value: '', label: 'All Statuses' },
@@ -131,6 +162,7 @@ export class DailyTrackingComponent implements OnInit {
     { value: 'inactive', label: 'Inactive' }
   ];
   // Bulk SMS properties
+  activeDetailsTab: 'info' | 'messages' = 'info';
   bulkMessages: string[] = [
     'Your account needs attention. Please check your balances.',
     'Your principal balance is low. Please recharge soon.',
@@ -139,114 +171,23 @@ export class DailyTrackingComponent implements OnInit {
   selectedBulkMessage: string = '';
   bulkMessageContent: string = '';
   retailers: Retailer[] = [
-    // 1-10: Libreville VIP
-    {
-      id: 1, code: 'RTL-001', fullName: 'Jean Okou', zone: 'Libreville', status: 'active', type: 'VIP',
-      principalBalance: 1250000, withdrawalBalance: 320000, autoTransferAmount: 150000, lastActivityDate: new Date('2023-05-20'),
-      topAggregatorCode: 'AGG-LB-01', messageReceived: "Veuillez effectuer un retrait urgent",
-      statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-LB-01', fullName: 'Marc Ondo', zone: 'Libreville', status: 'active', phone: '+24101234567', email: 'm.ondo@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(1000000, 300000, 200000, 150000, 100000, 80000)
-    },
-    {
-      id: 2, code: 'RTL-002', fullName: 'Sarah Nguema', zone: 'Libreville', status: 'active', type: 'ordinary',
-      principalBalance: 850000, withdrawalBalance: 210000, autoTransferAmount: 80000, lastActivityDate: new Date('2023-05-18'),
-      topAggregatorCode: 'AGG-LB-02', messageReceived: "Approvisionnement nécessaire",
-      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-LB-02', fullName: 'Pauline Mba', zone: 'Libreville', status: 'active', phone: '+24102345678', email: 'p.mba@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(700000, 200000, 150000, 100000, 50000, 50000)
-    },
-    {
-      id: 3, code: 'RTL-003', fullName: 'David Minko', zone: 'Libreville', status: 'critical', type: 'ordinary',
-      principalBalance: 150000, withdrawalBalance: 95000, autoTransferAmount: 20000, lastActivityDate: new Date('2023-05-15'),
-      topAggregatorCode: 'AGG-LB-03', messageReceived: "Solde critique - approvisionnement immédiat",
-      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-LB-03', fullName: 'Lucie Benga', zone: 'Libreville', status: 'active', phone: '+24103456789', email: 'l.benga@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(100000, 100000, 50000, 60000, 10000, 15000)
-    },
-    {
-      id: 4, code: 'RTL-004', fullName: 'Grace Ndong', zone: 'Libreville', status: 'inactive', type: 'ordinary',
-      principalBalance: 50000, withdrawalBalance: 20000, autoTransferAmount: 0, lastActivityDate: new Date('2023-04-10'),
-      topAggregatorCode: 'AGG-LB-01', messageReceived: "Compte inactif - contactez support",
-      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: false, dormant: true, inactive: true },
-      topAggregator: { code: 'AGG-LB-01', fullName: 'Marc Ondo', zone: 'Libreville', status: 'active', phone: '+24101234567', email: 'm.ondo@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(80000, 30000, 30000, 20000, 0, 0)
-    },
-    {
-      id: 5, code: 'RTL-005', fullName: 'Kevin Mbina', zone: 'Libreville', status: 'active', type: 'VIP',
-      principalBalance: 750000, withdrawalBalance: 180000, autoTransferAmount: 120000, lastActivityDate: new Date('2023-05-19'),
-      topAggregatorCode: 'AGG-LB-04', messageReceived: "Transfert disponible",
-      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-LB-04', fullName: 'Alain Sounga', zone: 'Libreville', status: 'inactive', phone: '+24104567890', email: 'a.sounga@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(600000, 200000, 120000, 80000, 80000, 60000)
-    },
-    {
-      id: 6, code: 'RTL-006', fullName: 'Marie-Louise Engonga', zone: 'Port-Gentil', status: 'active', type: 'VIP',
-      principalBalance: 920000, withdrawalBalance: 310000, autoTransferAmount: 180000, lastActivityDate: new Date('2023-05-20'),
-      topAggregatorCode: 'AGG-PG-01', messageReceived: "Retrait demandé",
-      statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-PG-01', fullName: 'Pierre Moussavou', zone: 'Port-Gentil', status: 'active', phone: '+24105678901', email: 'p.moussavou@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(800000, 250000, 250000, 120000, 120000, 90000)
-    },
-    {
-      id: 7, code: 'RTL-007', fullName: 'Roger Ndong Obiang', zone: 'Port-Gentil', status: 'active', type: 'ordinary',
-      principalBalance: 680000, withdrawalBalance: 250000, autoTransferAmount: 90000, lastActivityDate: new Date('2023-05-18'),
-      topAggregatorCode: 'AGG-PG-02', messageReceived: "Solde disponible pour transfert",
-      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-PG-02', fullName: 'Christine Mbina', zone: 'Port-Gentil', status: 'active', phone: '+24106789012', email: 'c.mbina@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(550000, 200000, 180000, 100000, 60000, 50000)
-    },
-    {
-      id: 8, code: 'RTL-008', fullName: 'Patricia Nzeng', zone: 'Port-Gentil', status: 'critical', type: 'ordinary',
-      principalBalance: 120000, withdrawalBalance: 85000, autoTransferAmount: 15000, lastActivityDate: new Date('2023-05-16'),
-      topAggregatorCode: 'AGG-PG-03', messageReceived: "URGENT: Approvisionnement requis",
-      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-PG-03', fullName: 'Gérard Oyoubi', zone: 'Port-Gentil', status: 'inactive', phone: '+24107890123', email: 'g.oyoubi@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(150000, 50000, 60000, 40000, 10000, 10000)
-    },
-    {
-      id: 9, code: 'RTL-009', fullName: 'Albert Bivigou', zone: 'Port-Gentil', status: 'active', type: 'ordinary',
-      principalBalance: 430000, withdrawalBalance: 190000, autoTransferAmount: 50000, lastActivityDate: new Date('2023-05-17'),
-      topAggregatorCode: 'AGG-PG-01', messageReceived: "Besoin de retrait",
-      statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-PG-01', fullName: 'Pierre Moussavou', zone: 'Port-Gentil', status: 'active', phone: '+24105678901', email: 'p.moussavou@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(350000, 150000, 120000, 90000, 30000, 30000)
-    },
-    {
-      id: 10, code: 'RTL-010', fullName: 'Sylvie Mba', zone: 'Port-Gentil', status: 'inactive', type: 'ordinary',
-      principalBalance: 80000, withdrawalBalance: 30000, autoTransferAmount: 0, lastActivityDate: new Date('2023-03-25'),
-      topAggregatorCode: 'AGG-PG-04', messageReceived: "Compte dormant - réactivation nécessaire",
-      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: false, dormant: true, inactive: true },
-      topAggregator: { code: 'AGG-PG-04', fullName: 'Jacques Ndong', zone: 'Port-Gentil', status: 'active', phone: '+24108901234', email: 'j.ndong@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(120000, 50000, 40000, 20000, 0, 0)
-    },
+    // Libreville (1-15)
+    { id: 1, code: 'RTL-2025-001', fullName: 'Jean Okou', zone: 'Libreville', subZone: 'Mont-Bouët', status: 'active', type: 'VIP', principalBalance: 1850000, withdrawalBalance: 420000, autoTransferAmount: 200000, lastActivityDate: new Date('2025-05-15'), topAggregatorCode: 'AGG-LB-01', messageReceived: "Retrait urgent", statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false }, topAggregator: { code: 'AGG-LB-01', fullName: 'Marc Ondo', zone: 'Libreville', status: 'active', phone: '+24101234567', email: 'm.ondo@ga' }, statistics: { totalTransactions: 124, monthlyAverage: 28, lastTransactionAmount: 75000 } },
+    { id: 2, code: 'RTL-2025-002', fullName: 'Sarah Nguema', zone: 'Libreville', subZone: 'Glass', status: 'active', type: 'ordinary', principalBalance: 950000, withdrawalBalance: 310000, autoTransferAmount: 90000, lastActivityDate: new Date('2025-05-14'), topAggregatorCode: 'AGG-LB-02', messageReceived: "Approvisionnement nécessaire", statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false }, topAggregator: { code: 'AGG-LB-02', fullName: 'Pauline Mba', zone: 'Libreville', status: 'active', phone: '+24102345678', email: 'p.mba@ga' }, statistics: { totalTransactions: 85, monthlyAverage: 22, lastTransactionAmount: 50000 } },
+    { id: 3, code: 'RTL-2025-003', fullName: 'David Minko', zone: 'Libreville', subZone: 'Akébé', status: 'critical', type: 'ordinary', principalBalance: 120000, withdrawalBalance: 110000, autoTransferAmount: 25000, lastActivityDate: new Date('2025-05-10'), topAggregatorCode: 'AGG-LB-03', messageReceived: "Solde critique", statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false }, topAggregator: { code: 'AGG-LB-03', fullName: 'Lucie Benga', zone: 'Libreville', status: 'active', phone: '+24103456789', email: 'l.benga@ga' } },
 
-    // 11-20: Franceville
-    {
-      id: 11, code: 'RTL-011', fullName: 'Daniel Meye', zone: 'Franceville', status: 'active', type: 'VIP',
-      principalBalance: 760000, withdrawalBalance: 220000, autoTransferAmount: 140000, lastActivityDate: new Date('2023-05-19'),
-      topAggregatorCode: 'AGG-FV-01', messageReceived: "Transfert possible",
-      statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-FV-01', fullName: 'Martine Obame', zone: 'Franceville', status: 'active', phone: '+24109012345', email: 'm.obame@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(600000, 200000, 150000, 100000, 100000, 60000)
-    },
-    {
-      id: 12, code: 'RTL-012', fullName: 'Julie Ndoutoume', zone: 'Franceville', status: 'active', type: 'ordinary',
-      principalBalance: 540000, withdrawalBalance: 180000, autoTransferAmount: 70000, lastActivityDate: new Date('2023-05-18'),
-      topAggregatorCode: 'AGG-FV-02', messageReceived: "Besoin d'approvisionnement",
-      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-FV-02', fullName: 'Patrick Mba', zone: 'Franceville', status: 'active', phone: '+24110123456', email: 'p.mba@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(450000, 150000, 120000, 80000, 40000, 40000)
-    },
-    {
-      id: 13, code: 'RTL-013', fullName: 'Olivier Mintsa', zone: 'Franceville', status: 'critical', type: 'ordinary',
-      principalBalance: 95000, withdrawalBalance: 45000, autoTransferAmount: 10000, lastActivityDate: new Date('2023-05-14'),
-      topAggregatorCode: 'AGG-FV-03', messageReceived: "Solde très bas - approvisionnez",
-      statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false },
-      topAggregator: { code: 'AGG-FV-03', fullName: 'Gisèle Minko', zone: 'Franceville', status: 'inactive', phone: '+24111234567', email: 'g.minko@aggregator.ga' },
-      balanceHistory: generateBalanceHistory(120000, 40000, 30000, 20000, 5000, 10000)
-    },
-    // ... (Continuer jusqu'à 50 avec le même modèle)
+    // Port-Gentil (16-30)
+    { id: 16, code: 'RTL-2025-016', fullName: 'Marie Engonga', zone: 'Port-Gentil', subZone: 'Zone Industrielle', status: 'active', type: 'VIP', principalBalance: 2200000, withdrawalBalance: 510000, autoTransferAmount: 250000, lastActivityDate: new Date('2025-05-16'), topAggregatorCode: 'AGG-PG-01', messageReceived: "Retrait demandé", statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false }, topAggregator: { code: 'AGG-PG-01', fullName: 'Pierre Moussavou', zone: 'Port-Gentil', status: 'active', phone: '+24105678901', email: 'p.moussavou@ga' } },
+    { id: 17, code: 'RTL-2025-017', fullName: 'Roger Obiang', zone: 'Port-Gentil', subZone: 'Balise', status: 'active', type: 'ordinary', principalBalance: 780000, withdrawalBalance: 350000, autoTransferAmount: 100000, lastActivityDate: new Date('2025-05-15'), topAggregatorCode: 'AGG-PG-02', messageReceived: "Transfert disponible", statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false }, topAggregator: { code: 'AGG-PG-02', fullName: 'Christine Mbina', zone: 'Port-Gentil', status: 'active', phone: '+24106789012', email: 'c.mbina@ga' } },
+
+    // Franceville (31-40)
+    { id: 31, code: 'RTL-2025-031', fullName: 'Daniel Meye', zone: 'Franceville', subZone: 'Mvouli', status: 'active', type: 'VIP', principalBalance: 1600000, withdrawalBalance: 320000, autoTransferAmount: 180000, lastActivityDate: new Date('2025-05-14'), topAggregatorCode: 'AGG-FV-01', messageReceived: "Transfert possible", statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false }, topAggregator: { code: 'AGG-FV-01', fullName: 'Martine Obame', zone: 'Franceville', status: 'active', phone: '+24109012345', email: 'm.obame@ga' } },
+
+    // Oyem (41-45)
+    { id: 41, code: 'RTL-2025-041', fullName: 'Paul Mba', zone: 'Oyem', subZone: 'Centre-ville', status: 'active', type: 'VIP', principalBalance: 1250000, withdrawalBalance: 280000, autoTransferAmount: 150000, lastActivityDate: new Date('2025-05-13'), topAggregatorCode: 'AGG-OY-01', messageReceived: "Nouvelle transaction", statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false }, topAggregator: { code: 'AGG-OY-01', fullName: 'Alain Nzeng', zone: 'Oyem', status: 'active', phone: '+24111223344', email: 'a.nzeng@ga' } },
+
+    // Mouila (46-50)
+    { id: 46, code: 'RTL-2025-046', fullName: 'Julie Mintsa', zone: 'Mouila', subZone: 'Marché Central', status: 'inactive', type: 'ordinary', principalBalance: 50000, withdrawalBalance: 20000, autoTransferAmount: 0, lastActivityDate: new Date('2025-03-10'), topAggregatorCode: 'AGG-ML-01', messageReceived: "Compte inactif", statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: false, dormant: true, inactive: true }, topAggregator: { code: 'AGG-ML-01', fullName: 'Gérard Oyoubi', zone: 'Mouila', status: 'active', phone: '+24122334455', email: 'g.oyoubi@ga' } }
   ];
   // Dans votre composant TypeScript
   sendSMSDirect(retailer: Retailer): void {
@@ -278,17 +219,305 @@ export class DailyTrackingComponent implements OnInit {
     // });
   }
 
-  // Méthode pour envoyer à l'aggrégateur (existant)
+  toggleDaysDropdown(): void {
+    this.showDaysDropdown = !this.showDaysDropdown;
+  }
 
 
-  // Méthodes utilitaires pour les notifications
 
+
+
+
+
+
+
+  // Helper pour construire le template du message
+  private buildMessageTemplate(content: string, retailer: Retailer): string {
+    const variables = {
+      '{name}': retailer.fullName,
+      '{code}': retailer.code,
+      '{balance}': retailer.principalBalance.toLocaleString(),
+      '{date}': new Date().toLocaleDateString()
+    };
+
+    return content.replace(
+      /{name}|{code}|{balance}|{date}/g,
+      match => variables[match as keyof typeof variables] || match
+    );
+  }
+
+  // Réinitialisation du formulaire
+  private resetMessageForm(): void {
+    this.customMessage = '';
+    this.selectedPredefinedMessage = '';
+  }
+
+  // Notification (à adapter avec votre système de notifications)
+  private showNotification(message: string, type: 'success' | 'error'): void {
+    // Implémentez votre système de notification ici
+    console.log(`${type.toUpperCase()}: ${message}`);
+    // Exemple avec un toast :
+    // this.toastService.show(message, { type });
+  }
+  getInactiveRetailersCount(days: number): number {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+
+    return this.retailers.filter(retailer => {
+      return retailer.statusDetails.inactive &&
+        new Date(retailer.lastActivityDate) <= cutoffDate;
+    }).length;
+  }
+
+  selectDays(days: number): void {
+    this.selectedDays = days;
+    this.showDaysDropdown = false;
+
+    // Réinitialisation si on sélectionne 3 jours (valeur par défaut)
+    if (days === 3) {
+      this.resetInactiveFilter();
+    } else {
+      this.isInactiveFilterActive = true;
+      this.selectedStatus = 'inactive';
+      this.applyFilters();
+    }
+
+    setTimeout(() => this.initCounterAnimation(), 0);
+  }
+
+  resetInactiveFilter(): void {
+    this.isInactiveFilterActive = false;
+    this.selectedStatus = '';
+    this.selectedDays = 3; // Réinitialise à la valeur par défaut
+    this.applyFilters();
+  }
+
+  onZoneChange() {
+    this.selectedSubzone = ''; // Réinitialise la sous-zone
+    this.applyFilters();
+  }
+
+  hasSubzones(): boolean {
+    const zone = this.zones.find(z => z.name === this.selectedZone);
+    return !!zone?.subzones?.length;
+  }
+
+  getCurrentSubzones(): string[] {
+    const zone = this.zones.find(z => z.name === this.selectedZone);
+    return zone?.subzones || [];
+  }
+
+  showInactivityAlert = false;
+  currentInactivityAlert?: Retailer;
+  inactivityAlertInterval: any;
+
+  // Méthodes pour compter les inactifs
+  getInactiveVipCount(days: number): number {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+
+    return this.retailers.filter(r =>
+      r.type === 'VIP' &&
+      r.statusDetails.inactive &&
+      new Date(r.lastActivityDate) <= cutoffDate
+    ).length;
+  }
+  openDetailsModal(retailer: Retailer): void {
+    this.selectedRetailerForDetails = retailer;
+    this.activeDetailsTab = 'info';
+    this.pauseAlerts(); // Mettre en pause les alertes pendant la consultation
+  }
+  pauseAlerts(): void {
+    this.alertPaused = true;
+
+    // Ferme les alertes visibles
+    this.showAlertModal = false;
+    this.showInactivityAlert = false;
+
+    console.log('Alertes mises en pause');
+  }
+
+  resumeAlertsAfterCooldown(): void {
+    // Annule tout timer existant
+    if (this.alertTimeout) {
+      clearTimeout(this.alertTimeout);
+    }
+
+    // Programme la reprise après le cooldown
+    this.alertTimeout = setTimeout(() => {
+      this.alertPaused = false;
+      console.log('Alertes réactivées après cooldown');
+
+      // Vérifie immédiatement s'il y a des alertes à montrer
+      this.checkCriticalAlerts();
+      this.checkInactivityAlerts();
+
+    }, this.alertCooldown);
+  }
+
+  checkCriticalAlerts(): void {
+    // 1. Vérifier si les alertes sont en pause
+    if (this.alertPaused) {
+      console.debug('Alertes en pause - vérification critique ignorée');
+      return;
+    }
+
+    // 2. Obtenir la date limite pour éviter les répétitions
+    const now = new Date();
+    const lastAlertCutoff = new Date(now.getTime() - 30000); // 30 secondes depuis dernière alerte
+
+    // 3. Filtrer les revendeurs critiques
+    const criticalAlerts = this.retailers.filter(retailer => {
+      // Critères pour VIP
+      const isVipCritical = retailer.type === 'VIP' && retailer.status === 'critical';
+
+      // Critères pour revendeur 650
+      const isRegularCritical = retailer.type === 'ordinary' &&
+        retailer.status === 'critical' &&
+        retailer.principalBalance <= 650000;
+
+      // Vérifier si déjà alerté récemment
+      const wasRecentlyAlerted = retailer.lastStatusChange &&
+        new Date(retailer.lastStatusChange) > lastAlertCutoff;
+
+      return (isVipCritical || isRegularCritical) && !wasRecentlyAlerted;
+    });
+
+    // 4. Trier par priorité (VIP d'abord) puis par ancienneté
+    criticalAlerts.sort((a, b) => {
+      if (a.type === 'VIP' && b.type !== 'VIP') return -1;
+      if (a.type !== 'VIP' && b.type === 'VIP') return 1;
+      return new Date(a.lastActivityDate).getTime() - new Date(b.lastActivityDate).getTime();
+    });
+
+    // 5. Afficher l'alerte si nécessaire
+    if (criticalAlerts.length > 0 && !this.showAlertModal) {
+      this.currentAlert = criticalAlerts[0];
+      this.showAlertModal = true;
+      this.lastAlertTime = now;
+
+      // Mettre à jour le timestamp pour éviter les répétitions
+      const retailer = this.retailers.find(r => r.id === this.currentAlert?.id);
+      if (retailer) {
+        retailer.lastStatusChange = now.toISOString();
+      }
+
+      console.log(`Alerte déclenchée pour: ${this.currentAlert.fullName} (${this.currentAlert.code})`);
+
+      // Fermeture automatique après 8 secondes si non interagi
+      setTimeout(() => {
+        if (this.showAlertModal && this.currentAlert?.id === criticalAlerts[0].id) {
+          this.showAlertModal = false;
+        }
+      }, 8000);
+    }
+  }
+
+  // Fermer le modal de détails
+  closeDetailsModal(): void {
+    this.selectedRetailerForDetails = undefined;
+    this.resumeAlertsAfterCooldown(); // Reprendre les alertes
+  }
+
+  // Envoyer un message
+  sendMessage(to: 'retailer' | 'aggregator'): void {
+    if (!this.selectedRetailerForDetails || !this.customMessage) return;
+
+    const recipient = to === 'retailer'
+      ? this.selectedRetailerForDetails
+      : this.selectedRetailerForDetails.topAggregator;
+
+    console.log(`Envoi message à ${to}:`, {
+      recipient: recipient.fullName,
+      phone: "recipient.phone",
+      message: this.customMessage
+    });
+
+    // Ici vous intégrerez votre service d'envoi de SMS
+    // this.smsService.send(...)
+
+    // Réinitialiser le formulaire
+    this.customMessage = '';
+    this.selectedPredefinedMessage = '';
+
+    // Feedback utilisateur
+    alert(`Message envoyé à ${recipient.fullName}`);
+  }
+
+
+  getInactive650Count(days: number): number {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+
+    return this.retailers.filter(r =>
+      r.type === 'ordinary' &&
+      r.principalBalance <= 650000 &&
+      r.statusDetails.inactive &&
+      new Date(r.lastActivityDate) <= cutoffDate
+    ).length;
+  }
+
+  hasInactiveVip(): boolean {
+    return this.getInactiveVipCount(this.selectedDays) > 0;
+  }
+
+  hasInactive650(): boolean {
+    return this.getInactive650Count(this.selectedDays) > 0;
+  }
+
+  getInactiveDays(retailer: Retailer): number {
+    const diff = new Date().getTime() - new Date(retailer.lastActivityDate).getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+  }
+
+  // Initialiser les alertes d'inactivité
+  initInactivityAlerts(): void {
+    this.checkInactivityAlerts();
+    this.inactivityAlertInterval = setInterval(() => {
+      this.checkInactivityAlerts();
+    }, 10000); // Vérifie toutes les 10 secondes
+  }
+
+  checkInactivityAlerts(): void {
+    const inactiveVips = this.retailers.filter(r =>
+      r.type === 'VIP' &&
+      r.statusDetails.inactive &&
+      this.getInactiveDays(r) >= 3 // Seuil de 3 jours pour l'alerte
+    );
+
+    const inactive650s = this.retailers.filter(r =>
+      r.type === 'ordinary' &&
+      r.principalBalance <= 650000 &&
+      r.statusDetails.inactive &&
+      this.getInactiveDays(r) >= 3 // Seuil de 3 jours pour l'alerte
+    );
+
+    // Priorité aux VIP
+    const alertCandidate = inactiveVips.length > 0 ? inactiveVips[0] :
+      inactive650s.length > 0 ? inactive650s[0] :
+        null;
+
+    if (alertCandidate && !this.showInactivityAlert) {
+      this.currentInactivityAlert = alertCandidate;
+      this.showInactivityAlert = true;
+
+      // Fermer automatiquement après 5 secondes
+      setTimeout(() => {
+        this.showInactivityAlert = false;
+      }, 5000);
+    }
+  }
   constructor() { }
 
   ngOnInit(): void {
+    //this.initAlerts();
+    this.initInactivityAlerts();
     this.initCounterAnimation();
     this.initFilterToggle();
     this.filteredRetailers = [...this.retailers];
+  }
+  ngOnDestroy(): void {
+    clearInterval(this.alertInterval);
   }
 
   initChart() {
@@ -357,8 +586,20 @@ export class DailyTrackingComponent implements OnInit {
   }
 
   applyFilters(): void {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - this.selectedDays);
+
     this.filteredRetailers = this.retailers.filter(retailer => {
-      const zoneMatch = !this.selectedZone || retailer.zone === this.selectedZone;
+      // 1. Filtre par zone principale OU sous-zone
+      const zoneMatch = !this.selectedZone ||
+        retailer.zone === this.selectedZone ||
+        retailer.subZone === this.selectedZone;
+
+      // 2. Si une sous-zone est sélectionnée, vérifier qu'elle correspond
+      const subzoneMatch = !this.selectedSubzone ||
+        retailer.subZone === this.selectedSubzone;
+
+      // 3. Filtre par statut
       const statusMatch = !this.selectedStatus ||
         (this.selectedStatus === 'needCashIn' && retailer.statusDetails.needCashIn) ||
         (this.selectedStatus === 'needCashOut' && retailer.statusDetails.needCashOut) ||
@@ -366,14 +607,16 @@ export class DailyTrackingComponent implements OnInit {
         (this.selectedStatus === 'dormant' && retailer.statusDetails.dormant) ||
         (this.selectedStatus === 'inactive' && retailer.statusDetails.inactive);
 
-      return zoneMatch && statusMatch;
+      // 4. Filtre temporel pour les inactifs
+      const inactiveDurationMatch = !this.isInactiveFilterActive ||
+        !this.selectedStatus ||
+        this.selectedStatus !== 'inactive' ||
+        (retailer.statusDetails.inactive && new Date(retailer.lastActivityDate) <= cutoffDate);
+
+      return zoneMatch && subzoneMatch && statusMatch && inactiveDurationMatch;
     });
-    this.currentPage = 1; // Reset to first page when filters change
+    this.currentPage = 1;
   }
-  // get paginatedRetailers(): Retailer[] {
-  //   const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-  //   return this.filteredRetailers.slice(startIndex, startIndex + this.itemsPerPage);
-  // }
 
   get paginatedRetailers(): Retailer[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
@@ -486,6 +729,28 @@ export class DailyTrackingComponent implements OnInit {
       });
     }
   }
+  // initCounterAnimation(): void {
+  //   const counters = document.querySelectorAll<HTMLElement>('.counter');
+  //   const speed = 200;
+
+  //   counters.forEach(counter => {
+  //     const targetAttr = counter.getAttribute('data-target');
+  //     if (!targetAttr) return;
+
+  //     const target = +targetAttr;
+  //     const count = +counter.innerText;
+  //     const increment = target / speed;
+
+  //     if (count < target) {
+  //       counter.innerText = Math.ceil(count + increment).toString();
+  //       setTimeout(() => this.initCounterAnimation(), 1);
+  //     } else {
+  //       counter.innerText = target.toString();
+  //     }
+  //   });
+  // }
+
+
   initCounterAnimation(): void {
     const counters = document.querySelectorAll<HTMLElement>('.counter');
     const speed = 200;
@@ -506,8 +771,6 @@ export class DailyTrackingComponent implements OnInit {
       }
     });
   }
-
-
 
 
 }
