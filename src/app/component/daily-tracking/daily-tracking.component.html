@@ -137,7 +137,7 @@
       </div>
     </div>
 
-    <!-- Inactive Resellers Card -->
+    <!-- Inactive Resellers Card - Version simplifiée -->
     <div
       class="p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-orange-500">
       <div class="flex items-center">
@@ -152,33 +152,15 @@
         <div class="flex-1">
           <div class="flex items-center justify-between">
             <p class="text-sm text-[#002c6b]">Inactive Resellers</p>
-            <div class="relative">
-              <button
-                (click)="toggleDaysDropdown()"
-                class="flex items-center text-xs text-gray-500 hover:text-gray-700 focus:outline-none">
-                <span class="text-[#002c6b]">{{ selectedDays }} day{{
-                  selectedDays !== 1 ? 's' : ''
-                  }}</span>
-                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </button>
-              <div
-                *ngIf="showDaysDropdown"
-                class="absolute right-0 z-10 py-1 mt-1 bg-white rounded-md shadow-lg w-28 ring-1 ring-black ring-opacity-5">
-                <button
-                  *ngFor="let day of [1,2,3,4,5,6,7,14,30]"
-                  (click)="selectDays(day)"
-                  class="block w-full px-4 py-2 text-xs text-left text-[#002c6b] hover:bg-gray-100">
-                  {{ day }} day{{ day !== 1 ? 's' : '' }}
-                </button>
-              </div>
-            </div>
+            <button (click)="openInactiveResellersModal()"
+              class="px-3 py-1 text-xs text-white bg-[#FF6600] rounded-md hover:bg-[#E55C00] transition-colors">
+              Détails
+            </button>
           </div>
-          <h3 class="text-2xl font-bold text-[#002c6b] counter"
-            [attr.data-target]="getInactiveRetailersCount(selectedDays)">0</h3>
+          <h3 class="text-2xl font-bold text-[#002c6b]">
+            <span class="counter"
+              [attr.data-target]="getInactiveRetailersCount(selectedDays)">0</span>
+          </h3>
         </div>
       </div>
     </div>
@@ -202,10 +184,22 @@
         </div>
       </div>
     </div>
-
     <!-- VIP Resellers Card -->
-    <div
-      class="p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-amber-400">
+    <div [class.animate-ping-scale]="vipAlertsCount > 0"
+      class="relative p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-amber-400">
+
+      <!-- Bouton pour ouvrir le modal -->
+      <button *ngIf="vipAlertsCount > 0"
+        (click)="openVipAlertsModal()"
+        class="absolute p-1 transition-colors duration-200 rounded-full top-2 right-2 text-amber-600 hover:text-amber-800 hover:bg-amber-100"
+        title="View VIP alerts">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </button>
+
       <div class="flex items-center">
         <!-- Icône VIP dorée -->
         <div class="p-3 mr-4 rounded-lg text-amber-500 bg-amber-50">
@@ -217,9 +211,9 @@
           </svg>
         </div>
         <div>
-          <p class="text-sm text-[#002c6b]">Premuim Agents</p>
+          <p class="text-sm text-[#002c6b]">Premium Agents</p>
           <h3 class="text-2xl font-bold text-[#002c6b]">
-            <span class="counter" data-target="8">0</span>
+            <span class="counter" [attr.data-target]="vipAlertsCount">0</span>
           </h3>
           <!-- Badge statut VIP -->
           <div class="mt-1">
@@ -237,8 +231,21 @@
     </div>
 
     <!-- Agent 650 Card -->
-    <div
-      class="p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-blue-500">
+    <div [class.animate-ping-scale]="agent650AlertsCount > 0"
+      class="relative p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-md hover:scale-105 hover:border-blue-500">
+
+      <!-- Bouton pour ouvrir le modal -->
+      <button *ngIf="agent650AlertsCount > 0"
+        (click)="openAgent650Modal()"
+        class="absolute p-1 text-blue-600 transition-colors duration-200 rounded-full top-2 right-2 hover:text-blue-800 hover:bg-blue-100"
+        title="View 650 Agents alerts">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </button>
+
       <div class="flex items-center">
         <!-- Icône Agent 650 -->
         <div class="p-3 mr-4 text-blue-600 bg-blue-100 rounded-lg">
@@ -252,7 +259,8 @@
         <div>
           <p class="text-sm text-[#002c6b]">Agents 650</p>
           <h3 class="text-2xl font-bold text-[#002c6b]">
-            <span class="counter" data-target="15">0</span>
+            <span class="counter"
+              [attr.data-target]="agent650AlertsCount">0</span>
           </h3>
           <!-- Badge statut -->
           <div class="mt-1">
@@ -765,6 +773,353 @@
         </button>
         <button type="button" (click)="closeModal()"
           class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showInactiveResellersModal"
+  class="fixed inset-0 z-50 overflow-y-auto">
+  <div
+    class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Overlay -->
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <!-- Contenu du modal -->
+    <div
+      class="inline-block w-full max-w-4xl p-6 my-8 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold text-[#002c6b]">Liste des revendeurs
+          inactifs</h3>
+        <button (click)="showInactiveResellersModal = false"
+          class="text-gray-400 hover:text-gray-500">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Tableau des revendeurs inactifs -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">Nom</th>
+              <th
+                class="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">Code</th>
+              <th
+                class="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">Jours
+                inactifs</th>
+              <th
+                class="px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase">Dernière
+                activité</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let retailer of getInactiveRetailers()">
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{
+                retailer.fullName }}</td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{
+                retailer.code }}</td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                {{ getInactiveDays(retailer) }} jours
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                {{ retailer.lastActivityDate | date:'mediumDate' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end mt-4">
+        <button (click)="showInactiveResellersModal = false"
+          class="px-4 py-2 text-sm font-medium text-white bg-[#FF6600] rounded-md hover:bg-[#E55C00]">
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour les alertes VIP -->
+<div *ngIf="showVipAlertsModal" class="fixed inset-0 z-50 overflow-y-auto">
+  <div
+    class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Fond du modal -->
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"
+        (click)="closeVipAlertsModal()"></div>
+    </div>
+
+    <!-- Contenu du modal -->
+    <div
+      class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full">
+      <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3 class="text-lg leading-6 font-medium text-[#002c6b] mb-4">
+              Premium Agents Alerts ({{ vipAlertsCount }})
+            </h3>
+
+            <!-- Status Legend -->
+            <div
+              class="flex flex-wrap items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
+              <span class="text-sm font-medium text-white">Reseller
+                status:</span>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
+                <span class="text-sm text-white">Need Cash In</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
+                <span class="text-sm text-white">Need Cash Out</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
+                <span class="text-sm text-white">Eligible for auto
+                  Transfer</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
+                <span class="text-sm text-white">Inactive</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
+                <span class="text-sm text-white">Dormant</span>
+              </div>
+            </div>
+
+            <!-- Tableau des alertes VIP -->
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-[#004080]">
+                  <tr>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Zone
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Category
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Status
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Reseller Code
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Full Name
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Alert Details
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr *ngFor="let alert of vipAlerts" class="hover:bg-gray-50">
+                    <td
+                      class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+                      {{ alert.zone }}
+                    </td>
+                    <td
+                      class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+                      {{ alert.type }}
+                    </td>
+                    <td class="px-3 py-4 text-center whitespace-nowrap">
+                      <div class="flex items-center justify-center gap-2">
+                        <span *ngIf="alert.statusDetails.needCashIn"
+                          class="inline-block w-5 h-5 bg-blue-500 rounded-full"
+                          title="Need Cash In"></span>
+                        <span *ngIf="alert.statusDetails.needCashOut"
+                          class="inline-block w-5 h-5 bg-purple-500 rounded-full"
+                          title="Need Cash Out"></span>
+                        <span *ngIf="alert.statusDetails.availableForTransfer"
+                          class="inline-block w-5 h-5 bg-green-500 rounded-full"
+                          title="Available for Transfer"></span>
+                        <span *ngIf="alert.statusDetails.inactive"
+                          class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
+                          title="Inactive"></span>
+                        <span *ngIf="alert.statusDetails.dormant"
+                          class="inline-block w-5 h-5 bg-red-500 rounded-full"
+                          title="Dormant"></span>
+                      </div>
+                    </td>
+                    <td
+                      class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
+                      {{ alert.code }}
+                    </td>
+                    <td
+                      class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+                      {{ alert.fullName }}
+                    </td>
+                    <td
+                      class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+                      {{ alert.alertMessage }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button"
+          (click)="closeVipAlertsModal()"
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#FF6600] text-base font-medium text-white hover:bg-[#e65c00] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6600] sm:ml-3 sm:w-auto sm:text-sm">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour les agents 650 -->
+<div *ngIf="showAgent650Modal" class="fixed inset-0 z-50 overflow-y-auto">
+  <div
+    class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Fond du modal -->
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"
+        (click)="closeAgent650Modal()"></div>
+    </div>
+
+    <!-- Contenu du modal -->
+    <div
+      class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full">
+      <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3 class="text-lg leading-6 font-medium text-[#002c6b] mb-4">
+              Agents 650 List ({{ agent650AlertsCount }})
+            </h3>
+
+            <!-- Status Legend -->
+            <div
+              class="flex flex-wrap items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
+              <span class="text-sm font-medium text-white">Reseller
+                status:</span>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
+                <span class="text-sm text-white">Need Cash In</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
+                <span class="text-sm text-white">Need Cash Out</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
+                <span class="text-sm text-white">Eligible for auto
+                  Transfer</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
+                <span class="text-sm text-white">Inactive</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
+                <span class="text-sm text-white">Dormant</span>
+              </div>
+            </div>
+
+            <!-- Tableau des agents 650 -->
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-[#004080]">
+                  <tr>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Zone
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Category
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Status
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Reseller Code
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Full Name
+                    </th>
+                    <th scope="col"
+                      class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+                      Current Balance
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr *ngFor="let agent of agent650Alerts"
+                    class="hover:bg-gray-50">
+                    <td
+                      class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+                      {{ agent.zone }}
+                    </td>
+                    <td
+                      class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+                      {{ agent.type }}
+                    </td>
+                    <td class="px-3 py-4 text-center whitespace-nowrap">
+                      <div class="flex items-center justify-center gap-2">
+                        <span *ngIf="agent.statusDetails.needCashIn"
+                          class="inline-block w-5 h-5 bg-blue-500 rounded-full"
+                          title="Need Cash In"></span>
+                        <span *ngIf="agent.statusDetails.needCashOut"
+                          class="inline-block w-5 h-5 bg-purple-500 rounded-full"
+                          title="Need Cash Out"></span>
+                        <span *ngIf="agent.statusDetails.availableForTransfer"
+                          class="inline-block w-5 h-5 bg-green-500 rounded-full"
+                          title="Available for Transfer"></span>
+                        <span *ngIf="agent.statusDetails.inactive"
+                          class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
+                          title="Inactive"></span>
+                        <span *ngIf="agent.statusDetails.dormant"
+                          class="inline-block w-5 h-5 bg-red-500 rounded-full"
+                          title="Dormant"></span>
+                      </div>
+                    </td>
+                    <td
+                      class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
+                      {{ agent.code }}
+                    </td>
+                    <td
+                      class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+                      {{ agent.fullName }}
+                    </td>
+                    <td
+                      class="px-3 py-4 text-sm font-bold text-center text-blue-600 whitespace-nowrap">
+                      {{ agent.currentBalance | currency:'XAF':'symbol':'1.0-0'
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button"
+          (click)="closeAgent650Modal()"
+          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-blue-800 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
           Close
         </button>
       </div>

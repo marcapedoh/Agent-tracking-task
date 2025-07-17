@@ -310,7 +310,12 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   showInactivityAlert = false;
   currentInactivityAlert?: Retailer;
   inactivityAlertInterval: any;
-
+  vipAlertsCount: number = 5; // Mettez ici le vrai nombre d'alertes
+  vipAlerts: any[] = []; // Remplissez ce tableau avec les vraies alertes VIP
+  agent650AlertsCount: number = 15; // Ou valeur dynamique
+  agent650Alerts: any[] = []; // Remplir avec vos données
+  showAgent650Modal: boolean = false;
+  showVipAlertsModal: boolean = false;
   // Méthodes pour compter les inactifs
   getInactiveVipCount(days: number): number {
     const cutoffDate = new Date();
@@ -335,6 +340,24 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     this.showInactivityAlert = false;
 
     console.log('Alertes mises en pause');
+  }
+  openVipAlertsModal() {
+    // Ici vous pourriez charger les données des alertes si nécessaire
+    this.showVipAlertsModal = true;
+  }
+
+  // Méthode pour fermer le modal
+  closeVipAlertsModal() {
+    this.showVipAlertsModal = false;
+  }
+  // Méthodes pour gérer le modal
+  openAgent650Modal() {
+    // Charger les données si nécessaire
+    this.showAgent650Modal = true;
+  }
+
+  closeAgent650Modal() {
+    this.showAgent650Modal = false;
   }
 
   resumeAlertsAfterCooldown(): void {
@@ -412,6 +435,23 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
       }, 8000);
     }
   }
+  showInactiveResellersModal = false;
+
+  openInactiveResellersModal(): void {
+    this.showInactiveResellersModal = true;
+  }
+
+  // Méthode pour récupérer les revendeurs inactifs
+  getInactiveRetailers(): Retailer[] {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - this.selectedDays);
+
+    return this.retailers.filter(retailer =>
+      retailer.statusDetails.inactive &&
+      new Date(retailer.lastActivityDate) <= cutoffDate
+    );
+  }
+
 
   // Fermer le modal de détails
   closeDetailsModal(): void {

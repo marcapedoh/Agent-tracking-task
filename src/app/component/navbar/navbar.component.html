@@ -1,5 +1,5 @@
 <nav
-  class="fixed top-0 left-0 right-0 flex items-center justify-between bg-white px-8 h-[70px] border-b-[3px] border-[#e60012] z-[1000] font-['Poppins',_sans-serif]">
+  class="fixed top-0 left-0 right-0 flex items-center justify-between bg-white px-4 sm:px-8 h-[70px] border-b-[3px] border-[#e60012] z-[1000] font-['Poppins',_sans-serif]">
   <div class="flex items-center gap-4">
     <div
       class="w-[50px] h-[50px] bg-[#004080] rounded-full flex items-center justify-center shadow-[0_0_6px_rgba(0,0,0,0.15)]">
@@ -15,6 +15,7 @@
       Tracking</span>
   </div>
 
+  <!-- Menu desktop (hidden on mobile) -->
   <div class="hidden md:block">
     <div class="flex gap-8">
       <a *ngFor="let menu of displayedMenus"
@@ -27,75 +28,95 @@
     </div>
   </div>
 
-  <div class="relative">
-    <!-- Zone cliquable pour ouvrir le dropdown -->
-    <div
-      (click)="toggleUserDropdown()"
-      class="flex items-center gap-2 p-2 transition-colors duration-200 rounded-md cursor-pointer hover:bg-gray-100">
-      <!-- Icône d'utilisateur -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-        fill="currentColor" class="w-6 h-6 text-[#002c6b]">
-        <path fill-rule="evenodd"
-          d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-          clip-rule="evenodd" />
-      </svg>
+  <div class="flex items-center gap-4">
+    <!-- User dropdown -->
+    <div class="relative hidden md:block">
+      <div (click)="toggleUserDropdown()"
+        class="flex items-center gap-2 p-2 transition-colors duration-200 rounded-md cursor-pointer hover:bg-gray-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+          fill="currentColor" class="w-6 h-6 text-[#002c6b]">
+          <path fill-rule="evenodd"
+            d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+            clip-rule="evenodd" />
+        </svg>
+        <span class="font-semibold text-[#002c6b]">APEDO Kossi Emmanuel</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+          fill="currentColor"
+          class="w-4 h-4 text-[#002c6b] transition-transform duration-200"
+          [class.rotate-180]="isUserDropdownOpen">
+          <path fill-rule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+            clip-rule="evenodd" />
+        </svg>
+      </div>
 
-      <!-- Nom de l'utilisateur -->
-      <span class="font-semibold text-[#002c6b]">APEDO Kossi Emmanuel</span>
-
-      <!-- Icône de flèche -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-        fill="currentColor"
-        class="w-4 h-4 text-[#002c6b] transition-transform duration-200"
-        [class.transform.rotate-180]="isUserDropdownOpen">
-        <path fill-rule="evenodd"
-          d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-          clip-rule="evenodd" />
-      </svg>
-    </div>
-
-    <!-- Dropdown menu -->
-    <div *ngIf="isUserDropdownOpen"
-      class="absolute right-0 z-50 w-56 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-      <div class="py-1">
-        <!-- Informations utilisateur -->
-        <div class="px-4 py-2 border-b border-gray-100">
-          <p class="text-sm font-medium text-gray-900">APEDO Kossi Emmanuel</p>
-          <p class="text-xs text-gray-500">emmanuel@gmail.com</p>
-          <p class="text-xs text-gray-500">ZONE MANAGER</p>
+      <div *ngIf="isUserDropdownOpen"
+        class="absolute right-0 z-50 w-56 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <div class="py-1">
+          <div class="px-4 py-2 border-b border-gray-100">
+            <p class="text-sm font-medium text-gray-900">APEDO Kossi
+              Emmanuel</p>
+            <p class="text-xs text-gray-500">emmanuel@gmail.com</p>
+            <p class="text-xs text-gray-500">ZONE MANAGER</p>
+          </div>
+          <button (click)="logout()"
+            class="flex w-full items-center gap-2 px-4 py-2 text-sm font-semibold text-[#FF6600] hover:bg-[#e6f0ff] transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+              fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm10.72 4.72a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H9a.75.75 0 010-1.5h10.94l-1.72-1.72a.75.75 0 010-1.06z"
+                clip-rule="evenodd" />
+            </svg>
+            Déconnexion
+          </button>
         </div>
-
-        <!-- Bouton de déconnexion -->
-        <button
-          (click)="logout()"
-          class="flex w-full items-center gap-2 px-4 py-2 text-sm font-semibold text-[#FF6600] hover:bg-[#e6f0ff] transition-colors duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-            fill="currentColor" class="w-5 h-5">
-            <path fill-rule="evenodd"
-              d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm10.72 4.72a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H9a.75.75 0 010-1.5h10.94l-1.72-1.72a.75.75 0 010-1.06z"
-              clip-rule="evenodd" />
-          </svg>
-          Déconnexion
-        </button>
       </div>
     </div>
+
+    <!-- Menu hamburger button (mobile only) -->
+    <button (click)="toggleMenu()"
+      class="md:hidden text-[#002c6b] cursor-pointer p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
   </div>
 
-  <button
-    (click)="toggleMenu()"
-    class="md:hidden text-[#002c6b] cursor-pointer">
+  <!-- Mobile menu overlay -->
+  <div *ngIf="isMenuOpen" (click)="toggleMenu()"
+    class="fixed inset-0 z-[1000] bg-black bg-opacity-50 md:hidden"></div>
 
-  </button>
-</nav>
+  <!-- Mobile menu -->
+  <div
+    [class]="'fixed top-[70px] right-0 bg-white w-[280px] h-[calc(100vh-70px)] shadow-[-3px_0_12px_rgba(0,0,0,0.2)] transition-transform duration-300 flex flex-col p-4 gap-4 z-[1001] ' + (isMenuOpen ? 'translate-x-0' : 'translate-x-full')">
+    <!-- User info in mobile menu -->
+    <div class="p-4 border-b border-gray-200">
+      <p class="font-medium text-gray-900">APEDO Kossi Emmanuel</p>
+      <p class="text-sm text-gray-500">emmanuel@gmail.com</p>
+      <p class="text-sm text-gray-500">ZONE MANAGER</p>
+    </div>
 
-<div
-  [class]="'fixed top-[70px] right-0 bg-white w-[200px] max-w-[80vw] h-[calc(100vh-70px)] shadow-[-3px_0_12px_rgba(0,0,0,0.2)] transition-transform duration-300 flex flex-col p-4 gap-4 z-[1001] ' + (isMenuOpen ? 'translate-x-0' : 'translate-x-full')">
-  <a *ngFor="let menu of displayedMenus"
-    [routerLink]="menu.route"
-    routerLinkActive="active"
-    [routerLinkActiveOptions]="{ exact: true }"
-    (click)="toggleMenu()"
-    class="no-underline font-semibold text-[1.1rem] text-[#002c6b] pb-[6px] border-b-2 border-transparent hover:text-[#FF6600] hover:border-[#FF6600] transition-colors duration-300">
-    {{ menu.label }}
-  </a>
-</div>
+    <!-- Menu links -->
+    <a *ngFor="let menu of displayedMenus"
+      [routerLink]="menu.route"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="toggleMenu()"
+      class="no-underline font-semibold text-[1.1rem] text-[#002c6b] pb-[6px] border-b-2 border-transparent hover:text-[#FF6600] hover:border-[#FF6600] transition-colors duration-300">
+      {{ menu.label }}
+    </a>
+
+    <!-- Logout button in mobile menu -->
+    <button (click)="logout(); toggleMenu()"
+      class="flex items-center gap-2 mt-auto p-2 text-sm font-semibold text-[#FF6600] hover:bg-[#e6f0ff] transition-colors duration-200">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        fill="currentColor" class="w-5 h-5">
+        <path fill-rule="evenodd"
+          d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm10.72 4.72a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H9a.75.75 0 010-1.5h10.94l-1.72-1.72a.75.75 0 010-1.06z"
+          clip-rule="evenodd" />
+      </svg>
+      Déconnexion
+    </button>
+  </div>
