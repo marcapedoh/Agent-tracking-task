@@ -77,7 +77,7 @@ export class InactiveDetailsComponent implements OnInit {
   agents: any[] = [];
   filteredAgents: any[] = [];
   paginatedAgents: any[] = [];
-
+  agentType: string = ""
   // Sélection multiple
   selectedAgents: any[] = [];
   allAgentsSelected: boolean = false;
