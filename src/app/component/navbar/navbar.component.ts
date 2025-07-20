@@ -3,8 +3,9 @@ import { AuthService } from 'src/app/services/auth.service';
 
 interface MenuItem {
   label: string;
-  route: string;
+  route?: string;  // Rendons cette propriété optionnelle avec le ?
   roles?: string[];
+  children?: MenuItem[];
 }
 
 // Typage clair des rôles possibles
@@ -14,9 +15,16 @@ type UserRole = 'zone_manager' | 'admin' | 'analyst';
 export const MENU_ITEMS: Record<UserRole, MenuItem[]> = {
   zone_manager: [
     { label: 'Dashboard', route: 'dashboard' },
-    { label: 'Daily Tracking', route: 'daily-tracking' },
-    { label: 'Rapports', route: '/zone-manager/resellers' },
-    { label: 'Communication', route: '/zone-manager/communication' },
+    {
+      label: 'Daily Tracking',
+      children: [
+        { label: 'Global view', route: 'daily-tracking' },
+        { label: 'Inactive details', route: 'daily-tracking/inactive-detail' },
+      ]
+    },
+    { label: 'Campaigns', route: '/zone-manager/resellers' },
+    { label: 'Reports', route: '/zone-manager/resellers' },
+    { label: 'History', route: '/zone-manager/communication' },
   ],
   admin: [
     { label: 'Dashboard', route: '/home/dashboard' },

@@ -76,23 +76,28 @@
   </div>
 
   <!-- Grid container for the stats cards. Responsive: 1 column mobile, 2 columns tablet, 5 columns desktop -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6 mb-4">
+  <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-5">
 
     <!-- Cashing Required Card -->
-    <div class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
       <div class="flex items-center">
         <div class="p-3 mr-4 text-blue-600 bg-blue-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
         <div>
           <p class="text-sm text-[#002c6b]">Cashing required</p>
-          <h3 class="text-2xl font-bold text-[#002c6b] counter" data-target="24">0</h3>
+          <h3 class="text-2xl font-bold text-[#002c6b] counter"
+            data-target="24">0</h3>
         </div>
       </div>
       <!-- Tooltip -->
-      <div class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
                 bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
                 whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
         Agents needing virtual money transfer to their main account.
@@ -100,21 +105,25 @@
     </div>
 
     <!-- Cashout Required Card -->
-    <div class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
       <div class="flex items-center">
         <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </div>
         <div>
           <p class="text-sm text-[#002c6b]">Cashout required</p>
-          <h3 class="text-2xl font-bold text-[#002c6b] counter" data-target="18">0</h3>
+          <h3 class="text-2xl font-bold text-[#002c6b] counter"
+            data-target="18">0</h3>
         </div>
       </div>
       <!-- Tooltip -->
-      <div class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
                 bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
                 whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
         Agents needing physical cash withdrawal via an aggregator.
@@ -122,21 +131,25 @@
     </div>
 
     <!-- Auto Transfer Card -->
-    <div class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
       <div class="flex items-center">
         <div class="p-3 mr-4 text-green-600 bg-green-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
         </div>
         <div>
           <p class="text-sm text-[#002c6b]">Auto Transfer</p>
-          <h3 class="text-2xl font-bold text-[#002c6b] counter" data-target="7">0</h3>
+          <h3 class="text-2xl font-bold text-[#002c6b] counter"
+            data-target="7">0</h3>
         </div>
       </div>
       <!-- Tooltip -->
-      <div class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
                 bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
                 whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
         Agents transferring money from main to cashout accounts.
@@ -144,23 +157,27 @@
     </div>
 
     <!-- Inactive Agents Card -->
-    <div class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
       <div class="flex items-center">
         <div class="p-3 mr-4 text-yellow-600 bg-yellow-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div class="flex-1">
           <p class="text-sm text-[#002c6b]">Inactive Agents</p>
           <h3 class="text-2xl font-bold text-[#002c6b]">
-            <span class="counter" [attr.data-target]="getInactiveRetailersCount(selectedDays)">0</span>
+            <span class="counter"
+              [attr.data-target]="getInactiveRetailersCount(selectedDays)">0</span>
           </h3>
         </div>
       </div>
       <!-- Tooltip -->
-      <div class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
                 bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
                 whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
         Agents inactive for 1 to 5 days.
@@ -168,13 +185,17 @@
     </div>
 
     <!-- Dormant Agents Card -->
-    <div class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
       <div class="flex items-center">
         <div class="p-3 mr-4 text-orange-600 bg-orange-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+            fill="currentColor" class="size-6">
+            <path fill-rule="evenodd"
+              d="M12 2.25A6.75 6.75 0 0 0 5.25 9v.75a8.217 8.217 0 0 1-2.119 5.52.75.75 0 0 0 .298 1.206c1.544.57 3.16.99 4.831 1.243a3.75 3.75 0 1 0 7.48 0 24.583 24.583 0 0 0 4.83-1.244.75.75 0 0 0 .298-1.205 8.217 8.217 0 0 1-2.118-5.52V9A6.75 6.75 0 0 0 12 2.25ZM9.75 18c0-.034 0-.067.002-.1a25.05 25.05 0 0 0 4.496 0l.002.1a2.25 2.25 0 1 1-4.5 0Zm.75-10.5a.75.75 0 0 0 0 1.5h1.599l-2.223 3.334A.75.75 0 0 0 10.5 13.5h3a.75.75 0 0 0 0-1.5h-1.599l2.223-3.334A.75.75 0 0 0 13.5 7.5h-3Z"
+              clip-rule="evenodd" />
           </svg>
+
         </div>
         <div>
           <p class="text-sm text-[#002c6b]">Dormant Agents</p>
@@ -184,7 +205,8 @@
         </div>
       </div>
       <!-- Tooltip -->
-      <div class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
                 bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
                 whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
         Agents inactive for more than 5 days.
@@ -192,54 +214,6 @@
     </div>
 
   </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   <!-- Retailers Table Section -->
   <div class="p-6 mb-8 bg-white border border-gray-100 rounded-lg shadow-sm">

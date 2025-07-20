@@ -12,6 +12,7 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { DailyTrackingComponent } from './component/daily-tracking/daily-tracking.component';
 import { FormsModule } from '@angular/forms';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { InactiveDetailsComponent } from './component/inactive-details/inactive-details.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     NavbarComponent,
     DashboardComponent,
     FooterComponent,
-    DailyTrackingComponent
+    DailyTrackingComponent,
+    InactiveDetailsComponent
   ],
   imports: [
     BrowserModule,

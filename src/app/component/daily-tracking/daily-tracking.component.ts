@@ -223,14 +223,6 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     this.showDaysDropdown = !this.showDaysDropdown;
   }
 
-
-
-
-
-
-
-
-
   // Helper pour construire le template du message
   private buildMessageTemplate(content: string, retailer: Retailer): string {
     const variables = {

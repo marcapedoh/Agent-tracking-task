@@ -4,6 +4,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './component/login/login.component';
 import { DashboardComponent } from './component/dashboard/dashboard.component';
 import { DailyTrackingComponent } from './component/daily-tracking/daily-tracking.component';
+import { InactiveDetailsComponent } from './component/inactive-details/inactive-details.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,10 @@ const routes: Routes = [
       {
         path: "daily-tracking",
         component: DailyTrackingComponent
+      },
+      {
+        path: "daily-tracking/inactive-detail",
+        component: InactiveDetailsComponent
       }
     ]
   },

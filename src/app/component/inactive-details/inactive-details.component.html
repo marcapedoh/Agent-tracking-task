@@ -1,0 +1,189 @@
+ <div class="min-h-screen p-6 bg-gray-50">
+  <div
+    class="flex flex-col items-start justify-between mb-8 md:flex-row md:items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-[#002c6b] inline-block mr-2">Daily
+        Tracking Statistics</h1>
+      <span class="text-sm text-[#002c6b]">{{ today | date:'fullDate' }}</span>
+      <p class="text-gray-600">Monitor cash flow and agent performance</p>
+    </div>
+
+    <div class="flex flex-col gap-4 mt-4 sm:flex-row md:mt-0">
+      <div class="relative">
+
+        <div
+          class="flex flex-col w-full space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 md:w-auto">
+
+          <!-- Status Filter -->
+          <select [(ngModel)]="selectedStatus" (change)="applyFilters()"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
+            <option *ngFor="let option of statusOptions"
+              [value]="option.value">{{option.label}}</option>
+          </select>
+
+          <!-- Zone Filter -->
+          <div class="flex flex-col space-y-2">
+            <!-- Sélecteur principal -->
+            <select [(ngModel)]="selectedZone" (change)="onZoneChange()"
+              class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
+              <option value>All Zones</option>
+              <option *ngFor="let zone of zones"
+                [value]="zone.name">{{zone.name}}</option>
+            </select>
+
+            <!-- Sous-zones (affiché conditionnellement) -->
+            <div *ngIf="hasSubzones()" class="flex items-center pl-4">
+              <!-- Ligne verticale décorative -->
+              <div
+                class="w-4 h-8 border-l-2 border-gray-300 border-dashed"></div>
+              <!-- Flèche -->
+              <svg class="w-4 h-4 -ml-4 text-gray-400" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+              <!-- Sélecteur des sous-zones -->
+              <select [(ngModel)]="selectedSubzone" (change)="applyFilters()"
+                class="w-full px-3 py-2 ml-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-36">
+                <option value>All Subzones</option>
+                <option *ngFor="let subzone of getCurrentSubzones()"
+                  [value]="subzone">{{subzone}}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Date Filter -->
+          <input type="date" [(ngModel)]="selectedDate"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
+
+        </div>
+
+      </div>
+
+      <button
+        class="flex items-center gap-2 px-4 py-2 text-white transition-colors bg-[#FF6600] rounded-lg hover:bg-[#FF6614]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+          viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+            clip-rule="evenodd" />
+        </svg>
+        <span class="font-medium">Export Report</span>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-4">
+    <!-- VIP Agent Card -->
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FFD70044] hover:border-amber-400">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 rounded-lg text-amber-500 bg-amber-50">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <!-- SVG Crown Icon for VIP -->
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-amber-800">VIP Agents alert</p>
+          <h3 class="text-2xl font-bold text-amber-600 counter"
+            data-target="12">0</h3>
+        </div>
+      </div>
+      <!-- Tooltip -->
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+              bg-amber-600 text-white text-xs rounded px-3 py-1 shadow-md
+              whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Our premium agents with exclusive benefits and privileges
+      </div>
+    </div>
+
+    <!-- Cashout Required Card -->
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-[#002c6b]">Cashout required</p>
+          <h3 class="text-2xl font-bold text-[#002c6b] counter"
+            data-target="18">0</h3>
+        </div>
+      </div>
+      <!-- Tooltip -->
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+                bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
+                whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Agents needing physical cash withdrawal via an aggregator.
+      </div>
+    </div>
+
+    <!-- Agents 650 Card -->
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#8B5CF644] hover:border-purple-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <!-- SVG User Group Icon -->
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-purple-800">Agents 650 Alerts</p>
+          <h3 class="text-2xl font-bold text-purple-600 counter"
+            data-target="25">0</h3>
+        </div>
+      </div>
+      <!-- Tooltip -->
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+              bg-purple-600 text-white text-xs rounded px-3 py-1 shadow-md
+              whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Our complete network of 650 qualified agents
+      </div>
+    </div>
+
+    <!-- Inactive Agents Card -->
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-yellow-600 bg-yellow-100 rounded-lg">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm text-[#002c6b]">Inactive Agents</p>
+          <h3 class="text-2xl font-bold text-[#002c6b]">
+            <span class="counter"
+              [attr.data-target]="getInactiveRetailersCount(selectedDays)">0</span>
+          </h3>
+        </div>
+      </div>
+      <!-- Tooltip -->
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+                bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
+                whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Agents inactive for 1 to 5 days.
+      </div>
+    </div>
+
+  </div>
+
+</div>

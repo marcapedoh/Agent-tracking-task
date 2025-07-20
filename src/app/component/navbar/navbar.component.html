@@ -18,13 +18,41 @@
   <!-- Menu desktop (hidden on mobile) -->
   <div class="hidden md:block">
     <div class="flex gap-8">
-      <a *ngFor="let menu of displayedMenus"
-        [routerLink]="menu.route"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="no-underline font-semibold text-[#002c6b] pb-[3px] border-b-2 border-transparent hover:text-[#FF6600] hover:border-[#FF6600] transition-colors duration-300">
-        {{ menu.label }}
-      </a>
+      <ng-container *ngFor="let menu of displayedMenus">
+        <!-- Menu simple -->
+        <a *ngIf="!menu.children"
+          [routerLink]="menu.route"
+          routerLinkActive="active"
+          class="no-underline font-semibold text-[#002c6b] pb-[3px] border-b-2 border-transparent hover:text-[#FF6600] hover:border-[#FF6600] transition-colors duration-300">
+          {{ menu.label }}
+        </a>
+
+        <!-- Menu avec dropdown -->
+        <div *ngIf="menu.children" class="relative group">
+          <button
+            class="flex items-center gap-1 font-semibold text-[#002c6b] pb-[3px] border-b-2 border-transparent hover:text-[#FF6600] hover:border-[#FF6600] transition-colors duration-300">
+            {{ menu.label }}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+              fill="currentColor" class="w-4 h-4">
+              <path fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                clip-rule="evenodd" />
+            </svg>
+          </button>
+
+          <div
+            class="absolute left-0 z-50 hidden w-48 mt-2 origin-top-left bg-white rounded-md shadow-lg group-hover:block ring-1 ring-black ring-opacity-5">
+            <div class="py-1">
+              <a *ngFor="let child of menu.children"
+                [routerLink]="child.route"
+                routerLinkActive="active"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#FF6600]">
+                {{ child.label }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </ng-container>
     </div>
   </div>
 
