@@ -55,7 +55,8 @@ interface Retailer {
 })
 export class InactiveDetailsComponent implements OnInit {
 
-
+  Math = Math;
+  itemsPerPageOptions = [10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100];
   itemsPerPage: number = 10;
   today: Date = new Date();
   isInactiveFilterActive: boolean = false;
@@ -73,6 +74,13 @@ export class InactiveDetailsComponent implements OnInit {
   selectedZone: string = '';
   selectedDays: number = 3;
   filteredRetailers: Retailer[] = [];
+  agents: any[] = [];
+  filteredAgents: any[] = [];
+  paginatedAgents: any[] = [];
+
+  // Sélection multiple
+  selectedAgents: any[] = [];
+  allAgentsSelected: boolean = false;
   selectedDate = '';
   zones = [
     { name: 'Libreville', subzones: ['Louis', 'Mont-Bouët', 'Glass', 'Akébé', 'Nombakélé'] },
@@ -124,6 +132,64 @@ export class InactiveDetailsComponent implements OnInit {
     }).length;
   }
 
+  toggleSelectAllAgents(event: any): void {
+    this.allAgentsSelected = event.target.checked;
+
+    if (this.allAgentsSelected) {
+      this.selectedAgents = [...this.paginatedAgents];
+    } else {
+      this.selectedAgents = [];
+    }
+  }
+
+  isAgentSelected(agent: any): boolean {
+    return this.selectedAgents.some(a => a.code === agent.code);
+  }
+
+  toggleAgentSelection(agent: any, event: any): void {
+    event.stopPropagation();
+
+    if (event.target.checked) {
+      this.selectedAgents.push(agent);
+    } else {
+      this.selectedAgents = this.selectedAgents.filter(a => a.code !== agent.code);
+    }
+
+    // Met à jour l'état de la case à cocher "Tout sélectionner"
+    this.allAgentsSelected = this.selectedAgents.length === this.paginatedAgents.length;
+  }
+
+  // Ouvre le modal pour voir les détails d'un agent
+  openAgentModal(agent: any): void {
+    // Implémentez votre logique pour ouvrir un modal avec les détails de l'agent
+    console.log('Ouvrir modal pour:', agent);
+    // this.modalService.open(agent);
+  }
+
+  // Ouvre le modal pour les actions groupées
+  openBulkActionModal(): void {
+    // Implémentez votre logique pour les actions groupées
+    console.log('Agents sélectionnés:', this.selectedAgents);
+    // this.bulkActionService.open(this.selectedAgents);
+  }
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = startPage + maxVisiblePages - 1;
+
+    if (endPage > this.totalPages) {
+      endPage = this.totalPages;
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  }
   initCounterAnimation(): void {
     const counters = document.querySelectorAll<HTMLElement>('.counter');
     const speed = 200;
@@ -181,6 +247,14 @@ export class InactiveDetailsComponent implements OnInit {
       return zoneMatch && subzoneMatch && statusMatch && inactiveDurationMatch;
     });
     this.currentPage = 1;
+  }
+  getInactiveDays(lastActivityDate: Date): number {
+    if (!lastActivityDate) return 0;
+
+    const today = new Date();
+    const lastDate = new Date(lastActivityDate);
+    const diffTime = Math.abs(today.getTime() - lastDate.getTime());
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Convertir en jours
   }
   get paginatedRetailers(): Retailer[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
