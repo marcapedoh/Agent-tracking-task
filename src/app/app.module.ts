@@ -13,6 +13,7 @@ import { DailyTrackingComponent } from './component/daily-tracking/daily-trackin
 import { FormsModule } from '@angular/forms';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { InactiveDetailsComponent } from './component/inactive-details/inactive-details.component';
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { InactiveDetailsComponent } from './component/inactive-details/inactive-
     BrowserModule,
     AppRoutingModule,
     NgApexchartsModule,
+    HttpClientModule,
     LeafletModule,
     FormsModule
   ],

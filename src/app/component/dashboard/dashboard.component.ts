@@ -15,6 +15,7 @@ import {
   ApexTooltip,
   ApexTitleSubtitle
 } from "ng-apexcharts";
+import {DailyTrackingService} from "../../services/daily-tracking/daily-tracking.service";
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -161,12 +162,18 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  constructor() { }
-
+  constructor(private dailyTrackingService:DailyTrackingService) { }
+  zones:any[]=[]
+  subZones:any[]=[]
   ngOnInit(): void {
     this.initCharts();
     this.initCounterAnimation();
     this.initFilterToggle();
+    this.dailyTrackingService.getZones().subscribe((response:any) => {
+      this.zones=response
+    })
+
+
   }
 
   initCharts(): void {
@@ -400,4 +407,6 @@ export function getLayers(): L.Layer[] {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     })
   ];
+
+
 }

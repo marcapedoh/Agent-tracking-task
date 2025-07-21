@@ -40,6 +40,7 @@ import {
   ApexTooltip,
   ApexLegend
 } from 'ng-apexcharts';
+import {DailyTrackingService} from "../../services/daily-tracking/daily-tracking.service";
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -134,8 +135,8 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     { name: 'Mouila' }, // Sans sous-zones
     { name: 'Lambaréné', subzones: ['Bikele'] }
   ];
-  filteredRetailers: Retailer[] = [];
-  selectedRetailers: Retailer[] = [];
+  filteredRetailers: any[] = [];
+  selectedRetailers: any[] = [];
   allSelected: boolean = false;
   // Modal related properties
   selectedRetailer: Retailer | null = null;
@@ -170,25 +171,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   ];
   selectedBulkMessage: string = '';
   bulkMessageContent: string = '';
-  retailers: Retailer[] = [
-    // Libreville (1-15)
-    { id: 1, code: 'RTL-2025-001', fullName: 'Jean Okou', zone: 'Libreville', subZone: 'Mont-Bouët', status: 'active', type: 'VIP', principalBalance: 1850000, withdrawalBalance: 420000, autoTransferAmount: 200000, lastActivityDate: new Date('2025-05-15'), topAggregatorCode: 'AGG-LB-01', messageReceived: "Retrait urgent", statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false }, topAggregator: { code: 'AGG-LB-01', fullName: 'Marc Ondo', zone: 'Libreville', status: 'active', phone: '+24101234567', email: 'm.ondo@ga' }, statistics: { totalTransactions: 124, monthlyAverage: 28, lastTransactionAmount: 75000 } },
-    { id: 2, code: 'RTL-2025-002', fullName: 'Sarah Nguema', zone: 'Libreville', subZone: 'Glass', status: 'active', type: 'ordinary', principalBalance: 950000, withdrawalBalance: 310000, autoTransferAmount: 90000, lastActivityDate: new Date('2025-05-14'), topAggregatorCode: 'AGG-LB-02', messageReceived: "Approvisionnement nécessaire", statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false }, topAggregator: { code: 'AGG-LB-02', fullName: 'Pauline Mba', zone: 'Libreville', status: 'active', phone: '+24102345678', email: 'p.mba@ga' }, statistics: { totalTransactions: 85, monthlyAverage: 22, lastTransactionAmount: 50000 } },
-    { id: 3, code: 'RTL-2025-003', fullName: 'David Minko', zone: 'Libreville', subZone: 'Akébé', status: 'critical', type: 'ordinary', principalBalance: 120000, withdrawalBalance: 110000, autoTransferAmount: 25000, lastActivityDate: new Date('2025-05-10'), topAggregatorCode: 'AGG-LB-03', messageReceived: "Solde critique", statusDetails: { needCashIn: true, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false }, topAggregator: { code: 'AGG-LB-03', fullName: 'Lucie Benga', zone: 'Libreville', status: 'active', phone: '+24103456789', email: 'l.benga@ga' } },
-
-    // Port-Gentil (16-30)
-    { id: 16, code: 'RTL-2025-016', fullName: 'Marie Engonga', zone: 'Port-Gentil', subZone: 'Zone Industrielle', status: 'active', type: 'VIP', principalBalance: 2200000, withdrawalBalance: 510000, autoTransferAmount: 250000, lastActivityDate: new Date('2025-05-16'), topAggregatorCode: 'AGG-PG-01', messageReceived: "Retrait demandé", statusDetails: { needCashIn: false, needCashOut: true, availableForTransfer: false, dormant: false, inactive: false }, topAggregator: { code: 'AGG-PG-01', fullName: 'Pierre Moussavou', zone: 'Port-Gentil', status: 'active', phone: '+24105678901', email: 'p.moussavou@ga' } },
-    { id: 17, code: 'RTL-2025-017', fullName: 'Roger Obiang', zone: 'Port-Gentil', subZone: 'Balise', status: 'active', type: 'ordinary', principalBalance: 780000, withdrawalBalance: 350000, autoTransferAmount: 100000, lastActivityDate: new Date('2025-05-15'), topAggregatorCode: 'AGG-PG-02', messageReceived: "Transfert disponible", statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false }, topAggregator: { code: 'AGG-PG-02', fullName: 'Christine Mbina', zone: 'Port-Gentil', status: 'active', phone: '+24106789012', email: 'c.mbina@ga' } },
-
-    // Franceville (31-40)
-    { id: 31, code: 'RTL-2025-031', fullName: 'Daniel Meye', zone: 'Franceville', subZone: 'Mvouli', status: 'active', type: 'VIP', principalBalance: 1600000, withdrawalBalance: 320000, autoTransferAmount: 180000, lastActivityDate: new Date('2025-05-14'), topAggregatorCode: 'AGG-FV-01', messageReceived: "Transfert possible", statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: true, dormant: false, inactive: false }, topAggregator: { code: 'AGG-FV-01', fullName: 'Martine Obame', zone: 'Franceville', status: 'active', phone: '+24109012345', email: 'm.obame@ga' } },
-
-    // Oyem (41-45)
-    { id: 41, code: 'RTL-2025-041', fullName: 'Paul Mba', zone: 'Oyem', subZone: 'Centre-ville', status: 'active', type: 'VIP', principalBalance: 1250000, withdrawalBalance: 280000, autoTransferAmount: 150000, lastActivityDate: new Date('2025-05-13'), topAggregatorCode: 'AGG-OY-01', messageReceived: "Nouvelle transaction", statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: false, dormant: false, inactive: false }, topAggregator: { code: 'AGG-OY-01', fullName: 'Alain Nzeng', zone: 'Oyem', status: 'active', phone: '+24111223344', email: 'a.nzeng@ga' } },
-
-    // Mouila (46-50)
-    { id: 46, code: 'RTL-2025-046', fullName: 'Julie Mintsa', zone: 'Mouila', subZone: 'Marché Central', status: 'inactive', type: 'ordinary', principalBalance: 50000, withdrawalBalance: 20000, autoTransferAmount: 0, lastActivityDate: new Date('2025-03-10'), topAggregatorCode: 'AGG-ML-01', messageReceived: "Compte inactif", statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: false, dormant: true, inactive: true }, topAggregator: { code: 'AGG-ML-01', fullName: 'Gérard Oyoubi', zone: 'Mouila', status: 'active', phone: '+24122334455', email: 'g.oyoubi@ga' } }
-  ];
+  retailers: any[] = [];
   // Dans votre composant TypeScript
   sendSMSDirect(retailer: Retailer): void {
     if (!retailer?.topAggregator?.phone) {
@@ -255,10 +238,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
 
-    return this.retailers.filter(retailer => {
-      return retailer.statusDetails.inactive &&
-        new Date(retailer.lastActivityDate) <= cutoffDate;
-    }).length;
+    return 0
   }
 
   selectDays(days: number): void {
@@ -417,7 +397,6 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
         retailer.lastStatusChange = now.toISOString();
       }
 
-      console.log(`Alerte déclenchée pour: ${this.currentAlert.fullName} (${this.currentAlert.code})`);
 
       // Fermeture automatique après 8 secondes si non interagi
       setTimeout(() => {
@@ -539,7 +518,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
       }, 5000);
     }
   }
-  constructor() { }
+  constructor(private dailyTrackingService: DailyTrackingService) { }
 
   ngOnInit(): void {
     //this.initAlerts();
@@ -547,8 +526,16 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     this.initCounterAnimation();
     this.initFilterToggle();
     this.filteredRetailers = [...this.retailers];
+    this.dailyTrackingService.getAllAgentTableDTI().subscribe((response:any) => {
+      this.retailers=response.slice(23);
+      console.log(response.slice(23));
+    })
+    this.dailyTrackingService.getZones().subscribe((response:any) => {
+      this.zones=response
+    })
   }
-  ngOnDestroy(): void {
+
+    ngOnDestroy(): void {
     clearInterval(this.alertInterval);
   }
 
@@ -620,8 +607,8 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   applyFilters(): void {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.selectedDays);
-
-    this.filteredRetailers = this.retailers.filter(retailer => {
+    this.filteredRetailers = this.retailers
+    /*this.filteredRetailers = this.retailers.filter(retailer => {
       // 1. Filtre par zone principale OU sous-zone
       const zoneMatch = !this.selectedZone ||
         retailer.zone === this.selectedZone ||
@@ -632,13 +619,13 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
         retailer.subZone === this.selectedSubzone;
 
       // 3. Filtre par statut
-      const statusMatch = !this.selectedStatus ||
+     /!* const statusMatch = !this.selectedStatus ||
         (this.selectedStatus === 'needCashIn' && retailer.statusDetails.needCashIn) ||
         (this.selectedStatus === 'needCashOut' && retailer.statusDetails.needCashOut) ||
         (this.selectedStatus === 'availableForTransfer' && retailer.statusDetails.availableForTransfer) ||
         (this.selectedStatus === 'dormant' && retailer.statusDetails.dormant) ||
         (this.selectedStatus === 'inactive' && retailer.statusDetails.inactive);
-
+*!/
       // 4. Filtre temporel pour les inactifs
       const inactiveDurationMatch = !this.isInactiveFilterActive ||
         !this.selectedStatus ||
@@ -646,11 +633,11 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
         (retailer.statusDetails.inactive && new Date(retailer.lastActivityDate) <= cutoffDate);
 
       return zoneMatch && subzoneMatch && statusMatch && inactiveDurationMatch;
-    });
+    });*/
     this.currentPage = 1;
   }
 
-  get paginatedRetailers(): Retailer[] {
+  get paginatedRetailers(): any[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.filteredRetailers.slice(startIndex, startIndex + this.itemsPerPage);
   }
