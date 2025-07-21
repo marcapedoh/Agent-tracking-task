@@ -1,16 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
 
 interface MenuItem {
   label: string;
-  route?: string;  // Rendons cette propriété optionnelle avec le ?
+  route?: string;
   roles?: string[];
   children?: MenuItem[];
 }
 
-// Typage clair des rôles possibles
 type UserRole = 'zone_manager' | 'admin' | 'analyst';
-
 
 export const MENU_ITEMS: Record<UserRole, MenuItem[]> = {
   zone_manager: [
@@ -48,11 +47,12 @@ export const MENU_ITEMS: Record<UserRole, MenuItem[]> = {
 export class NavbarComponent implements OnInit {
 
   displayedMenus: MenuItem[] = [];
-  userRole: UserRole | '' = '';  // initialisé vide
+  userRole: UserRole | '' = '';
   userName: string = '';
   isMenuOpen: boolean = false;
+  isUserDropdownOpen = false;
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
     const role = this.authService.getUserRole().toLowerCase() as UserRole;
@@ -61,14 +61,12 @@ export class NavbarComponent implements OnInit {
     this.displayedMenus = MENU_ITEMS[role] || [];
   }
 
-  isUserDropdownOpen = false;
-
   toggleUserDropdown() {
     this.isUserDropdownOpen = !this.isUserDropdownOpen;
   }
 
   logout() {
-    // Votre logique de déconnexion existante
+    this.authService.logout();
     this.isUserDropdownOpen = false;
   }
 
@@ -76,7 +74,11 @@ export class NavbarComponent implements OnInit {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  // logout() {
-  //   this.authService.logout();
-  // }
+  /** Permet de savoir si un sous-menu est actif pour garder le parent (Daily Tracking) actif */
+  isActiveSubMenu(menu: MenuItem): boolean {
+    if (!menu.children) {
+      return false;
+    }
+    return menu.children.some(child => this.router.url.includes(child.route || ''));
+  }
 }
