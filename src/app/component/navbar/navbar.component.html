@@ -1,88 +1,76 @@
-<nav
-  class="fixed top-0 left-0 right-0 flex items-center justify-between bg-white px-4 sm:px-8 h-[70px] border-b-[3px] border-[#e60012] z-[1000] font-['Poppins',_sans-serif]">
+<nav class="fixed top-0 left-0 right-0 flex items-center justify-between bg-white px-4 sm:px-8 h-[70px] border-b-[3px] border-[#e60012] z-[1000] font-['Poppins',_sans-serif]">
 
-  <!-- Logo & Titre -->
+  <!-- Logo et titre -->
   <div class="flex items-center gap-4">
-    <div class="w-[50px] h-[50px] bg-[#004080] rounded-full flex items-center justify-center shadow-[0_0_6px_rgba(0,0,0,0.15)]">
+    <div class="w-[50px] h-[50px] bg-[#004080] rounded-full flex items-center justify-center shadow-md">
       <img src="assets/huawei-logo.png" alt="Huawei" class="max-w-[70%] max-h-[70%] object-contain filter brightness-0 invert" />
     </div>
-    <div class="w-[50px] h-[50px] bg-[#004080] rounded-full flex items-center justify-center shadow-[0_0_6px_rgba(0,0,0,0.15)]">
+    <div class="w-[50px] h-[50px] bg-[#004080] rounded-full flex items-center justify-center shadow-md">
       <img src="assets/moov-logo.png" alt="Moov" class="max-w-[70%] max-h-[70%] object-contain" />
     </div>
     <span class="font-bold text-[1.4rem] text-[#002c6b] select-none">Agent Daily Tracking</span>
   </div>
 
-  <!-- Menu desktop -->
-  <div class="hidden md:block">
-    <div class="flex gap-8">
+  <!-- Menu Desktop -->
+  <div class="hidden md:flex gap-8">
+    <ng-container *ngFor="let menu of displayedMenus">
+      <!-- Simple -->
+      <a *ngIf="!menu.children"
+         [routerLink]="menu.route"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }"
+         class="no-underline font-semibold text-[#002c6b] pb-[3px] border-b-2 border-transparent hover:text-[#FF6600] hover:border-[#FF6600] transition">
+        {{ menu.label }}
+      </a>
 
-      <!-- Boucle sur tous les menus -->
-      <ng-container *ngFor="let menu of displayedMenus">
-
-        <!-- Lien simple sans sous-menu -->
-        <a *ngIf="!menu.children"
-           [routerLink]="menu.route"
-           routerLinkActive="active"
-           [routerLinkActiveOptions]="{ exact: true }"
-           class="no-underline font-semibold text-[#002c6b] pb-[3px] border-b-2 border-transparent hover:text-[#FF6600] hover:border-[#FF6600] transition-colors duration-300">
+      <!-- Avec Sous-menu -->
+      <div *ngIf="menu.children" class="relative group">
+        <button
+          class="flex items-center gap-1 font-semibold pb-[3px] border-b-2 transition"
+          [ngClass]="{
+            'border-[#004080] text-[#FF6600]': isActiveSubMenu(menu),
+            'border-transparent text-[#002c6b]': !isActiveSubMenu(menu)
+          }">
           {{ menu.label }}
-        </a>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+               fill="currentColor" class="w-4 h-4">
+            <path fill-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                  clip-rule="evenodd" />
+          </svg>
+        </button>
 
-        <!-- Lien avec sous-menu -->
-        <div *ngIf="menu.children" class="relative group"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: false }">
-
-          <!-- Titre du menu (parent) -->
-          <button
-            class="flex items-center gap-1 font-semibold pb-[3px] border-b-2 border-transparent transition-colors duration-300"
-            [ngClass]="{'active': isActiveSubMenu(menu)}">
-            <span [ngClass]="{'text-[#FF6600]': isActiveSubMenu(menu), 'text-[#002c6b]': !isActiveSubMenu(menu)}">
-              {{ menu.label }}
-            </span>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                 fill="currentColor" class="w-4 h-4">
-              <path fill-rule="evenodd"
-                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                    clip-rule="evenodd" />
-            </svg>
-          </button>
-
-          <!-- Sous-menu -->
-          <div
-            class="absolute left-0 z-50 hidden w-48 mt-0 origin-top-left bg-white rounded-md shadow-lg group-hover:block ring-1 ring-black ring-opacity-5">
-            <div class="py-1">
-              <a *ngFor="let child of menu.children"
-                 [routerLink]="child.route"
-                 routerLinkActive="active"
-                 [routerLinkActiveOptions]="{ exact: true }"
-                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#FF6600]">
-                {{ child.label }}
-              </a>
-            </div>
+        <div class="absolute left-0 z-50 hidden w-48 mt-0 bg-white rounded-md shadow-lg group-hover:block ring-1 ring-black ring-opacity-5">
+          <div class="py-1">
+            <a *ngFor="let child of menu.children"
+               [routerLink]="child.route"
+               routerLinkActive="active"
+               [routerLinkActiveOptions]="{ exact: true }"
+               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#FF6600]">
+              {{ child.label }}
+            </a>
           </div>
         </div>
-      </ng-container>
-
-    </div>
+      </div>
+    </ng-container>
   </div>
 
   <!-- Utilisateur & Déconnexion -->
   <div class="flex items-center gap-4">
 
-    <!-- Dropdown utilisateur -->
     <div class="relative hidden md:block">
-      <div (click)="toggleUserDropdown()" class="flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded-md">
+      <div (click)="toggleUserDropdown()"
+           class="flex items-center gap-2 px-3 py-2 bg-[#f5f8ff] rounded-lg cursor-pointer hover:shadow-md transition">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
              fill="currentColor" class="w-6 h-6 text-[#002c6b]">
           <path fill-rule="evenodd"
-                d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
                 clip-rule="evenodd" />
         </svg>
-        <span class="font-semibold text-[#002c6b]">APEDO Kossi Emmanuel</span>
+        <span class="font-medium text-[#002c6b]">APEDO Kossi Emmanuel</span>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
              fill="currentColor"
-             class="w-4 h-4 text-[#002c6b] transition-transform duration-200"
+             class="w-4 h-4 text-[#002c6b] transition-transform"
              [class.rotate-180]="isUserDropdownOpen">
           <path fill-rule="evenodd"
                 d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
@@ -90,30 +78,28 @@
         </svg>
       </div>
 
-      <!-- Dropdown profil -->
       <div *ngIf="isUserDropdownOpen"
-           class="absolute right-0 z-50 w-56 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-        <div class="py-1">
-          <div class="px-4 py-2 border-b border-gray-100">
-            <p class="text-sm font-medium text-gray-900">APEDO Kossi Emmanuel</p>
-            <p class="text-xs text-gray-500">emmanuel@gmail.com</p>
-            <p class="text-xs text-gray-500">ZONE MANAGER</p>
-          </div>
-          <button (click)="logout()" class="flex w-full items-center gap-2 px-4 py-2 text-sm font-semibold text-[#FF6600] hover:bg-[#e6f0ff]">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                 fill="currentColor" class="w-5 h-5">
-              <path fill-rule="evenodd"
-                    d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm10.72 4.72a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H9a.75.75 0 010-1.5h10.94l-1.72-1.72a.75.75 0 010-1.06z"
-                    clip-rule="evenodd" />
-            </svg>
-            Déconnexion
-          </button>
+           class="absolute right-0 z-50 w-56 mt-2 bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5">
+        <div class="p-4 border-b border-gray-100">
+          <p class="text-sm font-bold text-[#002c6b]">APEDO Kossi Emmanuel</p>
+          <p class="text-xs text-gray-500">emmanuel@gmail.com</p>
+          <p class="text-xs text-gray-500">ZONE MANAGER</p>
         </div>
+        <button (click)="logout()"
+                class="flex w-full items-center gap-2 px-4 py-2 text-sm font-semibold text-[#FF6600] hover:bg-[#e6f0ff] transition">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+               fill="currentColor" class="w-5 h-5">
+            <path fill-rule="evenodd"
+                  d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm10.72 4.72a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H9a.75.75 0 010-1.5h10.94l-1.72-1.72a.75.75 0 010-1.06z"
+                  clip-rule="evenodd" />
+          </svg>
+          Déconnexion
+        </button>
       </div>
     </div>
 
-    <!-- Menu Mobile (Burger) -->
-    <button (click)="toggleMenu()" class="md:hidden text-[#002c6b] cursor-pointer p-2">
+    <!-- Burger Mobile -->
+    <button (click)="toggleMenu()" class="md:hidden text-[#002c6b] p-2">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
            viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -122,7 +108,7 @@
     </button>
   </div>
 
-  <!-- Overlay mobile -->
+  <!-- Overlay Mobile -->
   <div *ngIf="isMenuOpen" (click)="toggleMenu()" class="fixed inset-0 z-[1000] bg-black bg-opacity-50 md:hidden"></div>
 
   <!-- Menu Mobile -->
@@ -137,7 +123,7 @@
        routerLinkActive="active"
        [routerLinkActiveOptions]="{ exact: true }"
        (click)="toggleMenu()"
-       class="no-underline font-semibold text-[1.1rem] text-[#002c6b] pb-[6px] border-b-2 border-transparent hover:text-[#FF6600] hover:border-[#FF6600] transition-colors duration-300">
+       class="no-underline font-semibold text-[1.1rem] text-[#002c6b] pb-[6px] border-b-2 border-transparent hover:text-[#FF6600] hover:border-[#FF6600] transition">
       {{ menu.label }}
     </a>
     <button (click)="logout(); toggleMenu()"
