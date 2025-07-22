@@ -279,6 +279,8 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     return zone?.subzones || [];
   }
 
+  getDailyTrackingData=[]
+
   showInactivityAlert = false;
   currentInactivityAlert?: Retailer;
   inactivityAlertInterval: any;
@@ -526,6 +528,9 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     this.initCounterAnimation();
     this.initFilterToggle();
     this.filteredRetailers = [...this.retailers];
+    this.dailyTrackingService.getDailyTrackingData().subscribe(res=>{
+      console.log(res);
+    })
     this.dailyTrackingService.getAllAgentTableDTI().subscribe((response:any) => {
       this.retailers=response.slice(23);
       console.log(response.slice(23));
