@@ -15,7 +15,6 @@ import {
   ApexTooltip,
   ApexTitleSubtitle
 } from "ng-apexcharts";
-import {DailyTrackingService} from "../../services/daily-tracking/daily-tracking.service";
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -162,16 +161,14 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  constructor(private dailyTrackingService:DailyTrackingService) { }
-  zones:any[]=[]
-  subZones:any[]=[]
+  constructor() { }
+  zones: any[] = []
+  subZones: any[] = []
   ngOnInit(): void {
     this.initCharts();
     this.initCounterAnimation();
     this.initFilterToggle();
-    this.dailyTrackingService.getZones().subscribe((response:any) => {
-      this.zones=response
-    })
+
 
 
   }

@@ -75,7 +75,7 @@
 
   </div>
 
-  <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-5">
     <!-- VIP Agent Card -->
     <div
       class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FFD70044] hover:border-amber-400">
@@ -89,7 +89,7 @@
           </svg>
         </div>
         <div>
-          <p class="text-sm text-amber-800">Premium Agents alert</p>
+          <p class="text-sm text-amber-800">Premium Agents</p>
           <h3 class="text-2xl font-bold text-amber-600 counter"
             data-target="12">0</h3>
         </div>
@@ -100,32 +100,6 @@
               bg-amber-600 text-white text-xs rounded px-3 py-1 shadow-md
               whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
         Our premium agents with exclusive benefits and privileges
-      </div>
-    </div>
-
-    <!-- Cashout Required Card -->
-    <div
-      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
-      <div class="flex items-center">
-        <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor"
-            stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm text-[#002c6b]">Cashout required</p>
-          <h3 class="text-2xl font-bold text-[#002c6b] counter"
-            data-target="18">0</h3>
-        </div>
-      </div>
-      <!-- Tooltip -->
-      <div
-        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
-                bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
-                whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
-        Agents needing physical cash withdrawal via an aggregator.
       </div>
     </div>
 
@@ -142,7 +116,7 @@
           </svg>
         </div>
         <div>
-          <p class="text-sm text-purple-800">Agents 650 Alerts</p>
+          <p class="text-sm text-purple-800">Agents 650</p>
           <h3 class="text-2xl font-bold text-purple-600 counter"
             data-target="25">0</h3>
         </div>
@@ -153,6 +127,62 @@
               bg-purple-600 text-white text-xs rounded px-3 py-1 shadow-md
               whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
         Our complete network of 650 qualified agents
+      </div>
+    </div>
+
+    <!-- Cashout Required Card -->
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-[#002c6b]">Inactif with cashout amount</p>
+          <h3 class="text-2xl font-bold text-[#002c6b] counter"
+            data-target="18">0</h3>
+        </div>
+      </div>
+      <!-- Tooltip -->
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+                bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
+                whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Agents needing physical cash withdrawal via an aggregator.
+      </div>
+    </div>
+
+    <!-- Inactive Agents Card -->
+    <div
+      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+      <div class="flex items-center">
+        <div class="p-3 mr-4 text-yellow-600 bg-yellow-100 rounded-lg">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M16 7h1m-4 0h1m5 4v3m0 0v3m0-3h-3m3 0h-3" />
+          </svg>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm text-[#002c6b]">Inactifs with Main account </p>
+          <h3 class="text-2xl font-bold text-[#002c6b]">
+            <span class="counter"
+              [attr.data-target]="getInactiveRetailersCount(selectedDays)">0</span>
+          </h3>
+        </div>
+      </div>
+      <!-- Tooltip -->
+      <div
+        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
+                bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
+                whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Agents inactive for 1 to 5 days.
       </div>
     </div>
 
@@ -168,7 +198,8 @@
           </svg>
         </div>
         <div class="flex-1">
-          <p class="text-sm text-[#002c6b]">Inactive Agents</p>
+          <p class="text-sm text-[#002c6b]">Inactifs with Withdrawal account
+          </p>
           <h3 class="text-2xl font-bold text-[#002c6b]">
             <span class="counter"
               [attr.data-target]="getInactiveRetailersCount(selectedDays)">0</span>

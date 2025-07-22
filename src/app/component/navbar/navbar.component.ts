@@ -21,9 +21,9 @@ export const MENU_ITEMS: Record<UserRole, MenuItem[]> = {
         { label: 'Inactive details', route: 'daily-tracking/inactive-detail' },
       ]
     },
-    { label: 'Campaigns', route: '/zone-manager/resellers' },
-    { label: 'Reports', route: '/zone-manager/resellers' },
-    { label: 'History', route: '/zone-manager/communication' },
+    { label: 'Campaigns', route: 'compaigns' },
+    { label: 'Reports', route: 'reports' },
+    { label: 'History', route: 'history' },
   ],
   admin: [
     { label: 'Dashboard', route: '/home/dashboard' },
