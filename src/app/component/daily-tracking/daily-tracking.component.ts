@@ -40,8 +40,6 @@ import {
   ApexTooltip,
   ApexLegend
 } from 'ng-apexcharts';
-import {DailyTrackingService} from "../../services/daily-tracking/daily-tracking.service";
-
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
@@ -518,7 +516,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
       }, 5000);
     }
   }
-  constructor(private dailyTrackingService: DailyTrackingService) { }
+  constructor() { }
 
   ngOnInit(): void {
     //this.initAlerts();
@@ -526,16 +524,10 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     this.initCounterAnimation();
     this.initFilterToggle();
     this.filteredRetailers = [...this.retailers];
-    this.dailyTrackingService.getAllAgentTableDTI().subscribe((response:any) => {
-      this.retailers=response.slice(23);
-      console.log(response.slice(23));
-    })
-    this.dailyTrackingService.getZones().subscribe((response:any) => {
-      this.zones=response
-    })
+
   }
 
-    ngOnDestroy(): void {
+  ngOnDestroy(): void {
     clearInterval(this.alertInterval);
   }
 
