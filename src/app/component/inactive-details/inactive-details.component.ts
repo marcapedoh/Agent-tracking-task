@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DailyTrackingService } from 'src/app/services/dailyTracking-Service/daily-tracking.service';
 
 interface Retailer {
   id: number;
@@ -63,11 +64,11 @@ export class InactiveDetailsComponent implements OnInit {
   currentPage: number = 1;
   statusOptions = [
     { value: '', label: 'All Statuses' },
-    { value: 'needCashIn', label: 'Need Cash In' },
-    { value: 'needCashOut', label: 'Need Cash Out' },
-    { value: 'availableForTransfer', label: 'Available for Transfer' },
-    { value: 'dormant', label: 'Dormant' },
-    { value: 'inactive', label: 'Inactive' }
+    { value: 'Need_Cashing', label: 'Need Cash In' },
+    { value: 'Need_Cashout', label: 'Need Cash Out' },
+    { value: 'Dormant', label: 'Available for Transfer' },
+    { value: 'Inactive', label: 'Dormant' },
+    { value: 'Normal', label: 'Inactive' }
   ];
   selectedStatus: string = '';
   selectedSubzone: string = '';
@@ -81,14 +82,8 @@ export class InactiveDetailsComponent implements OnInit {
   // Sélection multiple
   selectedAgents: any[] = [];
   allAgentsSelected: boolean = false;
-  selectedDate = '';
-  zones = [
-    { name: 'Libreville', subzones: ['Louis', 'Mont-Bouët', 'Glass', 'Akébé', 'Nombakélé'] },
-    { name: 'Port-Gentil', subzones: ['Industrielle', 'Louis', 'Balise'] },
-    { name: 'Franceville', subzones: ['Mvouli', 'Mikolongo'] },
-    { name: 'Oyem' },  // Sans sous-zones
-    { name: 'Mouila' }, // Sans sous-zones
-    { name: 'Lambaréné', subzones: ['Bikele'] }
+  zones: any = [
+
   ];
   retailers: Retailer[] = [
     // Libreville (1-15)
@@ -109,18 +104,48 @@ export class InactiveDetailsComponent implements OnInit {
     // Mouila (46-50)
     { id: 46, code: 'RTL-2025-046', fullName: 'Julie Mintsa', zone: 'Mouila', subZone: 'Marché Central', status: 'inactive', type: 'ordinary', principalBalance: 50000, withdrawalBalance: 20000, autoTransferAmount: 0, lastActivityDate: new Date('2025-03-10'), topAggregatorCode: 'AGG-ML-01', messageReceived: "Compte inactif", statusDetails: { needCashIn: false, needCashOut: false, availableForTransfer: false, dormant: true, inactive: true }, topAggregator: { code: 'AGG-ML-01', fullName: 'Gérard Oyoubi', zone: 'Mouila', status: 'active', phone: '+24122334455', email: 'g.oyoubi@ga' } }
   ];
+  datas: any = []
+  selectDate = ""
+  dateObj = new Date()
+  zonesWithSub: any = []
+  constructor(private dailyTrackingService: DailyTrackingService) { }
   ngOnInit(): void {
     this.initCounterAnimation();
+    this.dailyTrackingService.getAllZone().subscribe((data: any) => {
+      console.log(data)
+      this.zones = data
+      this.zones.forEach((zone: any) => {
+        this.dailyTrackingService.getSubZonesPerZoneName(zone.name).subscribe((res: any) => {
+          this.zonesWithSub[zone.name] = res[zone.name] ?? [];
+          console.log(this.zonesWithSub)
+        })
+      })
+    })
+  }
+
+  filterData() {
+    if (!this.selectDate) {
+      console.warn("Aucune date sélectionnée !");
+      return;
+    }
+
+    const formattedDate = new Date(this.selectDate).toISOString().split('T')[0];
+    this.dateObj = new Date(formattedDate);
+
+    this.dailyTrackingService.getAllSnapshot(this.selectDate, 0, 25).subscribe((res: any) => {
+      console.log(res.content);
+      this.datas = res.content
+    })
   }
   hasSubzones(): boolean {
-    const zone = this.zones.find(z => z.name === this.selectedZone);
-    return !!zone?.subzones?.length;
+    return !!(this.selectedZone && this.zonesWithSub[this.selectedZone]?.length > 0);
   }
 
   getCurrentSubzones(): string[] {
-    const zone = this.zones.find(z => z.name === this.selectedZone);
-    return zone?.subzones || [];
+    return this.selectedZone ? this.zonesWithSub[this.selectedZone] || [] : [];
   }
+
+
 
   getInactiveRetailersCount(days: number): number {
     const cutoffDate = new Date();
@@ -220,7 +245,7 @@ export class InactiveDetailsComponent implements OnInit {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.selectedDays);
 
-    this.filteredRetailers = this.retailers.filter(retailer => {
+    this.filteredRetailers = this.datas.filter((retailer: any) => {
       // 1. Filtre par zone principale OU sous-zone
       const zoneMatch = !this.selectedZone ||
         retailer.zone === this.selectedZone ||
@@ -232,17 +257,17 @@ export class InactiveDetailsComponent implements OnInit {
 
       // 3. Filtre par statut
       const statusMatch = !this.selectedStatus ||
-        (this.selectedStatus === 'needCashIn' && retailer.statusDetails.needCashIn) ||
-        (this.selectedStatus === 'needCashOut' && retailer.statusDetails.needCashOut) ||
-        (this.selectedStatus === 'availableForTransfer' && retailer.statusDetails.availableForTransfer) ||
-        (this.selectedStatus === 'dormant' && retailer.statusDetails.dormant) ||
-        (this.selectedStatus === 'inactive' && retailer.statusDetails.inactive);
+        (this.selectedStatus === 'Need_Cashing' && retailer.statusDetails.needCashIn) ||
+        (this.selectedStatus === 'Need_Cashout' && retailer.statusDetails.needCashOut) ||
+        (this.selectedStatus === 'Dormant' && retailer.statusDetails.availableForTransfer) ||
+        (this.selectedStatus === 'Inactive' && retailer.statusDetails.dormant) ||
+        (this.selectedStatus === 'Normal' && retailer.statusDetails.inactive);
 
       // 4. Filtre temporel pour les inactifs
       const inactiveDurationMatch = !this.isInactiveFilterActive ||
         !this.selectedStatus ||
-        this.selectedStatus !== 'inactive' ||
-        (retailer.statusDetails.inactive && new Date(retailer.lastActivityDate) <= cutoffDate);
+        this.selectedStatus !== 'Inactive' ||
+        (retailer.statusDetails.inactive && new Date(this.selectDate) <= cutoffDate);
 
       return zoneMatch && subzoneMatch && statusMatch && inactiveDurationMatch;
     });
@@ -256,15 +281,17 @@ export class InactiveDetailsComponent implements OnInit {
     const diffTime = Math.abs(today.getTime() - lastDate.getTime());
     return Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Convertir en jours
   }
-  get paginatedRetailers(): Retailer[] {
+  get paginatedData(): any[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredRetailers.slice(startIndex, startIndex + this.itemsPerPage);
+    return this.datas.slice(startIndex, startIndex + this.itemsPerPage);
   }
   get totalPages(): number {
-    return Math.ceil(this.filteredRetailers.length / this.itemsPerPage);
+    return Math.ceil(this.datas.length / this.itemsPerPage);
   }
 
   changePage(page: number): void {
     this.currentPage = page;
   }
+
+
 }
