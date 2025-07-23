@@ -40,6 +40,7 @@ import {
   ApexTooltip,
   ApexLegend
 } from 'ng-apexcharts';
+import { DailyTrackingService } from 'src/app/services/dailyTracking-Service/daily-tracking.service';
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
@@ -154,11 +155,11 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   itemsPerPageOptions = [10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100];
   statusOptions = [
     { value: '', label: 'All Statuses' },
-    { value: 'needCashIn', label: 'Need Cash In' },
-    { value: 'needCashOut', label: 'Need Cash Out' },
-    { value: 'availableForTransfer', label: 'Available for Transfer' },
-    { value: 'dormant', label: 'Dormant' },
-    { value: 'inactive', label: 'Inactive' }
+    { value: 'Need_Cashing', label: 'Need Cash In' },
+    { value: 'Need_Cashout', label: 'Need Cash Out' },
+    { value: 'Dormant', label: 'Available for Transfer' },
+    { value: 'Inactive', label: 'Dormant' },
+    { value: 'Normal', label: 'Inactive' }
   ];
   // Bulk SMS properties
   activeDetailsTab: 'info' | 'messages' = 'info';
@@ -267,15 +268,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  hasSubzones(): boolean {
-    const zone = this.zones.find(z => z.name === this.selectedZone);
-    return !!zone?.subzones?.length;
-  }
 
-  getCurrentSubzones(): string[] {
-    const zone = this.zones.find(z => z.name === this.selectedZone);
-    return zone?.subzones || [];
-  }
 
   showInactivityAlert = false;
   currentInactivityAlert?: Retailer;
@@ -473,10 +466,13 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   hasInactive650(): boolean {
     return this.getInactive650Count(this.selectedDays) > 0;
   }
+  getInactiveDays(lastActivityDate: Date): number {
+    if (!lastActivityDate) return 0;
 
-  getInactiveDays(retailer: Retailer): number {
-    const diff = new Date().getTime() - new Date(retailer.lastActivityDate).getTime();
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
+    const today = new Date();
+    const lastDate = new Date(lastActivityDate);
+    const diffTime = Math.abs(today.getTime() - lastDate.getTime());
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Convertir en jours
   }
 
   // Initialiser les alertes d'inactivité
@@ -516,19 +512,62 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
       }, 5000);
     }
   }
-  constructor() { }
+  constructor(private dailyTrackingService: DailyTrackingService) { }
 
+  zonesWithSub: any = []
   ngOnInit(): void {
     //this.initAlerts();
     this.initInactivityAlerts();
     this.initCounterAnimation();
     this.initFilterToggle();
     this.filteredRetailers = [...this.retailers];
+    this.dailyTrackingService.getAllZone().subscribe((data: any) => {
+      console.log(data)
+      this.zones = data
+      this.zones.forEach((zone: any) => {
+        this.dailyTrackingService.getSubZonesPerZoneName(zone.name).subscribe((res: any) => {
+          this.zonesWithSub[zone.name] = res[zone.name] ?? [];
+          console.log(this.zonesWithSub)
+        })
+      })
+    })
 
+  }
+
+  dateObj = new Date()
+  selectDate = ''
+  datas: any[] = []
+  filterData() {
+    if (!this.selectDate) {
+      console.warn("Aucune date sélectionnée !");
+      return;
+    }
+
+    const formattedDate = new Date(this.selectDate).toISOString().split('T')[0];
+    this.dateObj = new Date(formattedDate);
+
+    this.dailyTrackingService.getAllSnapshot(this.selectDate, 0, 25).subscribe((res: any) => {
+      console.log(res.content);
+      this.datas = res.content
+    })
+  }
+  hasSubzones(): boolean {
+    return !!(this.selectedZone && this.zonesWithSub[this.selectedZone]?.length > 0);
+  }
+
+  getCurrentSubzones(): string[] {
+    return this.selectedZone ? this.zonesWithSub[this.selectedZone] || [] : [];
   }
 
   ngOnDestroy(): void {
     clearInterval(this.alertInterval);
+  }
+
+
+
+
+  changePage(page: number): void {
+    this.currentPage = page;
   }
 
   initChart() {
@@ -599,8 +638,8 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   applyFilters(): void {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.selectedDays);
-    this.filteredRetailers = this.retailers
-    /*this.filteredRetailers = this.retailers.filter(retailer => {
+
+    this.filteredRetailers = this.datas.filter((retailer: any) => {
       // 1. Filtre par zone principale OU sous-zone
       const zoneMatch = !this.selectedZone ||
         retailer.zone === this.selectedZone ||
@@ -611,21 +650,21 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
         retailer.subZone === this.selectedSubzone;
 
       // 3. Filtre par statut
-     /!* const statusMatch = !this.selectedStatus ||
-        (this.selectedStatus === 'needCashIn' && retailer.statusDetails.needCashIn) ||
-        (this.selectedStatus === 'needCashOut' && retailer.statusDetails.needCashOut) ||
-        (this.selectedStatus === 'availableForTransfer' && retailer.statusDetails.availableForTransfer) ||
-        (this.selectedStatus === 'dormant' && retailer.statusDetails.dormant) ||
-        (this.selectedStatus === 'inactive' && retailer.statusDetails.inactive);
-*!/
+      const statusMatch = !this.selectedStatus ||
+        (this.selectedStatus === 'Need_Cashing' && retailer.statusDetails.needCashIn) ||
+        (this.selectedStatus === 'Need_Cashout' && retailer.statusDetails.needCashOut) ||
+        (this.selectedStatus === 'Dormant' && retailer.statusDetails.availableForTransfer) ||
+        (this.selectedStatus === 'Inactive' && retailer.statusDetails.dormant) ||
+        (this.selectedStatus === 'Normal' && retailer.statusDetails.inactive);
+
       // 4. Filtre temporel pour les inactifs
       const inactiveDurationMatch = !this.isInactiveFilterActive ||
         !this.selectedStatus ||
-        this.selectedStatus !== 'inactive' ||
-        (retailer.statusDetails.inactive && new Date(retailer.lastActivityDate) <= cutoffDate);
+        this.selectedStatus !== 'Inactive' ||
+        (retailer.statusDetails.inactive && new Date(this.selectDate) <= cutoffDate);
 
       return zoneMatch && subzoneMatch && statusMatch && inactiveDurationMatch;
-    });*/
+    });
     this.currentPage = 1;
   }
 
@@ -633,12 +672,41 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.filteredRetailers.slice(startIndex, startIndex + this.itemsPerPage);
   }
+  get paginatedData(): any[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.datas.slice(startIndex, startIndex + this.itemsPerPage);
+  }
   get totalPages(): number {
-    return Math.ceil(this.filteredRetailers.length / this.itemsPerPage);
+    return Math.ceil(this.datas.length / this.itemsPerPage);
   }
 
-  changePage(page: number): void {
-    this.currentPage = page;
+  openAgentModal(agent: any): void {
+    // Implémentez votre logique pour ouvrir un modal avec les détails de l'agent
+    console.log('Ouvrir modal pour:', agent);
+    // this.modalService.open(agent);
+  }
+
+  allAgentsSelected: boolean = false;
+
+  toggleAgentSelection(agent: any, event: any): void {
+    event.stopPropagation();
+
+    if (event.target.checked) {
+      this.selectedAgents.push(agent);
+    } else {
+      this.selectedAgents = this.selectedAgents.filter(a => a.code !== agent.code);
+    }
+
+    // Met à jour l'état de la case à cocher "Tout sélectionner"
+    this.allAgentsSelected = this.selectedAgents.length === this.paginatedAgents.length;
+  }
+
+
+
+  paginatedAgents: any[] = [];
+  selectedAgents: any[] = [];
+  isAgentSelected(agent: any): boolean {
+    return this.selectedAgents.some(a => a.code === agent.code);
   }
 
   getPageNumbers(): number[] {
