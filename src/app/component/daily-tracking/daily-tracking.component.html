@@ -47,17 +47,16 @@
               <select [(ngModel)]="selectedSubzone" (change)="applyFilters()"
                 class="w-full px-3 py-2 ml-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-36">
                 <option value>All Subzones</option>
-                <option *ngFor="let subzone of getCurrentSubzones()"
+                <option *ngFor="let subzone of  zonesWithSub[selectedZone]"
                   [value]="subzone">{{subzone}}</option>
               </select>
             </div>
           </div>
 
           <!-- Date Filter -->
-          <input type="date" [(ngModel)]="selectedDate"
-            (change)="applyFilters()"
+          <input type="date" [(ngModel)]="selectDate"
+            (change)="filterData()"
             class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
-
         </div>
 
       </div>
@@ -231,7 +230,7 @@
       </div>
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
-        <span class="text-sm text-white">Eligible for auto Transfer</span>
+        <span class="text-sm text-white">Normal</span>
       </div>
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
@@ -288,11 +287,11 @@
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Zone
+              Agent Type
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Category
+              Zone
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
@@ -300,86 +299,93 @@
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Agent Code
+              Agent Id
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Phone Number
+              MSISDN
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Alert Status
+              Inactive Days
             </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let retailer of paginatedRetailers"
+          <tr *ngFor="let agent of paginatedData"
             class="transition-colors duration-150 cursor-pointer hover:bg-gray-50"
-            (click)="openRetailerModal(retailer)">
+            (click)="openAgentModal(agent)">
             <td class="px-3 py-4 text-center whitespace-nowrap"
               (click)="$event.stopPropagation()">
               <input type="checkbox"
-                [checked]="isSelected(retailer)"
-                (change)="toggleRetailerSelection(retailer, $event)"
+                [checked]="isAgentSelected(agent)"
+                (change)="toggleAgentSelection(agent, $event)"
                 class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500">
             </td>
             <td
               class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{retailer.zone}}
+              <span [ngClass]="{
+            'bg-blue-100 text-blue-800': agent.category === 'Agent 650',
+            'bg-purple-100 text-purple-800': agent.category === 'Agent VIP'
+          }" class="px-2 py-1 text-xs font-semibold rounded-full">
+                {{agent.category }}
+              </span>
             </td>
             <td
               class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{retailer.type}}
+              {{agent.zone}}
             </td>
             <td class="px-3 py-4 text-center whitespace-nowrap">
               <div class="flex items-center justify-center gap-2">
-                <span *ngIf="retailer.statusDetails.needCashIn"
+                <span *ngIf="agent.agentStatus=='Need_Cashing'"
                   class="inline-block w-5 h-5 bg-blue-500 rounded-full"
-                  title="Need Cash In"></span>
-                <span *ngIf="retailer.statusDetails.needCashOut"
+                  title="Transaction Anormale"></span>
+                <span *ngIf="agent.agentStatus=='Need_Cashout'"
                   class="inline-block w-5 h-5 bg-purple-500 rounded-full"
-                  title="Need Cash Out"></span>
-                <span *ngIf="retailer.statusDetails.availableForTransfer"
-                  class="inline-block w-5 h-5 bg-green-500 rounded-full"
-                  title="Available for Transfer"></span>
-                <span *ngIf="retailer.statusDetails.inactive"
-                  class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
-                  title="Inactive"></span>
-                <span *ngIf="retailer.statusDetails.dormant"
+                  title="Suspicion de Fraude"></span>
+                <span *ngIf="agent.agentStatus=='Dormant'"
                   class="inline-block w-5 h-5 bg-red-500 rounded-full"
-                  title="Dormant"></span>
+                  title="Urgent"></span>
+                <span *ngIf="agent.agentStatus=='Inactive'"
+                  class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
+                  title="A Surveiller"></span>
+                <span *ngIf="agent.agentStatus=='Normal'"
+                  class="inline-block w-5 h-5 bg-green-500 rounded-full"
+                  title="A Surveiller"></span>
+
               </div>
             </td>
-
             <td
               class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
-              {{retailer.isGabCel}}
+              {{agent.agentId}}
             </td>
             <td
               class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{retailer.isPremium}}
+              {{agent.msisdn}}
             </td>
-            <td class="px-3 py-4 text-center whitespace-nowrap">
-              <div class="flex justify-center">
-                <span *ngIf="retailer.messageReceived" class="text-green-500"
-                  title="Message received">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                    viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd" />
-                  </svg>
-                </span>
-                <span *ngIf="!retailer.messageReceived" class="text-gray-400"
-                  title="No message received">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                    viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clip-rule="evenodd" />
-                  </svg>
-                </span>
-              </div>
+            <!-- <td
+              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+              {{agent.lastAlert | date:'short'}}
+            </td> -->
+            <!-- <td
+              class="px-3 py-4 text-sm font-medium text-center whitespace-nowrap">
+              <span [ngClass]="{
+            'text-green-600': agent.alertCount < 3,
+            'text-yellow-600': agent.alertCount >= 3 && agent.alertCount < 5,
+            'text-red-600': agent.alertCount >= 5
+          }">
+                {{agent.alertCount}}
+              </span>
+            </td> -->
+            <td
+              class="px-3 py-4 text-sm font-medium text-center whitespace-nowrap">
+              <span [ngClass]="{
+            'text-green-600': getInactiveDays(dateObj) === 0,
+            'text-yellow-600': getInactiveDays(dateObj) > 0 && getInactiveDays(dateObj) <= 7,
+            'text-red-600': getInactiveDays(dateObj) > 7
+          }">
+                {{getInactiveDays(dateObj) +" Jours"}}
+              </span>
             </td>
           </tr>
         </tbody>
