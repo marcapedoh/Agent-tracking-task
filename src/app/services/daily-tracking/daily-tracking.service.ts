@@ -27,4 +27,5 @@ export class DailyTrackingService {
     const today = new Date().toISOString().split('T')[0];
     return this.httpClient.get(`http://localhost:8080/agent-tracking/api/data/all-snapshots?snapshotDate=${today}`);
   }
+
 }
