@@ -273,12 +273,10 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   showInactivityAlert = false;
   currentInactivityAlert?: Retailer;
   inactivityAlertInterval: any;
-  vipAlertsCount: number = 5; // Mettez ici le vrai nombre d'alertes
-  vipAlerts: any[] = []; // Remplissez ce tableau avec les vraies alertes VIP
-  agent650AlertsCount: number = 15; // Ou valeur dynamique
-  agent650Alerts: any[] = []; // Remplir avec vos données
   showAgent650Modal: boolean = false;
   showVipAlertsModal: boolean = false;
+
+
   // Méthodes pour compter les inactifs
   getInactiveVipCount(days: number): number {
     const cutoffDate = new Date();
@@ -290,11 +288,15 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
       new Date(r.lastActivityDate) <= cutoffDate
     ).length;
   }
+
+
   openDetailsModal(retailer: Retailer): void {
     this.selectedRetailerForDetails = retailer;
     this.activeDetailsTab = 'info';
     this.pauseAlerts(); // Mettre en pause les alertes pendant la consultation
   }
+
+
   pauseAlerts(): void {
     this.alertPaused = true;
 
@@ -309,19 +311,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     this.showVipAlertsModal = true;
   }
 
-  // Méthode pour fermer le modal
-  closeVipAlertsModal() {
-    this.showVipAlertsModal = false;
-  }
-  // Méthodes pour gérer le modal
-  openAgent650Modal() {
-    // Charger les données si nécessaire
-    this.showAgent650Modal = true;
-  }
 
-  closeAgent650Modal() {
-    this.showAgent650Modal = false;
-  }
 
   resumeAlertsAfterCooldown(): void {
     // Annule tout timer existant
@@ -435,9 +425,6 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
       message: this.customMessage
     });
 
-    // Ici vous intégrerez votre service d'envoi de SMS
-    // this.smsService.send(...)
-
     // Réinitialiser le formulaire
     this.customMessage = '';
     this.selectedPredefinedMessage = '';
@@ -520,6 +507,14 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     this.initInactivityAlerts();
     this.initCounterAnimation();
     this.initFilterToggle();
+
+    // Définir la date du jour au format 'YYYY-MM-DD'
+    const today = new Date();
+    this.selectDate = today.toISOString().substring(0, 10);
+
+    // Appeler directement le filtre avec la date du jour
+    this.filterData();
+
     this.filteredRetailers = [...this.retailers];
     this.dailyTrackingService.getAllZone().subscribe((data: any) => {
       console.log(data)
@@ -546,7 +541,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     const formattedDate = new Date(this.selectDate).toISOString().split('T')[0];
     this.dateObj = new Date(formattedDate);
 
-    this.dailyTrackingService.getAllSnapshot(this.selectDate, 0, 25).subscribe((res: any) => {
+    this.dailyTrackingService.getAllSnapshot(this.selectDate, 0, this.itemsPerPage).subscribe((res: any) => {
       console.log(res.content);
       this.datas = res.content
     })
@@ -555,6 +550,14 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     return !!(this.selectedZone && this.zonesWithSub[this.selectedZone]?.length > 0);
   }
 
+  sanitizeValue(value: string | null | undefined): string {
+    if (value === null || value === undefined || value.trim().toUpperCase() === '[NULL]' || value.trim() === '') {
+      return '-';
+    }
+    return value;
+  }
+
+
   getCurrentSubzones(): string[] {
     return this.selectedZone ? this.zonesWithSub[this.selectedZone] || [] : [];
   }
@@ -562,8 +565,6 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     clearInterval(this.alertInterval);
   }
-
-
 
 
   changePage(page: number): void {
@@ -681,9 +682,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   }
 
   openAgentModal(agent: any): void {
-    // Implémentez votre logique pour ouvrir un modal avec les détails de l'agent
-    console.log('Ouvrir modal pour:', agent);
-    // this.modalService.open(agent);
+    this.selectedRetailer = agent;
   }
 
   allAgentsSelected: boolean = false;
@@ -828,6 +827,9 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   //     }
   //   });
   // }
+  selectedCategory: any;
+  sites: any;
+  selectedSite: any;
 
 
   initCounterAnimation(): void {
@@ -852,6 +854,9 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   }
 
 
+  exportReport() {
+
+  }
 }
 
 
@@ -865,7 +870,7 @@ export function generateBalanceHistory(
   autoTransferVar: number
 ) {
   return Array.from({ length: 30 }, (_, i) => {
-    const dayProgress = i / 29; // Normalisé entre 0 et 1
+    const dayProgress = i / 29;
     return {
       date: new Date(2023, 4, i + 1), // Mai 2023
       principalBalance: Math.round(principalBase + (principalVar * dayProgress * (0.9 + Math.random() * 0.2))),

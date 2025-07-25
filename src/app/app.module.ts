@@ -17,6 +17,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { CompaignsComponent } from './component/compaigns/compaigns.component';
 import { ReportComponent } from './component/report/report.component';
 import { HistoryComponent } from './component/history/history.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { HistoryComponent } from './component/history/history.component';
     NgApexchartsModule,
     HttpClientModule,
     LeafletModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,12 +1,25 @@
  <div class="min-h-screen p-6 bg-gray-50">
   <div
     class="flex flex-col items-start justify-between mb-8 md:flex-row md:items-center">
-    <div>
-      <h1 class="text-2xl font-bold text-[#002c6b] inline-block mr-2">Daily
-        Tracking Statistics</h1>
+
+    <div class="mb-4">
+      <h1 class="text-2xl font-bold text-[#002c6b] inline-block mr-2">
+        Daily Tracking Statistics
+      </h1>
       <span class="text-sm text-[#002c6b]">{{ today | date:'fullDate' }}</span>
-      <p class="text-gray-600">Monitor cash flow and agent performance</p>
+
+      <p class="text-gray-600 mt-1">
+        Monitor cash flow and agent performance
+      </p>
+
+      <!-- Sous-titre stylisé pour la section INACTIVE DETAILS -->
+      <div class="mt-3 inline-block px-4 py-1 bg-[#fff4eb] border-l-4 border-[#cc5200] rounded-md shadow-sm">
+        <p class="text-[#cc5200] text-sm font-semibold tracking-wide uppercase">
+          🔍 INACTIVE DETAILS — Breakdown of Inactive Agents
+        </p>
+      </div>
     </div>
+
 
     <div class="flex flex-col gap-4 mt-4 sm:flex-row md:mt-0">
       <div class="relative">
