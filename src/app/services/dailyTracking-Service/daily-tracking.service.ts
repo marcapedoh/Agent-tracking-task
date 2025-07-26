@@ -8,7 +8,7 @@ export class DailyTrackingService {
 
   constructor(private httpClient: HttpClient) { }
 
-  getAllSnapshot(snapshotDate: string, page: number = 0, size: number= 100) {
+  getAllSnapshot(snapshotDate: string, page: number = 0, size: number = 10) {
     const params = {
       snapshotDate: snapshotDate,
       page: page,

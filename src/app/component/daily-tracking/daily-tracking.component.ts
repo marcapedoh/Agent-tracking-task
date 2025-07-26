@@ -157,9 +157,9 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     { value: '', label: 'All Statuses' },
     { value: 'Need_Cashing', label: 'Need Cash In' },
     { value: 'Need_Cashout', label: 'Need Cash Out' },
-    { value: 'Dormant', label: 'Available for Transfer' },
-    { value: 'Inactive', label: 'Dormant' },
-    { value: 'Normal', label: 'Inactive' }
+    { value: 'Dormant', label: 'Dormant' },
+    { value: 'Inactive', label: 'Inactive' },
+    { value: 'Normal', label: 'Normal' }
   ];
   // Bulk SMS properties
   activeDetailsTab: 'info' | 'messages' = 'info';
@@ -236,7 +236,6 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   getInactiveRetailersCount(days: number): number {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
-
     return 0
   }
 
@@ -517,7 +516,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
 
     this.filteredRetailers = [...this.retailers];
     this.dailyTrackingService.getAllZone().subscribe((data: any) => {
-      console.log(data)
+
       this.zones = data
       this.zones.forEach((zone: any) => {
         this.dailyTrackingService.getSubZonesPerZoneName(zone.name).subscribe((res: any) => {
@@ -532,6 +531,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   dateObj = new Date()
   selectDate = ''
   datas: any[] = []
+  allData: any[] = []
   filterData() {
     if (!this.selectDate) {
       console.warn("Aucune date sélectionnée !");
@@ -543,8 +543,11 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
 
     this.dailyTrackingService.getAllSnapshot(this.selectDate, 0, this.itemsPerPage).subscribe((res: any) => {
       console.log(res.content);
-      this.datas = res.content
+      this.allData = res.content;   // Original
+      this.datas = [...this.allData];
     })
+
+
   }
   hasSubzones(): boolean {
     return !!(this.selectedZone && this.zonesWithSub[this.selectedZone]?.length > 0);
@@ -561,16 +564,12 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   getCurrentSubzones(): string[] {
     return this.selectedZone ? this.zonesWithSub[this.selectedZone] || [] : [];
   }
-
   ngOnDestroy(): void {
     clearInterval(this.alertInterval);
   }
-
-
   changePage(page: number): void {
     this.currentPage = page;
   }
-
   initChart() {
     this.chartOptions = {
       series: [
@@ -640,34 +639,105 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.selectedDays);
 
-    this.filteredRetailers = this.datas.filter((retailer: any) => {
+    this.datas = this.datas.filter((retailer: any) => {
       // 1. Filtre par zone principale OU sous-zone
-      const zoneMatch = !this.selectedZone ||
-        retailer.zone === this.selectedZone ||
-        retailer.subZone === this.selectedZone;
+      // const zoneMatch = !this.selectedZone ||
+      //   retailer.zone === this.selectedZone ||
+      //   retailer.subZone === this.selectedZone;
 
       // 2. Si une sous-zone est sélectionnée, vérifier qu'elle correspond
+      // const subzoneMatch = !this.selectedSubzone ||
+      //   retailer.subZone === this.selectedSubzone;
+
+      // 3. Filtre par statut
+      // const statusMatch = !this.selectedStatus ||
+      //   retailer.agentStatus?.toUpperCase() === this.selectedStatus.toUpperCase() ||
+      //   (this.selectedStatus === 'Need_Cashing' && retailer.agentStatus.toUpperCase() === 'NEED_CASHING') ||
+      //   (this.selectedStatus === 'Need_Cashout' && retailer.agentStatus.toUpperCase() === 'NEED_CASHOUT') ||
+      //   (this.selectedStatus === 'Dormant' && retailer.agentStatus.toUpperCase() === 'DORMANT') ||
+      //   (this.selectedStatus === 'Inactive' && retailer.agentStatus.toUpperCase() === 'INACTIVE') ||
+      //   (this.selectedStatus === 'Normal' && retailer.agentStatus.toUpperCase() === 'NORMAL');
+
+      // console.log(statusMatch)
+      // // 4. Filtre temporel pour les inactifs
+      // const inactiveDurationMatch = !this.isInactiveFilterActive ||
+      //   !this.selectedStatus ||
+      //   this.selectedStatus !== 'Inactive' ||
+      //   (retailer.agentStatus.toUpperCase() === 'INACTIVE' && new Date(this.selectDate) <= cutoffDate);
+
       const subzoneMatch = !this.selectedSubzone ||
         retailer.subZone === this.selectedSubzone;
 
-      // 3. Filtre par statut
+      const statusMapping: { [key: string]: string } = {
+        Need_Cashing: 'NEED_CASHING',
+        Need_Cashout: 'NEED_CASHOUT',
+        Dormant: 'DORMANT',
+        Inactive: 'INACTIVE',
+        Normal: 'NORMAL'
+      };
+
       const statusMatch = !this.selectedStatus ||
-        (this.selectedStatus === 'Need_Cashing' && retailer.statusDetails.needCashIn) ||
-        (this.selectedStatus === 'Need_Cashout' && retailer.statusDetails.needCashOut) ||
-        (this.selectedStatus === 'Dormant' && retailer.statusDetails.availableForTransfer) ||
-        (this.selectedStatus === 'Inactive' && retailer.statusDetails.dormant) ||
-        (this.selectedStatus === 'Normal' && retailer.statusDetails.inactive);
+        retailer.agentStatus?.toUpperCase() === statusMapping[this.selectedStatus];
 
-      // 4. Filtre temporel pour les inactifs
       const inactiveDurationMatch = !this.isInactiveFilterActive ||
-        !this.selectedStatus ||
         this.selectedStatus !== 'Inactive' ||
-        (retailer.statusDetails.inactive && new Date(this.selectDate) <= cutoffDate);
+        (retailer.agentStatus?.toUpperCase() === 'INACTIVE' &&
+          retailer.lastActiveDate &&
+          new Date(retailer.lastActiveDate) <= cutoffDate);
 
-      return zoneMatch && subzoneMatch && statusMatch && inactiveDurationMatch;
+      return subzoneMatch && statusMatch && inactiveDurationMatch;
     });
+    console.log(this.datas)
     this.currentPage = 1;
   }
+
+  filterByStatus(): void {
+    if (!this.selectedStatus) {
+      this.datas = [...this.allData]; // Remet la liste complète si aucun statut choisi
+      return;
+    }
+    console.log(this.datas)
+
+    const statusMapping: { [key: string]: string } = {
+      Need_Cashing: 'NEED_CASHING',
+      Need_Cashout: 'NEED_CASHOUT',
+      Dormant: 'DORMANT',
+      Inactive: 'INACTIVE',
+      Normal: 'NORMAL'
+    };
+
+    const mappedStatus = statusMapping[this.selectedStatus];
+    console.log(mappedStatus)
+    this.datas = this.allData.filter(agent =>
+      agent.agentStatus?.toUpperCase() === mappedStatus
+    );
+
+    console.log('Agents filtrés par statut :', this.datas);
+    this.currentPage = 1; // Reset pagination
+  }
+
+  filterByZoneAndSubzone(): void {
+    // Si aucune zone ni sous-zone n'est sélectionnée, on remet tout
+    if (!this.selectedZone && !this.selectedSubzone) {
+      this.datas = [...this.allData];
+      return;
+    }
+
+    let filtered = [...this.allData];
+
+    if (this.selectedZone) {
+      filtered = filtered.filter(agent => agent.zone === this.selectedZone);
+    }
+
+    if (this.selectedSubzone) {
+      filtered = filtered.filter(agent => agent.subZone === this.selectedSubzone);
+    }
+
+    this.datas = filtered;
+    this.currentPage = 1; // Réinitialiser la pagination
+    console.log('Agents filtrés par zone/sous-zone :', this.datas);
+  }
+
 
   get paginatedRetailers(): any[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;

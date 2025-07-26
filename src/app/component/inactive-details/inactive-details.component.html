@@ -8,18 +8,18 @@
       </h1>
       <span class="text-sm text-[#002c6b]">{{ today | date:'fullDate' }}</span>
 
-      <p class="text-gray-600 mt-1">
+      <p class="mt-1 text-gray-600">
         Monitor cash flow and agent performance
       </p>
 
       <!-- Sous-titre stylisé pour la section INACTIVE DETAILS -->
-      <div class="mt-3 inline-block px-4 py-1 bg-[#fff4eb] border-l-4 border-[#cc5200] rounded-md shadow-sm">
+      <div
+        class="mt-3 inline-block px-4 py-1 bg-[#fff4eb] border-l-4 border-[#cc5200] rounded-md shadow-sm">
         <p class="text-[#cc5200] text-sm font-semibold tracking-wide uppercase">
           🔍 INACTIVE DETAILS — Breakdown of Inactive Agents
         </p>
       </div>
     </div>
-
 
     <div class="flex flex-col gap-4 mt-4 sm:flex-row md:mt-0">
       <div class="relative">
@@ -300,24 +300,18 @@
       <span class="text-sm font-medium text-white">Agent status:</span>
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
-        <span class="text-sm text-white">Need Cash In</span>
+        <span class="text-sm text-white">Inactive with main account</span>
       </div>
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
-        <span class="text-sm text-white">Need Cash Out</span>
+        <span class="text-sm text-white">Inactive with withdrawal account</span>
       </div>
-      <div class="flex items-center">
-        <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
-        <span class="text-sm text-white">Normal</span>
-      </div>
+
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
         <span class="text-sm text-white">Inactive</span>
       </div>
-      <div class="flex items-center">
-        <span class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
-        <span class="text-sm text-white">Dormant</span>
-      </div>
+
     </div>
 
     <!-- Table Header with Filters -->
@@ -371,7 +365,7 @@
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Agent Type
+              Category
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
@@ -383,11 +377,11 @@
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Agent Id
+              Agent Code
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              MSISDN
+              Phone Number
             </th>
             <!-- <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
