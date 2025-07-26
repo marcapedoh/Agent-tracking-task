@@ -24,66 +24,116 @@
     <div class="flex flex-col gap-4 mt-4 sm:flex-row md:mt-0">
       <div class="relative">
 
-        <div
-          class="flex flex-col w-full space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 md:w-auto">
+        <div class="flex flex-wrap items-end justify-between gap-4">
 
           <!-- Status Filter -->
-          <select [(ngModel)]="selectedStatus" (change)="applyFilters()"
-            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
-            <option *ngFor="let option of statusOptions"
-              [value]="option.value">{{option.label}}</option>
-          </select>
+          <div class="relative">
+            <label for="statusFilter"
+              class="block mb-1 text-sm font-semibold text-gray-700">Status</label>
+            <select
+              id="statusFilter"
+              [(ngModel)]="selectedStatus"
+              (change)="filterByStatus()"
+              class="w-40 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
+              <option *ngFor="let option of statusOptions"
+                [value]="option.value">{{ option.label }}</option>
+            </select>
+            <!-- Dropdown arrow -->
+            <div
+              class="absolute inset-y-0 flex items-center pointer-events-none right-3">
+              <svg class="w-4 h-4 text-gray-500" fill="none"
+                stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6 9l6 6 6-6"></path>
+              </svg>
+            </div>
+          </div>
 
           <!-- Zone Filter -->
-          <div class="flex flex-col space-y-2">
-            <!-- Sélecteur principal -->
-            <select [(ngModel)]="selectedZone" (change)="onZoneChange()"
-              class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
+          <div class="relative">
+            <label for="zoneFilter"
+              class="block mb-1 text-sm font-semibold text-gray-700">Zone</label>
+            <select
+              id="zoneFilter"
+              [(ngModel)]="selectedZone"
+              (change)="filterByZoneAndSubzone()"
+              class="w-40 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
               <option value>All Zones</option>
-              <option *ngFor="let zone of zones"
-                [value]="zone.name">{{zone.name}}</option>
+              <option *ngFor="let zone of zones" [value]="zone.name">{{
+                zone.name
+                }}</option>
             </select>
-
-            <!-- Sous-zones (affiché conditionnellement) -->
-            <div *ngIf="hasSubzones()" class="flex items-center pl-4">
-              <!-- Ligne verticale décorative -->
-              <div
-                class="w-4 h-8 border-l-2 border-gray-300 border-dashed"></div>
-              <!-- Flèche -->
-              <svg class="w-4 h-4 -ml-4 text-gray-400" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Dropdown arrow -->
+            <div
+              class="absolute inset-y-0 flex items-center pointer-events-none right-3">
+              <svg class="w-4 h-4 text-gray-500" fill="none"
+                stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  d="M6 9l6 6 6-6"></path>
               </svg>
-              <!-- Sélecteur des sous-zones -->
-              <select [(ngModel)]="selectedSubzone" (change)="applyFilters()"
-                class="w-full px-3 py-2 ml-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-36">
-                <option value>All Subzones</option>
-                <option *ngFor="let subzone of  zonesWithSub[selectedZone]"
-                  [value]="subzone">{{subzone}}</option>
-              </select>
+            </div>
+          </div>
+
+          <!-- Subzone Filter (conditionnel) -->
+          <div *ngIf="hasSubzones()" class="relative">
+            <label for="subzoneFilter"
+              class="block mb-1 text-sm font-semibold text-gray-700">Subzone</label>
+            <select
+              id="subzoneFilter"
+              [(ngModel)]="selectedSubzone"
+              (change)="applyFilters()"
+              class="w-36 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
+              <option value>All Subzones</option>
+              <option *ngFor="let subzone of zonesWithSub[selectedZone]"
+                [value]="subzone">{{ subzone }}</option>
+            </select>
+            <!-- Dropdown arrow -->
+            <div
+              class="absolute inset-y-0 flex items-center pointer-events-none right-3">
+              <svg class="w-4 h-4 text-gray-500" fill="none"
+                stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6 9l6 6 6-6"></path>
+              </svg>
             </div>
           </div>
 
           <!-- Date Filter -->
-          <input type="date" [(ngModel)]="selectDate"
-            (change)="filterData()"
-            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-40">
+          <div>
+            <label for="dateFilter"
+              class="block mb-1 text-sm font-semibold text-gray-700">Date</label>
+            <input
+              id="dateFilter"
+              type="date"
+              [(ngModel)]="selectDate"
+              (change)="filterData()"
+              class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm
+               focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]" />
+          </div>
+
+          <!-- Export Report Button -->
+          <div>
+            <button
+              (click)="exportReport()"
+              class="flex items-center gap-2 px-5 py-2 text-white bg-[#FF6600] rounded-lg
+               hover:bg-[#FF6614] transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:ring-opacity-50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+                viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                  clip-rule="evenodd" />
+              </svg>
+              <span class="font-medium">Export Report</span>
+            </button>
+          </div>
 
         </div>
 
       </div>
 
-      <button
-        class="flex items-center gap-2 px-4 py-2 text-white transition-colors bg-[#FF6600] rounded-lg hover:bg-[#FF6614]">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-          viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd"
-            d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-            clip-rule="evenodd" />
-        </svg>
-        <span class="font-medium">Export Report</span>
-      </button>
     </div>
 
   </div>
@@ -381,6 +431,14 @@
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+              Main Account Amount
+            </th>
+            <th scope="col"
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
+              withdrawal Account Amount
+            </th>
+            <th scope="col"
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
               Phone Number
             </th>
             <!-- <th scope="col"
@@ -423,28 +481,47 @@
             </td>
             <td class="px-3 py-4 text-center whitespace-nowrap">
               <div class="flex items-center justify-center gap-2">
-                <span *ngIf="agent.agentStatus=='Need_Cashing'"
+                <span
+                  *ngIf="agent.agentStatus=='Inactive' && agent.mainAccountBalance>10"
                   class="inline-block w-5 h-5 bg-blue-500 rounded-full"
                   title="Transaction Anormale"></span>
-                <span *ngIf="agent.agentStatus=='Need_Cashout'"
+                <span
+                  *ngIf="agent.agentStatus=='Inactive' && agent.cashoutAccountBalance>10"
                   class="inline-block w-5 h-5 bg-purple-500 rounded-full"
                   title="Suspicion de Fraude"></span>
-                <span *ngIf="agent.agentStatus=='Dormant'"
+                <!-- <span *ngIf="agent.agentStatus=='Dormant'"
                   class="inline-block w-5 h-5 bg-red-500 rounded-full"
-                  title="Urgent"></span>
-                <span *ngIf="agent.agentStatus=='Inactive'"
+                  title="Urgent"></span> -->
+                <!-- <span *ngIf="agent.agentStatus=='Inactive'"
                   class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
-                  title="A Surveiller"></span>
-                <span *ngIf="agent.agentStatus=='Normal'"
+                  title="A Surveiller"></span> -->
+                <!-- <span *ngIf="agent.agentStatus=='Normal'"
                   class="inline-block w-5 h-5 bg-green-500 rounded-full"
-                  title="A Surveiller"></span>
+                  title="A Surveiller"></span> -->
 
               </div>
             </td>
             <td
               class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
-              {{agent.agentId}}
+              {{agent.shortCode}}
             </td>
+            <td
+              class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
+              {{ agent.mainAccountBalance
+              ? (agent.mainAccountBalance | number) +
+              ' XAF'
+              : 'N/A' }}
+
+            </td>
+            <td
+              class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
+              {{ agent.cashoutAccountBalance
+              ? (agent.cashoutAccountBalance | number) +
+              ' XAF'
+              : 'N/A' }}
+
+            </td>
+
             <td
               class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
               {{agent.msisdn}}

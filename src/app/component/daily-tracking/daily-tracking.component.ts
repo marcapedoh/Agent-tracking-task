@@ -138,7 +138,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   selectedRetailers: any[] = [];
   allSelected: boolean = false;
   // Modal related properties
-  selectedRetailer: Retailer | null = null;
+  selectedRetailer: any = {};
   showBulkSMSModal: boolean = false;
   activeTab: 'retailer' | 'aggregator' = 'retailer';
   activeMainTab: 'list' | 'details' = 'list';
@@ -501,12 +501,13 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   constructor(private dailyTrackingService: DailyTrackingService) { }
 
   zonesWithSub: any = []
+  agents: any[] = []
   ngOnInit(): void {
     //this.initAlerts();
     this.initInactivityAlerts();
     this.initCounterAnimation();
     this.initFilterToggle();
-
+    this.initChart();
     // Définir la date du jour au format 'YYYY-MM-DD'
     const today = new Date();
     this.selectDate = today.toISOString().substring(0, 10);
@@ -524,6 +525,11 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
           console.log(this.zonesWithSub)
         })
       })
+    })
+
+    this.dailyTrackingService.getAllAgent().subscribe((res: any) => {
+      console.log(res)
+      this.agents = res
     })
 
   }
@@ -575,15 +581,15 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
       series: [
         {
           name: "Principal Balance",
-          data: this.selectedRetailer?.balanceHistory?.map(item => item.principalBalance) || []
+          data: this.selectedRetailer?.balanceHistory?.map((item: any) => item.principalBalance) || [14, 78, 5, 21, 19, 8, 11]
         },
         {
           name: "Withdrawal Balance",
-          data: this.selectedRetailer?.balanceHistory?.map(item => item.withdrawalBalance) || []
+          data: this.selectedRetailer?.balanceHistory?.map((item: any) => item.withdrawalBalance) || [25, 36, 23, 12, 7, 2, 16]
         },
         {
           name: "Auto Transfer",
-          data: this.selectedRetailer?.balanceHistory?.map(item => item.autoTransferAmount) || []
+          data: this.selectedRetailer?.balanceHistory?.map((item: any) => item.autoTransferAmount) || [18, 52, 13, 42, 8, 5, 5]
         }
       ],
       chart: {
@@ -602,7 +608,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
         width: 2
       },
       xaxis: {
-        categories: this.selectedRetailer?.balanceHistory?.map(item =>
+        categories: this.selectedRetailer?.balanceHistory?.map((item: any) =>
           new Date(item.date).toLocaleDateString()
         ) || [],
         labels: {
@@ -614,14 +620,14 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
       yaxis: {
         labels: {
           formatter: (value) => {
-            return `XAF ${value.toLocaleString()}`;
+            return ` ${value.toLocaleString()}`;
           }
         }
       },
       tooltip: {
         y: {
           formatter: (value) => {
-            return `XAF ${value.toLocaleString()}`;
+            return ` ${value.toLocaleString()}`;
           }
         }
       },
@@ -751,8 +757,15 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
     return Math.ceil(this.datas.length / this.itemsPerPage);
   }
 
+  agentFound: any = {}
   openAgentModal(agent: any): void {
     this.selectedRetailer = agent;
+    console.log(agent)
+    this.agentFound = this.agents.find((agent: any) =>
+      this.selectedRetailer.agentId == agent.id
+    )
+
+    console.log("AgentFound ", this.agentFound)
   }
 
   allAgentsSelected: boolean = false;

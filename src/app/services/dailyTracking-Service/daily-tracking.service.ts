@@ -27,4 +27,8 @@ export class DailyTrackingService {
   getSubZonesPerZoneName(zoneName: string) {
     return this.httpClient.get(`http://localhost:8080/agent-tracking/api/data/zones/${zoneName}/subzones/names`)
   }
+
+  getAllAgent() {
+    return this.httpClient.get("http://localhost:8080/agent-tracking/api/data/agents")
+  }
 }

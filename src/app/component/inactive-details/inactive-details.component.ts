@@ -66,9 +66,9 @@ export class InactiveDetailsComponent implements OnInit {
     { value: '', label: 'All Statuses' },
     { value: 'Need_Cashing', label: 'Need Cash In' },
     { value: 'Need_Cashout', label: 'Need Cash Out' },
-    { value: 'Dormant', label: 'Available for Transfer' },
-    { value: 'Inactive', label: 'Dormant' },
-    { value: 'Normal', label: 'Inactive' }
+    { value: 'Dormant', label: 'Dormant' },
+    { value: 'Inactive', label: 'Inactive' },
+    { value: 'Normal', label: 'Normal' }
   ];
   selectedStatus: string = '';
   selectedSubzone: string = '';
@@ -123,20 +123,7 @@ export class InactiveDetailsComponent implements OnInit {
     })
   }
 
-  filterData() {
-    if (!this.selectDate) {
-      console.warn("Aucune date sélectionnée !");
-      return;
-    }
 
-    const formattedDate = new Date(this.selectDate).toISOString().split('T')[0];
-    this.dateObj = new Date(formattedDate);
-
-    this.dailyTrackingService.getAllSnapshot(this.selectDate, 0, 25).subscribe((res: any) => {
-      console.log(res.content);
-      this.datas = res.content
-    })
-  }
   hasSubzones(): boolean {
     return !!(this.selectedZone && this.zonesWithSub[this.selectedZone]?.length > 0);
   }
@@ -165,6 +152,31 @@ export class InactiveDetailsComponent implements OnInit {
     } else {
       this.selectedAgents = [];
     }
+  }
+
+  filterByStatus(): void {
+    if (!this.selectedStatus) {
+      this.datas = [...this.allData]; // Remet la liste complète si aucun statut choisi
+      return;
+    }
+    console.log(this.datas)
+
+    const statusMapping: { [key: string]: string } = {
+      Need_Cashing: 'NEED_CASHING',
+      Need_Cashout: 'NEED_CASHOUT',
+      Dormant: 'DORMANT',
+      Inactive: 'INACTIVE',
+      Normal: 'NORMAL'
+    };
+
+    const mappedStatus = statusMapping[this.selectedStatus];
+    console.log(mappedStatus)
+    this.datas = this.allData.filter(agent =>
+      agent.agentStatus?.toUpperCase() === mappedStatus
+    );
+
+    console.log('Agents filtrés par statut :', this.datas);
+    this.currentPage = 1; // Reset pagination
   }
 
   isAgentSelected(agent: any): boolean {
@@ -234,6 +246,49 @@ export class InactiveDetailsComponent implements OnInit {
         counter.innerText = target.toString();
       }
     });
+  }
+  exportReport() {
+
+  }
+  allData: any[] = []
+  filterData() {
+    if (!this.selectDate) {
+      console.warn("Aucune date sélectionnée !");
+      return;
+    }
+
+    const formattedDate = new Date(this.selectDate).toISOString().split('T')[0];
+    this.dateObj = new Date(formattedDate);
+
+    this.dailyTrackingService.getAllSnapshot(this.selectDate, 0, this.itemsPerPage).subscribe((res: any) => {
+      console.log(res.content);
+      this.allData = res.content;   // Original
+      this.datas = [...this.allData];
+    })
+
+
+  }
+
+  filterByZoneAndSubzone(): void {
+    // Si aucune zone ni sous-zone n'est sélectionnée, on remet tout
+    if (!this.selectedZone && !this.selectedSubzone) {
+      this.datas = [...this.allData];
+      return;
+    }
+
+    let filtered = [...this.allData];
+
+    if (this.selectedZone) {
+      filtered = filtered.filter(agent => agent.zone === this.selectedZone);
+    }
+
+    if (this.selectedSubzone) {
+      filtered = filtered.filter(agent => agent.subZone === this.selectedSubzone);
+    }
+
+    this.datas = filtered;
+    this.currentPage = 1; // Réinitialiser la pagination
+    console.log('Agents filtrés par zone/sous-zone :', this.datas);
   }
 
   onZoneChange() {

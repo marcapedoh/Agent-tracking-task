@@ -503,7 +503,7 @@
             <div class="flex items-center justify-between">
 
               <h3 class="text-lg font-medium leading-6 text-gray-900">
-                Agent Details - {{selectedRetailer.code}}
+                Agent Details - {{selectedRetailer.shortCode}}
               </h3>
 
               <button (click)="closeModal()"
@@ -521,7 +521,7 @@
               <!-- Tabs -->
               <div class="border-b border-gray-200">
 
-                <!--       Menu       -->
+                <!--  Menu  -->
                 <nav class="flex -mb-px space-x-8">
 
                   <button (click)="activeTab = 'retailer'; initChart()"
@@ -550,164 +550,213 @@
 
               <!-- Retailer Info Tab -->
               <div *ngIf="activeTab === 'retailer'" class="mt-4">
+                <!-- General Info Section -->
+                <fieldset
+                  class="p-4 bg-white border border-gray-300 rounded-lg shadow-sm">
+                  <legend
+                    class="px-3 text-lg font-semibold text-gray-700">General
+                    Information</legend>
+                  <div class="grid grid-cols-1 gap-4 mt-2 sm:grid-cols-3">
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Full Name</p>
+                      <p
+                        class="mt-1 text-sm text-gray-900">{{agentFound.name}}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Phone
+                        Number</p>
+                      <p
+                        class="mt-1 text-sm text-gray-900">{{agentFound.msisdn}}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Category</p>
+                      <p
+                        class="mt-1 text-sm text-gray-900">{{agentFound.type}}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Site</p>
+                      <p
+                        class="mt-1 text-sm text-gray-900">{{selectedRetailer.siteName}}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Zone</p>
+                      <p
+                        class="mt-1 text-sm text-gray-900">{{selectedRetailer.zone}}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">SubZone</p>
+                      <p
+                        class="mt-1 text-sm text-gray-900">{{selectedRetailer.subZone}}</p>
+                    </div>
+                  </div>
+                </fieldset>
+                <!-- Balances Section -->
+                <fieldset
+                  class="p-4 mb-3 border border-gray-300 rounded-lg bg-gray-50">
+                  <legend class="px-3 text-base font-semibold text-gray-700">
+                    Current Account Balance
+                  </legend>
+
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <!-- Main Account Balance -->
+                    <div class="text-center">
+                      <p class="text-sm font-medium text-gray-500">Main Account
+                        Balance</p>
+                      <p class="mt-1 text-lg font-semibold text-gray-900">
+                        {{ selectedRetailer.mainAccountBalance
+                        ? (selectedRetailer.mainAccountBalance | number) +
+                        ' XAF'
+                        : 'N/A' }}
+                      </p>
+                    </div>
+
+                    <!-- Cashout Account Balance -->
+                    <div class="text-center">
+                      <p class="text-sm font-medium text-gray-500">Cashout
+                        Account Balance</p>
+                      <p class="mt-1 text-lg font-semibold text-gray-900">
+                        {{ selectedRetailer.cashoutAccountBalance != null
+                        ? (selectedRetailer.cashoutAccountBalance | number) +
+                        ' XAF'
+                        : 'N/A' }}
+                      </p>
+                    </div>
+
+                    <!-- Commission Account Balance -->
+                    <div class="text-center">
+                      <p class="text-sm font-medium text-gray-500">Commission
+                        Account Balance</p>
+                      <p class="mt-1 text-lg font-semibold text-gray-900">
+                        {{ selectedRetailer.commissionAccountBalance
+                        ? (selectedRetailer.commissionAccountBalance | number) +
+                        ' XAF'
+                        : 'N/A' }}
+                      </p>
+                    </div>
+                  </div>
+                </fieldset>
 
                 <!-- Balances Section -->
-                <div
-                  class="grid grid-cols-1 gap-4 p-4 rounded-lg bg-gray-50 sm:grid-cols-3">
+                <fieldset
+                  class="p-4 mt-4 border border-gray-300 rounded-lg bg-gray-50">
+                  <legend class="px-3 text-base font-semibold text-gray-700">
+                    Account Limits
+                  </legend>
 
-                  <div class="text-center">
-                    <p class="text-sm font-medium text-gray-500">Main Account
-                      Balance</p>
-                    <p class="mt-1 text-lg font-semibold text-gray-900">
-                      XAF {{selectedRetailer.principalBalance | number}}
-                    </p>
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <!-- Ceiling Amount -->
+                    <div class="text-center">
+                      <p class="text-sm font-medium text-gray-500">Ceiling
+                        Amount</p>
+                      <p class="mt-1 text-lg font-semibold text-gray-900">
+                        {{ selectedRetailer.ceilingAmount
+                        ? (selectedRetailer.ceilingAmount | number) + ' XAF'
+                        : 'N/A' }}
+                      </p>
+                    </div>
+
+                    <!-- Threshold Amount -->
+                    <div class="text-center">
+                      <p class="text-sm font-medium text-gray-500">Threshold
+                        Amount</p>
+                      <p class="mt-1 text-lg font-semibold text-gray-900">
+                        {{ selectedRetailer.thresholdAmount
+                        ? (selectedRetailer.thresholdAmount | number) + ' XAF'
+                        : 'N/A' }}
+                      </p>
+                    </div>
+
+                    <!-- Inactive Days -->
+                    <div class="text-center">
+                      <p class="text-sm font-medium text-gray-500">Inactive
+                        Days</p>
+                      <p class="mt-1 text-lg font-semibold text-gray-900">
+                        {{ selectedRetailer.momoInactiveDays
+                        ? (selectedRetailer.momoInactiveDays | number)
+                        : 'N/A' }}
+                      </p>
+                    </div>
                   </div>
-
-                  <div class="text-center">
-                    <p class="text-sm font-medium text-gray-500">Cashout Account
-                      Balance</p>
-                    <p class="mt-1 text-lg font-semibold text-gray-900">
-                      XAF {{selectedRetailer.withdrawalBalance | number}}
-                    </p>
-                  </div>
-
-                  <div class="text-center">
-                    <p class="text-sm font-medium text-gray-500">Commission
-                      Account Balance</p>
-                    <p class="mt-1 text-lg font-semibold text-gray-900">
-                      XAF {{ selectedRetailer.autoTransferAmount != null ?
-                      (selectedRetailer.autoTransferAmount | number) : '0' }}
-                    </p>
-
-                  </div>
-                </div>
-
-                <!-- Balances Section -->
-                <div
-                  class="grid grid-cols-1 gap-4 p-4 rounded-lg bg-gray-50 sm:grid-cols-3">
-
-                  <div class="text-center">
-                    <p class="text-sm font-medium text-gray-500">Main Account
-                      Balance</p>
-                    <p class="mt-1 text-lg font-semibold text-gray-900">
-                      XAF {{selectedRetailer.principalBalance | number}}
-                    </p>
-                  </div>
-
-                  <div class="text-center">
-                    <p class="text-sm font-medium text-gray-500">Cashout Account
-                      Balance</p>
-                    <p class="mt-1 text-lg font-semibold text-gray-900">
-                      XAF {{selectedRetailer.withdrawalBalance | number}}
-                    </p>
-                  </div>
-
-                  <div class="text-center">
-                    <p class="text-sm font-medium text-gray-500">Commission
-                      Account Balance</p>
-                    <p class="mt-1 text-lg font-semibold text-gray-900">
-                      XAF {{ selectedRetailer.autoTransferAmount != null ?
-                      (selectedRetailer.autoTransferAmount | number) : '0' }}
-                    </p>
-
-                  </div>
-                </div>
+                </fieldset>
 
                 <!-- Status Details Section -->
-                <div
-                  class="grid grid-cols-1 gap-4 p-4 mt-4 rounded-lg bg-gray-50 sm:grid-cols-2">
-                  <!--  Status Display -->
-                  <div class="mt-4">
-                    <p class="mb-2 text-sm font-medium text-gray-500">
-                      Status:</p>
+                <fieldset
+                  class="p-4 mt-4 border border-gray-300 rounded-lg bg-gray-50">
+                  <legend class="px-2 text-sm font-semibold text-gray-600">
+                    Agent Status
+                  </legend>
 
-                    <div class="flex flex-wrap items-center gap-4">
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <!-- Status Display -->
+                    <div class="mt-4">
+                      <p
+                        class="mb-2 text-sm font-medium text-gray-500">Status:</p>
 
-                      <div *ngIf="selectedRetailer.statusDetails.needCashIn"
-                        class="flex items-center">
-                        <span
-                          class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
-                        <span class="text-sm text-gray-700">Need Cash In</span>
+                      <div class="flex flex-wrap items-center gap-4">
+                        <div
+                          *ngIf="selectedRetailer.agentStatus=='Need_Cashing'"
+                          class="flex items-center">
+                          <span
+                            class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
+                          <span class="text-sm text-gray-700">Need Cash
+                            In</span>
+                        </div>
+
+                        <div
+                          *ngIf="selectedRetailer.agentStatus=='Need_Cashout'"
+                          class="flex items-center">
+                          <span
+                            class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
+                          <span class="text-sm text-gray-700">Need Cash
+                            Out</span>
+                        </div>
+
+                        <div *ngIf="selectedRetailer.agentStatus=='Inactive'"
+                          class="flex items-center">
+                          <span
+                            class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
+                          <span class="text-sm text-gray-700">Inactive</span>
+                        </div>
+
+                        <div *ngIf="selectedRetailer.agentStatus=='Dormant'"
+                          class="flex items-center">
+                          <span
+                            class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
+                          <span class="text-sm text-gray-700">Dormant</span>
+                        </div>
                       </div>
+                    </div>
 
-                      <div *ngIf="selectedRetailer.statusDetails.needCashOut"
-                        class="flex items-center">
-                        <span
-                          class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
-                        <span class="text-sm text-gray-700">Need Cash Out</span>
+                    <!-- Type Display -->
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Type</p>
+                      <div class="mt-1">
+                        <span [ngClass]="{
+          'bg-purple-100 text-purple-800': selectedRetailer.type === 'VIP',
+          'bg-blue-100 text-blue-800': selectedRetailer.type === 'ordinary'
+        }"
+                          class="inline-flex px-2 py-1 text-xs font-semibold leading-5 rounded-full">
+                          {{ selectedRetailer.type ? (selectedRetailer.type |
+                          uppercase) : 'ORDINARY' }}
+                        </span>
                       </div>
-
-                      <div
-                        *ngIf="selectedRetailer.statusDetails.availableForTransfer"
-                        class="flex items-center">
-                        <span
-                          class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
-                        <span class="text-sm text-gray-700">Available for
-                          Transfer</span>
-                      </div>
-
-                      <div *ngIf="selectedRetailer.statusDetails.inactive"
-                        class="flex items-center">
-                        <span
-                          class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
-                        <span class="text-sm text-gray-700">Inactive</span>
-                      </div>
-
-                      <div *ngIf="selectedRetailer.statusDetails.dormant"
-                        class="flex items-center">
-                        <span
-                          class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
-                        <span class="text-sm text-gray-700">Dormant</span>
-                      </div>
-
                     </div>
                   </div>
+                </fieldset>
 
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Type</p>
-                    <div class="mt-1">
-                      <span [ngClass]="{
-                        'bg-purple-100 text-purple-800': selectedRetailer.type === 'VIP',
-                        'bg-blue-100 text-blue-800': selectedRetailer.type === 'ordinary'
-                      }"
-                        class="inline-flex px-2 py-1 text-xs font-semibold leading-5 rounded-full">
-                        {{ selectedRetailer.type ? (selectedRetailer.type |
-                        uppercase) : 'ORDINARY' }}
-
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- General Info Section -->
-                <div
-                  class="grid grid-cols-1 gap-4 p-4 mt-4 rounded-lg bg-gray-50 sm:grid-cols-2">
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Full Name</p>
-                    <p
-                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.fullName}}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Zone</p>
-                    <p
-                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.zone}}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Last
-                      Activity</p>
-                    <p class="mt-1 text-sm text-gray-900">
-                      {{ selectedRetailer.lastActivityDate ?
-                      (selectedRetailer.lastActivityDate | date:'medium') :
-                      'N/A' }}
-                    </p>
-
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Top
-                      Aggregator</p>
-                    <p
-                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregatorCode}}</p>
-                  </div>
+                <div class="p-4 mt-4 bg-white rounded-lg shadow-md">
+                  <h3 class="mb-4 text-lg font-semibold text-gray-700">Balance
+                    History</h3>
+                  <apx-chart
+                    [series]="chartOptions.series!"
+                    [chart]="chartOptions.chart!"
+                    [xaxis]="chartOptions.xaxis!"
+                    [yaxis]="chartOptions.yaxis!"
+                    [stroke]="chartOptions.stroke!"
+                    [tooltip]="chartOptions.tooltip!"
+                    [legend]="chartOptions.legend!"
+                    [colors]="chartOptions.colors!">
+                  </apx-chart>
                 </div>
 
               </div>
@@ -769,19 +818,19 @@
       </div>
 
       <!-- Boutons -->
-      <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
-        <button type="button" (click)="sendSMS(selectedRetailer)"
-          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-          Send SMS to Aggregator
-        </button>
+      <div
+        class="items-center justify-center px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+
         <button type="button" (click)="sendSMSDirect(selectedRetailer)"
-          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
-          Send SMS to Agent
+          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-[#FF6600] border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+          Position
         </button>
-        <button type="button" (click)="closeModal()"
-          class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-          Close
+
+        <button type="button" (click)="sendSMS(selectedRetailer)"
+          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-gray-800 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+          Send Sms
         </button>
+
       </div>
 
     </div>
