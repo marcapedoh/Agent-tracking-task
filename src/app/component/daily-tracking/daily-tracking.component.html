@@ -520,28 +520,35 @@
             <div class="mt-4">
               <!-- Tabs -->
               <div class="border-b border-gray-200">
+                <nav class="flex -mb-px space-x-8 overflow-x-auto">
 
-                <!--  Menu  -->
-                <nav class="flex -mb-px space-x-8">
-
-                  <button (click)="activeTab = 'retailer'; initChart()"
-                    [class.border-blue-500]="activeTab === 'retailer'"
-                    [class.text-blue-600]="activeTab === 'retailer'"
-                    class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap hover:text-gray-700 hover:border-gray-300">
+                  <button
+                    (click)="activeTab = 'retailer'; initChart()"
+                    [ngClass]="{
+        'text-orange-600 border-b-2 border-blue-500 font-semibold': activeTab === 'retailer',
+        'text-gray-500 border-b-2 border-transparent hover:text-orange-600 hover:border-blue-300': activeTab !== 'retailer'
+      }"
+                    class="px-1 py-4 text-sm transition duration-200 ease-in-out whitespace-nowrap">
                     Agent Info
                   </button>
 
-                  <button (click)="activeTab = 'aggregator'"
-                    [class.border-blue-500]="activeTab === 'aggregator'"
-                    [class.text-blue-600]="activeTab === 'aggregator'"
-                    class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap hover:text-gray-700 hover:border-gray-300">
+                  <button
+                    (click)="activeTab = 'aggregator'"
+                    [ngClass]="{
+        'text-orange-600 border-b-2 border-blue-500 font-semibold': activeTab === 'aggregator',
+        'text-gray-500 border-b-2 border-transparent hover:text-orange-600 hover:border-blue-300': activeTab !== 'aggregator'
+      }"
+                    class="px-1 py-4 text-sm transition duration-200 ease-in-out whitespace-nowrap">
                     Main Aggregator Info
                   </button>
 
-                  <button (click)="activeTab ='Location'"
-                    [class.border-blue-500]="activeTab === 'Location'"
-                    [class.text-blue-600]="activeTab === 'Location'"
-                    class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap hover:text-gray-700 hover:border-gray-300">
+                  <button
+                    (click)="activeTab = 'Location'"
+                    [ngClass]="{
+        'text-orange-600 border-b-2 border-blue-500 font-semibold': activeTab === 'Location',
+        'text-gray-500 border-b-2 border-transparent hover:text-orange-600 hover:border-blue-300': activeTab !== 'Location'
+      }"
+                    class="px-1 py-4 text-sm transition duration-200 ease-in-out whitespace-nowrap">
                     Location
                   </button>
 
@@ -589,6 +596,8 @@
                         class="mt-1 text-sm text-gray-900">{{selectedRetailer.subZone}}</p>
                     </div>
                   </div>
+                  <!-- Boutons -->
+
                 </fieldset>
                 <!-- Balances Section -->
                 <fieldset
@@ -780,6 +789,15 @@
                   </apx-chart>
                 </div>
 
+                <div
+                  class="px-4 py-3 text-end bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+
+                  <button type="button" (click)="sendSMS(selectedRetailer)"
+                    class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-gray-800 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Send Sms
+                  </button>
+
+                </div>
               </div>
 
               <!-- Aggregator Info Tab (unchanged) -->
@@ -822,6 +840,15 @@
                       class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.email
                       || 'N/A'}}</p>
                   </div> -->
+                  <div
+                    class="px-4 py-3 text-end bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+
+                    <button type="button" (click)="sendSMS(selectedRetailer)"
+                      class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-gray-800 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                      Send Sms
+                    </button>
+
+                  </div>
                 </div>
                 <div *ngIf="!mainAgregateur"
                   class="p-4 text-center text-gray-500 rounded-lg bg-gray-50">
@@ -849,17 +876,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Boutons -->
-      <div
-        class="px-4 py-3 text-end bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
-
-        <button type="button" (click)="sendSMS(selectedRetailer)"
-          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-gray-800 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-          Send Sms
-        </button>
-
       </div>
 
     </div>

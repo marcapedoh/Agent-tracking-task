@@ -22,10 +22,61 @@
     </div>
 
     <div class="flex flex-col gap-4 mt-4 sm:flex-row md:mt-0">
-      <div class="relative">
+      <div class="p-4 bg-white rounded-lg shadow-md">
+        <div
+          class="grid items-end justify-between grid-cols-1 gap-4 md:grid-cols-4">
+          <!-- Filtre par nombre de jours inactifs -->
+          <div>
+            <label for="inactiveDays"
+              class="block mb-1 text-sm font-medium text-gray-700">Jours
+              d'inactivité</label>
+            <div class="relative">
+              <input type="number"
+                id="inactiveDays"
+                min="1"
+                [(ngModel)]="selectedInactiveDays"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Nombre de jours">
+              <div
+                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <span class="text-gray-500">jours</span>
+              </div>
+            </div>
+          </div>
 
-        <div class="flex flex-wrap items-end justify-between gap-4">
+          <!-- Filtre par montant Main Account -->
+          <div>
+            <label for="mainAccountAmount"
+              class="block mb-1 text-sm font-medium text-gray-700">Montant Main
+              Account</label>
+            <div class="relative">
+              <input type="number" id="mainAccountAmount"
+                [(ngModel)]="mainAccountAmount"
+                placeholder="Montant minimum"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <div
+                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <span class="text-gray-500">XAF</span>
+              </div>
+            </div>
+          </div>
 
+          <!-- Filtre par montant Withdrawal Account -->
+          <div>
+            <label for="withdrawalAmount"
+              class="block mb-1 text-sm font-medium text-gray-700">Montant
+              Withdrawal Account</label>
+            <div class="relative">
+              <input type="number" id="withdrawalAmount"
+                placeholder="Montant minimum"
+                [(ngModel)]="withdrawalAccountAmount"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <div
+                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <span class="text-gray-500">XAF</span>
+              </div>
+            </div>
+          </div>
           <!-- Status Filter -->
           <div class="relative">
             <label for="statusFilter"
@@ -131,16 +182,15 @@
           </div>
 
         </div>
-
       </div>
 
     </div>
 
   </div>
 
-  <div class="p-4 mb-6 bg-white border border-gray-200 shadow-sm rounded-xl">
+  <!-- <div class="p-4 mb-6 bg-white border border-gray-200 shadow-sm rounded-xl">
     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <!-- Filtre par nombre de jours inactifs -->
+
       <div>
         <label for="inactiveDays"
           class="block mb-1 text-sm font-medium text-gray-700">Jours
@@ -159,7 +209,6 @@
         </div>
       </div>
 
-      <!-- Filtre par montant Main Account -->
       <div>
         <label for="mainAccountAmount"
           class="block mb-1 text-sm font-medium text-gray-700">Montant Main
@@ -175,7 +224,6 @@
         </div>
       </div>
 
-      <!-- Filtre par montant Withdrawal Account -->
       <div>
         <label for="withdrawalAmount"
           class="block mb-1 text-sm font-medium text-gray-700">Montant
@@ -192,14 +240,14 @@
       </div>
     </div>
 
-    <!-- Bouton Appliquer -->
+
     <div class="flex justify-end mt-4">
       <button
         class="px-4 py-2 text-white bg-[#004080] rounded-md hover:bg-[#004065] focus:outline-none focus:ring-2 focus:ring-gray-800 focus:ring-offset-2">
         Appliquer les filtres
       </button>
     </div>
-  </div>
+  </div> -->
   <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-5">
     <!-- VIP Agent Card -->
     <div
@@ -267,7 +315,8 @@
           </svg>
         </div>
         <div>
-          <p class="text-sm text-[#002c6b]">Inactif with cashout amount</p>
+          <p class="text-sm text-[#002c6b]">Inactif Agents with Money on Both
+            Accounts</p>
           <h3 class="text-2xl font-bold text-[#002c6b] counter"
             data-target="18">0</h3>
         </div>
@@ -295,7 +344,8 @@
           </svg>
         </div>
         <div class="flex-1">
-          <p class="text-sm text-[#002c6b]">Inactifs with Main account </p>
+          <p class="text-sm text-[#002c6b]">Inactive Agents with Principal
+            Balance > </p>
           <h3 class="text-2xl font-bold text-[#002c6b]">
             <span class="counter"
               [attr.data-target]="getInactiveRetailersCount(selectedDays)">0</span>
@@ -323,7 +373,8 @@
           </svg>
         </div>
         <div class="flex-1">
-          <p class="text-sm text-[#002c6b]">Inactifs with Withdrawal account
+          <p class="text-sm text-[#002c6b]">Inactive Agents with Withdrawal
+            Balance >
           </p>
           <h3 class="text-2xl font-bold text-[#002c6b]">
             <span class="counter"
@@ -367,7 +418,7 @@
     <!-- Table Header with Filters -->
     <div
       class="flex flex-col items-start justify-between mb-4 space-y-4 md:flex-row md:items-center md:space-y-0">
-      <h3 class="text-lg font-semibold text-[#002c6b]">Agents Alerts List: {{
+      <h3 class="text-lg font-semibold text-[#002c6b]">Inactive Alerts List: {{
         selectedZone?selectedZone:"All Zone" }} / {{
         selectDate?selectDate: today | date:'fullDate' }}</h3>
 
@@ -382,9 +433,9 @@
         <select [(ngModel)]="agentType" (change)="applyFilters()"
           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-24">
           <option
-            value="VIP">VIP Agent</option>
+            value="Premuim">Premuim Agent</option>
           <option
-            value="650">Agent 650</option>
+            value="650"> 650 Agent</option>
         </select>
 
         <!-- Bulk Action Button -->

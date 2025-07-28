@@ -63,22 +63,22 @@ export class InactiveDetailsComponent implements OnInit {
   isInactiveFilterActive: boolean = false;
   currentPage: number = 1;
   statusOptions = [
-    { value: '', label: 'All Statuses' },
-    { value: 'Need_Cashing', label: 'Need Cash In' },
-    { value: 'Need_Cashout', label: 'Need Cash Out' },
-    { value: 'Dormant', label: 'Dormant' },
-    { value: 'Inactive', label: 'Inactive' },
-    { value: 'Normal', label: 'Normal' }
+    { value: '', label: 'All Status' },
+    { value: 'Need_Cashing', label: "Inactive with main account" },
+    { value: 'Need_Cashout', label: "Inactive with withdrawal account" },
   ];
   selectedStatus: string = '';
   selectedSubzone: string = '';
   selectedZone: string = '';
+  selectedInactiveDays: number = 1
+  mainAccountAmount: number = 0
+  withdrawalAccountAmount: number = 0
   selectedDays: number = 3;
   filteredRetailers: Retailer[] = [];
   agents: any[] = [];
   filteredAgents: any[] = [];
   paginatedAgents: any[] = [];
-  agentType: string = ""
+  agentType: string = "Premuim"
   // Sélection multiple
   selectedAgents: any[] = [];
   allAgentsSelected: boolean = false;
