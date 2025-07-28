@@ -31,4 +31,8 @@ export class DailyTrackingService {
   getAllAgent() {
     return this.httpClient.get("http://localhost:8080/agent-tracking/api/data/agents")
   }
+
+  getMainAggregator(agentId: string) {
+    return this.httpClient.get(`http://localhost:8080/agent-tracking/api/data/agents/${agentId}/aggregator`)
+  }
 }

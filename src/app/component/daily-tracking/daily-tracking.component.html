@@ -485,7 +485,7 @@
 </div>
 
 <!-- Retailer Details Modal -->
-<div *ngIf="selectedRetailer" class="fixed inset-0 z-50 overflow-y-auto">
+<div *ngIf="agentModal" class="fixed inset-0 z-50 overflow-y-auto">
   <div
     class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
     <!-- Background overlay -->
@@ -538,11 +538,11 @@
                     Main Aggregator Info
                   </button>
 
-                  <button (click)="activeTab = 'aggregator'"
-                    [class.border-blue-500]="activeTab === 'aggregator'"
-                    [class.text-blue-600]="activeTab === 'aggregator'"
+                  <button (click)="activeTab ='Location'"
+                    [class.border-blue-500]="activeTab === 'Location'"
+                    [class.text-blue-600]="activeTab === 'Location'"
                     class="px-1 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap hover:text-gray-700 hover:border-gray-300">
-                    Top Aggregator Info
+                    Location
                   </button>
 
                 </nav>
@@ -571,7 +571,7 @@
                     <div>
                       <p class="text-sm font-medium text-gray-500">Category</p>
                       <p
-                        class="mt-1 text-sm text-gray-900">{{agentFound.type}}</p>
+                        class="mt-1 text-sm text-gray-900">{{selectedRetailer.category}}</p>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Site</p>
@@ -724,6 +724,7 @@
                             class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
                           <span class="text-sm text-gray-700">Dormant</span>
                         </div>
+
                       </div>
                     </div>
 
@@ -740,6 +741,26 @@
                           uppercase) : 'ORDINARY' }}
                         </span>
                       </div>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Estimate
+                        cashing Amount</p>
+                      <p class="mt-1 text-lg font-semibold text-gray-900">
+                        {{ selectedRetailer.estimateCashingAmount
+                        ? (selectedRetailer.estimateCashingAmount | number)
+                        + ' XAF'
+                        : 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-500">Estimate
+                        cashout Amount</p>
+                      <p class="mt-1 text-lg font-semibold text-gray-900">
+                        {{ selectedRetailer.estimateCashoutAmount
+                        ? (selectedRetailer.estimateCashoutAmount | number)
+                        + ' XAF'
+                        : 'N/A' }}
+                      </p>
                     </div>
                   </div>
                 </fieldset>
@@ -763,25 +784,21 @@
 
               <!-- Aggregator Info Tab (unchanged) -->
               <div *ngIf="activeTab === 'aggregator'" class="mt-4">
-                <div *ngIf="selectedRetailer.topAggregator"
+                <div *ngIf="mainAgregateur"
                   class="grid grid-cols-1 gap-4 p-4 rounded-lg bg-gray-50 sm:grid-cols-2">
                   <div>
                     <p class="text-sm font-medium text-gray-500">Aggregator
                       Code</p>
                     <p
-                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.code}}</p>
+                      class="mt-1 text-sm text-gray-900">{{mainAgregateur.shortCode}}</p>
                   </div>
                   <div>
                     <p class="text-sm font-medium text-gray-500">Full Name</p>
                     <p
-                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.fullName}}</p>
+                      class="mt-1 text-sm text-gray-900">{{mainAgregateur.name}}</p>
                   </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Zone</p>
-                    <p
-                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.zone}}</p>
-                  </div>
-                  <div>
+
+                  <!-- <div>
                     <p class="text-sm font-medium text-gray-500">Status</p>
                     <p class="mt-1 text-sm text-gray-900">
                       <span [ngClass]="{
@@ -792,23 +809,40 @@
                         {{selectedRetailer.topAggregator.status | uppercase}}
                       </span>
                     </p>
-                  </div>
+                  </div> -->
                   <div>
                     <p class="text-sm font-medium text-gray-500">Phone
                       Number</p>
                     <p
-                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.phone}}</p>
+                      class="mt-1 text-sm text-gray-900">{{mainAgregateur.msisdn}}</p>
                   </div>
-                  <div>
+                  <!-- <div>
                     <p class="text-sm font-medium text-gray-500">Email</p>
                     <p
                       class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.email
                       || 'N/A'}}</p>
-                  </div>
+                  </div> -->
                 </div>
-                <div *ngIf="!selectedRetailer.topAggregator"
+                <div *ngIf="!mainAgregateur"
                   class="p-4 text-center text-gray-500 rounded-lg bg-gray-50">
                   No aggregator information available
+                </div>
+
+              </div>
+
+              <!-- Aggregator Info Tab (unchanged) -->
+              <div *ngIf="activeTab === 'Location'" class="mt-4">
+                <div *ngIf="mainAgregateur"
+                  class="grid grid-cols-1 gap-4 p-4 rounded-lg bg-gray-50 sm:grid-cols-1">
+                  <div id="gabonMap"
+                    class="relative overflow-hidden bg-gray-100 rounded-lg h-80">
+                    <div
+                      leaflet
+                      [leafletOptions]="mapOptions"
+                      [leafletLayers]="mapLayers"
+                      class="absolute inset-0 z-0">
+                    </div>
+                  </div>
                 </div>
 
               </div>
@@ -819,12 +853,7 @@
 
       <!-- Boutons -->
       <div
-        class="items-center justify-center px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
-
-        <button type="button" (click)="sendSMSDirect(selectedRetailer)"
-          class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-[#FF6600] border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
-          Position
-        </button>
+        class="px-4 py-3 text-end bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
 
         <button type="button" (click)="sendSMS(selectedRetailer)"
           class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-gray-800 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">

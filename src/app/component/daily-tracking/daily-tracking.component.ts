@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import * as L from 'leaflet';
 // import {
 //   ApexAxisChartSeries,
 //   ApexChart,
@@ -104,8 +105,10 @@ interface Retailer {
   templateUrl: './daily-tracking.component.html',
   styleUrls: ['./daily-tracking.component.css']
 })
-export class DailyTrackingComponent implements OnInit, OnDestroy {
+export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedDays: number = 3;
+  mapLayers: L.Layer[] = [];
+  map!: L.Map;
   showDaysDropdown: boolean = false;
   isInactiveFilterActive: boolean = false;
   selectedZone: string = '';
@@ -136,11 +139,95 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   ];
   filteredRetailers: any[] = [];
   selectedRetailers: any[] = [];
+
+  initMap(): void {
+    // Ajouter les marqueurs
+    const agent = this.selectedRetailer;
+
+    const marker = L.marker(
+      [
+        agent.boxLatitude ? agent.boxLatitude : agent.cellLatitude,
+        agent.boxLongitude ? agent.boxLongitude : agent.cellLongitude
+      ] as L.LatLngExpression,
+      {
+        icon: this.getIconForStatus(agent.status)
+      }
+    ).bindPopup(`
+    <b>${this.mainAgregateur.name}</b><br>
+    <span>${this.mainAgregateur.shortCode}</span><br>
+`);
+
+    this.mapLayers.push(marker);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+
+        // Marqueur pour la machine
+        const userMarker = L.marker([userLat, userLng], {
+          icon: L.icon({
+            iconUrl: 'assets/marker-blue.png', // Icône pour la machine
+            iconSize: [40, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34]
+          })
+        }).bindPopup(`<b>Ma Position</b>`);
+
+        this.mapLayers.push(userMarker);
+
+        // ✅ Tracer la trajectoire
+        const latlngs: L.LatLngExpression[] = [
+          [userLat, userLng],
+          [
+            agent.boxLatitude ? agent.boxLatitude : agent.cellLatitude,
+            agent.boxLongitude ? agent.boxLongitude : agent.cellLongitude
+          ]
+        ];
+
+        const polyline = L.polyline(latlngs, { color: 'blue', weight: 4 });
+        this.mapLayers.push(polyline);
+
+        // ✅ Centrer la carte sur les deux points
+        const bounds = L.latLngBounds(latlngs);
+        this.map.fitBounds(bounds);
+      }, (error) => {
+        console.error('Erreur de géolocalisation :', error);
+      });
+    } else {
+      console.error('Géolocalisation non supportée par ce navigateur.');
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.map = L.map('map', {
+      center: [0, 0],
+      zoom: 5,
+      layers: [
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        })
+      ]
+    });
+  }
+
+  getIconForStatus(status: string): L.Icon {
+    const iconUrl = status === 'active' ? 'assets/marker-green.png' :
+      status === 'inactive' ? 'assets/marker-red.png' :
+        'assets/marker-orange.png';
+
+    return L.icon({
+      iconUrl,
+      iconSize: [40, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34]
+    });
+  }
   allSelected: boolean = false;
   // Modal related properties
   selectedRetailer: any = {};
   showBulkSMSModal: boolean = false;
-  activeTab: 'retailer' | 'aggregator' = 'retailer';
+  activeTab: 'retailer' | 'aggregator' | 'Location' = 'retailer';
   activeMainTab: 'list' | 'details' = 'list';
   selectedPredefinedMessage = '';
   customMessage = '';
@@ -503,13 +590,17 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   zonesWithSub: any = []
   agents: any[] = []
   ngOnInit(): void {
+    const today = new Date();
+    today.setDate(today.getDate() - 1); // On enlève 1 jour
+    this.selectedDate = today.toISOString().split('T')[0];
     //this.initAlerts();
+
     this.initInactivityAlerts();
     this.initCounterAnimation();
     this.initFilterToggle();
     this.initChart();
     // Définir la date du jour au format 'YYYY-MM-DD'
-    const today = new Date();
+
     this.selectDate = today.toISOString().substring(0, 10);
 
     // Appeler directement le filtre avec la date du jour
@@ -758,15 +849,32 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   }
 
   agentFound: any = {}
+  agentModal = false
+  mainAgregateur: any = {}
+  mapOptions: L.MapOptions = {
+
+  };
   openAgentModal(agent: any): void {
     this.selectedRetailer = agent;
+    this.agentModal = true
     console.log(agent)
     this.agentFound = this.agents.find((agent: any) =>
       this.selectedRetailer.agentId == agent.id
     )
+    this.dailyTrackingService.getMainAggregator(this.selectedRetailer.agentId).subscribe(res => {
+      this.mainAgregateur = res
+      console.log("Aggregator ", this.mainAgregateur)
+    })
+    this.initMap()
+    this.mapOptions = {
+      layers: getLayers(),
+      zoom: 6,
+      center: L.latLng(+this.selectedRetailer.boxLatitude ? +this.selectedRetailer.boxLatitude : +this.selectedRetailer.cellLatitude, +this.selectedRetailer.boxLongitude ? +this.selectedRetailer.boxLongitude : +this.selectedRetailer.cellLongitude)
+    };
 
     console.log("AgentFound ", this.agentFound)
   }
+
 
   allAgentsSelected: boolean = false;
 
@@ -843,6 +951,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy {
   }
 
   closeModal(): void {
+    this.agentModal = false
     this.selectedRetailer = null;
   }
 
@@ -961,4 +1070,15 @@ export function generateBalanceHistory(
       autoTransferAmount: Math.round(autoTransferBase + (autoTransferVar * dayProgress * (0.9 + Math.random() * 0.2)))
     };
   });
+}
+
+
+export function getLayers(): L.Layer[] {
+  return [
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    })
+  ];
+
+
 }
