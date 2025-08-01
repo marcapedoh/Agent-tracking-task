@@ -1,4 +1,4 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -25,7 +25,7 @@ export class DailyTrackingService {
       if (filters.agentStatus) params = params.set('agentStatus', filters.agentStatus);
       if (filters.category) params = params.set('category', filters.category);
     }
-
+    console.log(params)
     return this.httpClient.get("http://localhost:8080/agent-tracking/api/data/global/filtered", { params });
   }
 
@@ -45,7 +45,7 @@ export class DailyTrackingService {
     return this.httpClient.get(`http://localhost:8080/agent-tracking/api/data/agents/${agentId}/aggregator`)
   }
 
-  getSummary(date: string, zone?: string, subZone?: string){
+  getSummary(date: string, zone?: string, subZone?: string) {
     let params = new HttpParams().set('date', date);
 
     if (zone) {

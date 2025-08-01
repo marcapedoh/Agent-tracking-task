@@ -34,16 +34,12 @@ export type ChartOptions = {
 export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Services et Constantes
-  constructor(private dailyTrackingService: DailyTrackingService) { }
   Math = Math;
-
   // Donnees brutes et Utilisateurs
   retailers: any[] = [];
   agents: any[] = [];
   datas: any[] = [];
   allData: any[] = [];
-
-
   // Date et Filtres
   today: Date = new Date();
   selectedDate = '';
@@ -54,14 +50,11 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
   selectedZone: string = '';
   selectedSubzone: string = '';
   isInactiveFilterActive: boolean = false;
-
-
   // Leaflet Map
   map!: L.Map;
   mapLayers: L.Layer[] = [];
   mapOptions: L.MapOptions = {};
   agentModal = false;
-
   // Statistiques / Chart
   chartOptions!: Partial<ChartOptions>;
 
@@ -88,15 +81,9 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
 
   // Pagination
   currentPage: number = 0;
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 100;
   itemsPerPageOptions = [10, 50, 100, 150, 200]
   allSelected: boolean = false;
-
-  //============================ Filtrage des donnees du tableau =======================================//
-
-
-
-
   filteredRetailers: any[] = [];
 
 
@@ -108,6 +95,8 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
     { value: 'Auto_Transfer', label: 'Auto Transfer' },
   ];
 
+
+  constructor(private dailyTrackingService: DailyTrackingService) { }
 
   // Initialisation
 
@@ -122,9 +111,25 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
     this.initFilterToggle();
     this.initChart();
     this.filterData();
-
+    this.dailyTrackingService.getAllSnapshot(this.selectDate, this.currentPage, this.itemsPerPage).subscribe((res: any) => {
+      console.log(res.content);
+      this.allData = res.content;
+      this.datas = [...this.allData];
+    })
     this.filteredRetailers = [...this.retailers];
+    this.getZoneAndSubZone()
+    this.getAllAgent();
 
+  }
+
+
+  getAllAgent() {
+    this.dailyTrackingService.getAllAgent().subscribe((res: any) => {
+      this.agents = res;
+
+    });
+  }
+  getZoneAndSubZone() {
     this.dailyTrackingService.getAllZone().subscribe((data: any) => {
       this.zones = data;
       this.zones.forEach((zone: any) => {
@@ -133,12 +138,6 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
         });
       });
     });
-
-    this.dailyTrackingService.getAllAgent().subscribe((res: any) => {
-      this.agents = res;
-
-    });
-
   }
 
   ngAfterViewInit(): void {
@@ -158,7 +157,6 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   // Carte et Leaflet
-
   initMap(): void {
     // Ajouter les marqueurs
     const agent = this.selectedRetailer;
@@ -218,7 +216,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   // Chart et Historique
-  statsData:any={}
+  statsData: any = {}
   initChart() {
     this.chartOptions = {
       series: [
@@ -311,9 +309,9 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
       this.allData = res.content;
       this.datas = [...this.allData];
     })
-    this.dailyTrackingService.getSummary(this.selectedDate,this.selectedZone,this.selectedSubzone).subscribe((res: any) => {
+    this.dailyTrackingService.getSummary(this.selectedDate, this.selectedZone, this.selectedSubzone).subscribe((res: any) => {
       console.log(res)
-      this.statsData=res;
+      this.statsData = res;
     })
   }
 
@@ -322,7 +320,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.selectedDays);
 
-    this.datas = this.agents.filter((retailer: any) => {
+    this.datas = this.datas.filter((retailer: any) => {
 
       const subzoneMatch = !this.selectedSubzone ||
         retailer.subZone === this.selectedSubzone;
@@ -516,11 +514,11 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
   // Pagination
   get paginatedData(): any[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.agents.slice(startIndex, startIndex + this.itemsPerPage);
+    return this.datas.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
   get totalPages(): number {
-    return Math.ceil(this.agents.length / this.itemsPerPage);
+    return Math.ceil(this.datas.length / this.itemsPerPage);
   }
 
   getPageNumbers(): number[] {
@@ -622,7 +620,7 @@ export class DailyTrackingComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
 
-  exportReport() {}
+  exportReport() { }
 }
 
 
