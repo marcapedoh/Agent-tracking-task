@@ -35,5 +35,15 @@ apx-chart {
 
 
 
+/* Largeur fixe pour le bloc "items per page" si besoin */
+.items-per-page {
+  min-width: 150px;
+}
+
+/* Limiter la largeur max des boutons de page */
+.pagination button {
+  min-width: 36px;
+  text-align: center;
+}
 
 

@@ -1,0 +1,13 @@
+h1 {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  background-color: #e6f0ff;
+  color: #004080;
+  font-weight: 600;
+  border-radius: 9999px;
+}

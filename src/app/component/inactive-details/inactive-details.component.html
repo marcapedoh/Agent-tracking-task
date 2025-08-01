@@ -19,13 +19,15 @@
           🔍 INACTIVE DETAILS — Breakdown of Inactive Agents
         </p>
       </div>
+
     </div>
+
+
+
 
     <div class="flex flex-col gap-4 mt-4 sm:flex-row md:mt-0">
       <div class="relative">
-
         <div class="flex flex-wrap items-end justify-between gap-4">
-
           <!-- Status Filter -->
           <div class="relative">
             <label for="statusFilter"
@@ -129,78 +131,63 @@
               <span class="font-medium">Export Report</span>
             </button>
           </div>
-
         </div>
-
       </div>
-
     </div>
-
   </div>
 
-  <div class="p-4 mb-6 bg-white border border-gray-200 shadow-sm rounded-xl">
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <!-- Filtre par nombre de jours inactifs -->
-      <div>
-        <label for="inactiveDays"
-          class="block mb-1 text-sm font-medium text-gray-700">Jours
-          d'inactivité</label>
-        <div class="relative">
-          <input type="number"
-            id="inactiveDays"
-            min="1"
-            value="5"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Nombre de jours">
-          <div
-            class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <span class="text-gray-500">jours</span>
-          </div>
-        </div>
-      </div>
+   <!-- Additional Filters: Inactive Days + Account Thresholds -->
+   <div class="flex flex-wrap items-end gap-4 mt-4">
 
-      <!-- Filtre par montant Main Account -->
-      <div>
-        <label for="mainAccountAmount"
-          class="block mb-1 text-sm font-medium text-gray-700">Montant Main
-          Account</label>
-        <div class="relative">
-          <input type="number" id="mainAccountAmount"
-            placeholder="Montant minimum"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <div
-            class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <span class="text-gray-500">XOF</span>
-          </div>
-        </div>
-      </div>
+     <!-- Inactive Days -->
+     <div class="relative">
+       <label for="inactiveDays" class="block mb-1 text-sm font-semibold text-gray-700">Inactive Days</label>
+       <input
+         id="inactiveDays"
+         type="number"
+         min="1"
+         [(ngModel)]="inactiveDays"
+         (change)="applyFilters()"
+         class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
+         placeholder="e.g. 5" />
+     </div>
 
-      <!-- Filtre par montant Withdrawal Account -->
-      <div>
-        <label for="withdrawalAmount"
-          class="block mb-1 text-sm font-medium text-gray-700">Montant
-          Withdrawal Account</label>
-        <div class="relative">
-          <input type="number" id="withdrawalAmount"
-            placeholder="Montant minimum"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <div
-            class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <span class="text-gray-500">XOF</span>
-          </div>
-        </div>
-      </div>
-    </div>
+     <!-- Main Account Threshold -->
+     <div class="relative">
+       <label for="mainAccountAmount" class="block mb-1 text-sm font-semibold text-gray-700">Min Main Account</label>
+       <input
+         id="mainAccountAmount"
+         type="number"
+         min="0"
+         [(ngModel)]="mainAccountThreshold"
+         (change)="applyFilters()"
+         class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
+         placeholder="e.g. 10000" />
+     </div>
 
-    <!-- Bouton Appliquer -->
-    <div class="flex justify-end mt-4">
-      <button
-        class="px-4 py-2 text-white bg-[#004080] rounded-md hover:bg-[#004065] focus:outline-none focus:ring-2 focus:ring-gray-800 focus:ring-offset-2">
-        Appliquer les filtres
-      </button>
-    </div>
-  </div>
-  <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-5">
+     <!-- Withdrawal Account Threshold -->
+     <div class="relative">
+       <label for="withdrawalAmount" class="block mb-1 text-sm font-semibold text-gray-700">Min Commission Account</label>
+       <input
+         id="withdrawalAmount"
+         type="number"
+         min="0"
+         [(ngModel)]="withdrawalThreshold"
+         (change)="applyFilters()"
+         class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
+         placeholder="e.g. 5000" />
+     </div>
+
+   </div>
+
+
+
+
+
+
+
+
+   <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-5">
     <!-- VIP Agent Card -->
     <div
       class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FFD70044] hover:border-amber-400">
@@ -344,24 +331,23 @@
 
   <!-- Alerts Table Section -->
   <div class="p-6 mb-8 bg-white border border-gray-100 rounded-lg shadow-sm">
-    <!-- Status Legend -->
-    <div
-      class="flex flex-wrap items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
-      <span class="text-sm font-medium text-white">Agent status:</span>
+    <div class="flex flex-wrap items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
+      <span class="text-sm font-medium text-white">Agent Status:</span>
+
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
-        <span class="text-sm text-white">Inactive with main account</span>
+        <span class="text-sm text-white">Inactive – Main Account Only</span>
       </div>
+
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
-        <span class="text-sm text-white">Inactive with withdrawal account</span>
+        <span class="text-sm text-white">Inactive – Cashout Account Only</span>
       </div>
 
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
-        <span class="text-sm text-white">Inactive</span>
+        <span class="text-sm text-white">Inactive – Both Accounts</span>
       </div>
-
     </div>
 
     <!-- Table Header with Filters -->
@@ -382,7 +368,7 @@
         <select [(ngModel)]="agentType" (change)="applyFilters()"
           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:w-24">
           <option
-            value="VIP">VIP Agent</option>
+            value="VIP">Premium Agent</option>
           <option
             value="650">Agent 650</option>
         </select>
@@ -470,7 +456,7 @@
               class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
               <span [ngClass]="{
             'bg-blue-100 text-blue-800': agent.category === 'Agent 650',
-            'bg-purple-100 text-purple-800': agent.category === 'Agent VIP'
+            'bg-purple-100 text-purple-800': agent.category === 'Agent Premium'
           }" class="px-2 py-1 text-xs font-semibold rounded-full">
                 {{agent.category }}
               </span>
@@ -489,15 +475,6 @@
                   *ngIf="agent.agentStatus=='Inactive' && agent.cashoutAccountBalance>10"
                   class="inline-block w-5 h-5 bg-purple-500 rounded-full"
                   title="Suspicion de Fraude"></span>
-                <!-- <span *ngIf="agent.agentStatus=='Dormant'"
-                  class="inline-block w-5 h-5 bg-red-500 rounded-full"
-                  title="Urgent"></span> -->
-                <!-- <span *ngIf="agent.agentStatus=='Inactive'"
-                  class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
-                  title="A Surveiller"></span> -->
-                <!-- <span *ngIf="agent.agentStatus=='Normal'"
-                  class="inline-block w-5 h-5 bg-green-500 rounded-full"
-                  title="A Surveiller"></span> -->
 
               </div>
             </td>
@@ -526,20 +503,7 @@
               class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
               {{agent.msisdn}}
             </td>
-            <!-- <td
-              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{agent.lastAlert | date:'short'}}
-            </td> -->
-            <!-- <td
-              class="px-3 py-4 text-sm font-medium text-center whitespace-nowrap">
-              <span [ngClass]="{
-            'text-green-600': agent.alertCount < 3,
-            'text-yellow-600': agent.alertCount >= 3 && agent.alertCount < 5,
-            'text-red-600': agent.alertCount >= 5
-          }">
-                {{agent.alertCount}}
-              </span>
-            </td> -->
+
             <td
               class="px-3 py-4 text-sm font-medium text-center whitespace-nowrap">
               <span [ngClass]="{

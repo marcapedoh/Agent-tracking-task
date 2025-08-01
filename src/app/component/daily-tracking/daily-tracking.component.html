@@ -48,6 +48,29 @@
           </div>
         </div>
 
+        <!-- Category Filter -->
+        <div class="relative">
+          <label for="categoryFilter"
+                 class="block mb-1 text-sm font-semibold text-gray-700">Category</label>
+          <select
+            id="categoryFilter"
+            [(ngModel)]="selectedCategory"
+            (change)="applyFilters()"
+            class="w-44 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
+            <option value="">All Categories</option>
+            <option *ngFor="let category of categoryOptions" [value]="category.value">
+              {{ category.label }}
+            </option>
+          </select>
+          <!-- Dropdown arrow -->
+          <div class="absolute inset-y-0 flex items-center pointer-events-none right-3">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+            </svg>
+          </div>
+        </div>
+
+
         <!-- Zone Filter -->
         <div class="relative">
           <label for="zoneFilter"
@@ -131,7 +154,7 @@
   </div>
 
   <!-- Grid container for the stats cards. Responsive: 1 column mobile, 2 columns tablet, 5 columns desktop -->
-  <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-5">
+  <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-3">
 
     <!-- Cashing Required Card -->
     <div
@@ -147,7 +170,7 @@
         <div>
           <p class="text-sm text-[#002c6b]">Cashing required</p>
           <h3 class="text-2xl font-bold text-[#002c6b] counter"
-            data-target="24">0</h3>
+            [attr.data-target]="statsData.need_cashing">0</h3>
         </div>
       </div>
       <!-- Tooltip -->
@@ -173,7 +196,7 @@
         <div>
           <p class="text-sm text-[#002c6b]">Cashout required</p>
           <h3 class="text-2xl font-bold text-[#002c6b] counter"
-            data-target="18">0</h3>
+              [attr.data-target]="statsData.need_cashout">0</h3>
         </div>
       </div>
       <!-- Tooltip -->
@@ -199,7 +222,7 @@
         <div>
           <p class="text-sm text-[#002c6b]">Auto Transfer</p>
           <h3 class="text-2xl font-bold text-[#002c6b] counter"
-            data-target="7">0</h3>
+              [attr.data-target]="statsData.auto_transfer">0</h3>
         </div>
       </div>
       <!-- Tooltip -->
@@ -211,98 +234,40 @@
       </div>
     </div>
 
-    <!-- Inactive Agents Card -->
-    <div
-      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
-      <div class="flex items-center">
-        <div class="p-3 mr-4 text-yellow-600 bg-yellow-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor"
-            stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <div class="flex-1">
-          <p class="text-sm text-[#002c6b]">Inactive Agents</p>
-          <h3 class="text-2xl font-bold text-[#002c6b]">
-            <span class="counter"
-              [attr.data-target]="getInactiveRetailersCount(selectedDays)">0</span>
-          </h3>
-        </div>
-      </div>
-      <!-- Tooltip -->
-      <div
-        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
-                bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
-                whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
-        Agents inactive for 1 to 5 days.
-      </div>
-    </div>
-
-    <!-- Dormant Agents Card -->
-    <div
-      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
-      <div class="flex items-center">
-        <div class="p-3 mr-4 text-orange-600 bg-orange-100 rounded-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-            fill="currentColor" class="size-6">
-            <path fill-rule="evenodd"
-              d="M12 2.25A6.75 6.75 0 0 0 5.25 9v.75a8.217 8.217 0 0 1-2.119 5.52.75.75 0 0 0 .298 1.206c1.544.57 3.16.99 4.831 1.243a3.75 3.75 0 1 0 7.48 0 24.583 24.583 0 0 0 4.83-1.244.75.75 0 0 0 .298-1.205 8.217 8.217 0 0 1-2.118-5.52V9A6.75 6.75 0 0 0 12 2.25ZM9.75 18c0-.034 0-.067.002-.1a25.05 25.05 0 0 0 4.496 0l.002.1a2.25 2.25 0 1 1-4.5 0Zm.75-10.5a.75.75 0 0 0 0 1.5h1.599l-2.223 3.334A.75.75 0 0 0 10.5 13.5h3a.75.75 0 0 0 0-1.5h-1.599l2.223-3.334A.75.75 0 0 0 13.5 7.5h-3Z"
-              clip-rule="evenodd" />
-          </svg>
-
-        </div>
-        <div>
-          <p class="text-sm text-[#002c6b]">Dormant Agents</p>
-          <h3 class="text-2xl font-bold text-[#002c6b]">
-            <span class="counter" data-target="12">0</span>
-          </h3>
-        </div>
-      </div>
-      <!-- Tooltip -->
-      <div
-        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100
-                bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md
-                whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
-        Agents inactive for more than 5 days.
-      </div>
-    </div>
-
   </div>
 
   <!-- Retailers Table Section -->
   <div class="p-6 mb-8 bg-white border border-gray-100 rounded-lg shadow-sm">
     <!-- Status Legend -->
+
+
+
     <div
       class="flex flex-wrap items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
       <span class="text-sm font-medium text-white">Agent status:</span>
+
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
         <span class="text-sm text-white">Need Cash In</span>
       </div>
+
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
         <span class="text-sm text-white">Need Cash Out</span>
       </div>
-      <div class="flex items-center">
-        <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
-        <span class="text-sm text-white">Normal</span>
-      </div>
+
       <div class="flex items-center">
         <span class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
-        <span class="text-sm text-white">Inactive</span>
+        <span class="text-sm text-white">Eligible For Auto-Transfer</span>
       </div>
-      <div class="flex items-center">
-        <span class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
-        <span class="text-sm text-white">Dormant</span>
-      </div>
+
     </div>
 
     <!-- Table Header with Filters -->
     <div
       class="flex flex-col items-start justify-between mb-4 space-y-4 md:flex-row md:items-center md:space-y-0">
       <h3 class="text-lg font-semibold text-[#002c6b]">Agents Status
-        List: {{ selectedZone?selectedZone:"All Zone" }} / {{
+        List: {{ selectedZone?selectedZone:"All Zone" }}  {{
         selectedDate?selectedDate: today |
         date:'fullDate' }}</h3>
 
@@ -335,153 +300,153 @@
 
       <table class="min-w-full divide-y divide-gray-200">
         <!-- Table header -->
-        <thead class="bg-[#004080]">
-          <tr>
-            <!-- Checkbox pour sélectionner/désélectionner tous les agents -->
-            <th scope="col" class="relative px-3 py-3 text-center">
-              <input type="checkbox"
-                [checked]="allSelected"
-                (change)="toggleSelectAll($event)"
-                class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-            </th>
-
-            <!-- Colonnes principales -->
-            <th scope="col"
-              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Zone
-            </th>
-            <th scope="col"
-              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Subzone
-            </th>
-            <th scope="col"
-              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Status
-            </th>
-            <th scope="col"
-              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Category
-            </th>
-            <th scope="col"
-              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Agent Code
-            </th>
-            <th scope="col"
-              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Phone Number
-            </th>
-          </tr>
+        <thead class="bg-[#004080] sticky top-0 z-10">
+        <tr>
+          <th scope="col" class="relative px-3 py-3 text-center bg-[#004080] text-white">
+            <input type="checkbox"
+                   [checked]="allSelected"
+                   (change)="toggleSelectAll($event)"
+                   class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          </th>
+          <th scope="col"
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase bg-[#004080]">
+            Zone
+          </th>
+          <th scope="col"
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase bg-[#004080]">
+            Subzone
+          </th>
+          <th scope="col"
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase bg-[#004080]">
+            Status
+          </th>
+          <th scope="col"
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase bg-[#004080]">
+            Category
+          </th>
+          <th scope="col"
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase bg-[#004080]">
+            Agent Code
+          </th>
+          <th scope="col"
+              class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase bg-[#004080]">
+            Phone Number
+          </th>
+        </tr>
         </thead>
 
         <!-- Corps du tableau -->
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let agent of paginatedData"
+        <tr *ngFor="let agent of paginatedData"
             class="transition-colors duration-150 cursor-pointer hover:bg-gray-50"
             (click)="openAgentModal(agent)">
-            <!-- Checkbox pour sélectionner l'agent (éviter la propagation du clic) -->
-            <td class="px-3 py-4 text-center whitespace-nowrap"
+          <!-- Checkbox pour sélectionner l'agent (éviter la propagation du clic) -->
+          <td class="px-3 py-4 text-center whitespace-nowrap"
               (click)="$event.stopPropagation()">
-              <input type="checkbox"
-                [checked]="isAgentSelected(agent)"
-                (change)="toggleAgentSelection(agent, $event)"
-                class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-            </td>
+            <input type="checkbox"
+                   [checked]="isAgentSelected(agent)"
+                   (change)="toggleAgentSelection(agent, $event)"
+                   class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          </td>
 
-            <!-- Affichage de la zone, ou "-" si nul -->
-            <td
-              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{ agent.zone ?? '-' }}
-            </td>
+          <!-- Affichage de la zone, ou "-" si nul -->
+          <td
+            class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+            {{ agent.zone ?? '-' }}
+          </td>
 
-            <!-- Affichage de la subzone avec gestion null, '[NULL]' et chaîne vide -->
-            <td
-              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{ sanitizeValue(agent.subZone) }}
-            </td>
+          <!-- Affichage de la subzone avec gestion null, '[NULL]' et chaîne vide -->
+          <td
+            class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+            {{ sanitizeValue(agent.subZone) }}
+          </td>
 
-            <!-- Indicateurs de statut sous forme de points colorés -->
-            <td class="px-3 py-4 text-center whitespace-nowrap">
-              <div class="flex items-center justify-center gap-2">
-                <span *ngIf="agent.agentStatus.toUpperCase()==='NEED_CASHING'"
-                  class="inline-block w-5 h-5 bg-blue-500 rounded-full"
-                  title="Transaction Anormale"></span>
-                <span *ngIf="agent.agentStatus.toUpperCase()==='NEED_CASHOUT'"
-                  class="inline-block w-5 h-5 bg-purple-500 rounded-full"
-                  title="Suspicion de Fraude"></span>
-                <span *ngIf="agent.agentStatus.toUpperCase()==='DORMANT'"
-                  class="inline-block w-5 h-5 bg-red-500 rounded-full"
-                  title="Urgent"></span>
-                <span *ngIf="agent.agentStatus.toUpperCase()==='INACTIVE'"
-                  class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
-                  title="A Surveiller"></span>
-                <span *ngIf="agent.agentStatus.toUpperCase()==='NORMAL'"
-                  class="inline-block w-5 h-5 bg-green-500 rounded-full"
-                  title="A Surveiller"></span>
-                <!-- Si aucun statut, affiche un tiret -->
-                <span *ngIf="!agent.agentStatus">-</span>
-              </div>
-            </td>
+          <!-- Indicateurs de statut sous forme de points colorés -->
+          <td class="px-3 py-4 text-center whitespace-nowrap">
+            <div class="flex items-center justify-center gap-2">
+                <span *ngIf="agent.agentStatus?.toUpperCase()==='NEED_CASHING'"
+                      class="inline-block w-5 h-5 bg-blue-500 rounded-full"
+                      title="Transaction Anormale"></span>
+              <span *ngIf="agent.agentStatus?.toUpperCase()==='NEED_CASHOUT'"
+                    class="inline-block w-5 h-5 bg-purple-500 rounded-full"
+                    title="Suspicion de Fraude"></span>
+              <span *ngIf="agent.agentStatus?.toUpperCase()==='AUTO_TRANSFER'"
+                    class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
+                    title="A Surveiller"></span>
 
-            <!-- Affichage de la catégorie avec mapping des valeurs -->
-            <td
-              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              <ng-container [ngSwitch]="agent.category">
-                <span *ngSwitchCase="'650'">650</span>
-                <span *ngSwitchCase="'Premium'">Premium</span>
-                <span *ngSwitchCase="'650andPremium'">650 & Premium</span>
-                <span *ngSwitchCase="'Ordinary'">Ordinary</span>
-                <!-- Valeur par défaut si null ou inconnue -->
-                <span *ngSwitchDefault>-</span>
-              </ng-container>
-            </td>
+              <!-- Si aucun statut, affiche un tiret -->
+              <span *ngIf="!agent.agentStatus">-</span>
+            </div>
+          </td>
 
-            <!-- Code de l'agent, ou "-" si nul -->
-            <td
-              class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
-              {{ agent.shortCode ?? '-' }}
-            </td>
 
-            <!-- Numéro de téléphone, ou "-" si nul -->
-            <td
-              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{ agent.msisdn ?? '-' }}
-            </td>
-          </tr>
+
+          <!-- Affichage de la catégorie avec mapping des valeurs -->
+          <td
+            class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+            <ng-container [ngSwitch]="agent.category">
+              <span *ngSwitchCase="'650'">650</span>
+              <span *ngSwitchCase="'Premium'">Premium</span>
+              <span *ngSwitchCase="'650_and_Premium'">650 & Premium</span>
+              <span *ngSwitchCase="'Ordinary'">Ordinary</span>
+              <!-- Valeur par défaut si null ou inconnue -->
+              <span *ngSwitchDefault>-</span>
+            </ng-container>
+          </td>
+
+          <!-- Code de l'agent, ou "-" si nul -->
+          <td
+            class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
+            {{ agent.shortCode ?? '-' }}
+          </td>
+
+          <!-- Numéro de téléphone, ou "-" si nul -->
+          <td
+            class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+            {{ agent.msisdn ?? '-' }}
+          </td>
+        </tr>
         </tbody>
       </table>
 
     </div>
 
     <!-- Pagination -->
+
     <div
       class="flex items-center justify-between px-6 py-3 bg-white border-t border-gray-200">
       <div class="text-sm text-gray-500">
         Showing <span class="font-medium">{{(currentPage - 1) * itemsPerPage +
-          1}}</span> to
+      1}}</span> to
         <span class="font-medium">{{Math.min(currentPage * itemsPerPage,
-          datas.length)}}</span> of
-        <span class="font-medium">{{datas.length}}</span> results
+          agents.length)}}</span> of
+        <span class="font-medium">{{agents.length}}</span> results
       </div>
       <div class="flex space-x-2">
         <button (click)="changePage(currentPage - 1)"
-          [disabled]="currentPage === 1"
-          class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50">
+                [disabled]="currentPage === 1"
+                class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50">
           Previous
         </button>
         <button *ngFor="let page of getPageNumbers()" (click)="changePage(page)"
-          [class.bg-[#FF6600]]="page === currentPage"
-          [class.text-white]="page === currentPage"
-          class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                [class.bg-[#FF6600]]="page === currentPage"
+                [class.text-white]="page === currentPage"
+                class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
           {{page}}
         </button>
         <button (click)="changePage(currentPage + 1)"
-          [disabled]="currentPage === totalPages"
-          class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50">
+                [disabled]="currentPage === totalPages"
+                class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50">
           Next
         </button>
       </div>
     </div>
+
+
+
   </div>
+
+
 </div>
 
 <!-- Retailer Details Modal -->
@@ -518,6 +483,7 @@
             </div>
 
             <div class="mt-4">
+
               <!-- Tabs -->
               <div class="border-b border-gray-200">
 
@@ -711,18 +677,11 @@
                             Out</span>
                         </div>
 
-                        <div *ngIf="selectedRetailer.agentStatus=='Inactive'"
+                        <div *ngIf="selectedRetailer.agentStatus=='Auto_Transfer'"
                           class="flex items-center">
                           <span
                             class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
-                          <span class="text-sm text-gray-700">Inactive</span>
-                        </div>
-
-                        <div *ngIf="selectedRetailer.agentStatus=='Dormant'"
-                          class="flex items-center">
-                          <span
-                            class="w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
-                          <span class="text-sm text-gray-700">Dormant</span>
+                          <span class="text-sm text-gray-700">Eligible For Auto-Transfer</span>
                         </div>
 
                       </div>
@@ -733,9 +692,9 @@
                       <p class="text-sm font-medium text-gray-500">Type</p>
                       <div class="mt-1">
                         <span [ngClass]="{
-          'bg-purple-100 text-purple-800': selectedRetailer.type === 'VIP',
-          'bg-blue-100 text-blue-800': selectedRetailer.type === 'ordinary'
-        }"
+                                          'bg-purple-100 text-purple-800': selectedRetailer.type === 'VIP',
+                                          'bg-blue-100 text-blue-800': selectedRetailer.type === 'ordinary'
+                                        }"
                           class="inline-flex px-2 py-1 text-xs font-semibold leading-5 rounded-full">
                           {{ selectedRetailer.type ? (selectedRetailer.type |
                           uppercase) : 'ORDINARY' }}
@@ -784,46 +743,29 @@
 
               <!-- Aggregator Info Tab (unchanged) -->
               <div *ngIf="activeTab === 'aggregator'" class="mt-4">
-                <div *ngIf="mainAgregateur"
+                <div *ngIf="mainAggregator"
                   class="grid grid-cols-1 gap-4 p-4 rounded-lg bg-gray-50 sm:grid-cols-2">
                   <div>
                     <p class="text-sm font-medium text-gray-500">Aggregator
                       Code</p>
                     <p
-                      class="mt-1 text-sm text-gray-900">{{mainAgregateur.shortCode}}</p>
+                      class="mt-1 text-sm text-gray-900">{{mainAggregator.shortCode}}</p>
                   </div>
                   <div>
                     <p class="text-sm font-medium text-gray-500">Full Name</p>
                     <p
-                      class="mt-1 text-sm text-gray-900">{{mainAgregateur.name}}</p>
+                      class="mt-1 text-sm text-gray-900">{{mainAggregator.name}}</p>
                   </div>
 
-                  <!-- <div>
-                    <p class="text-sm font-medium text-gray-500">Status</p>
-                    <p class="mt-1 text-sm text-gray-900">
-                      <span [ngClass]="{
-                        'bg-green-100 text-green-800': selectedRetailer.topAggregator.status === 'active',
-                        'bg-yellow-100 text-yellow-800': selectedRetailer.topAggregator.status === 'inactive'
-                      }"
-                        class="inline-flex px-2 py-1 text-xs font-semibold leading-5 rounded-full">
-                        {{selectedRetailer.topAggregator.status | uppercase}}
-                      </span>
-                    </p>
-                  </div> -->
                   <div>
                     <p class="text-sm font-medium text-gray-500">Phone
                       Number</p>
                     <p
-                      class="mt-1 text-sm text-gray-900">{{mainAgregateur.msisdn}}</p>
+                      class="mt-1 text-sm text-gray-900">{{mainAggregator.msisdn}}</p>
                   </div>
-                  <!-- <div>
-                    <p class="text-sm font-medium text-gray-500">Email</p>
-                    <p
-                      class="mt-1 text-sm text-gray-900">{{selectedRetailer.topAggregator.email
-                      || 'N/A'}}</p>
-                  </div> -->
+
                 </div>
-                <div *ngIf="!mainAgregateur"
+                <div *ngIf="!mainAggregator"
                   class="p-4 text-center text-gray-500 rounded-lg bg-gray-50">
                   No aggregator information available
                 </div>
@@ -832,7 +774,7 @@
 
               <!-- Aggregator Info Tab (unchanged) -->
               <div *ngIf="activeTab === 'Location'" class="mt-4">
-                <div *ngIf="mainAgregateur"
+                <div *ngIf="mainAggregator"
                   class="grid grid-cols-1 gap-4 p-4 rounded-lg bg-gray-50 sm:grid-cols-1">
                   <div id="gabonMap"
                     class="relative overflow-hidden bg-gray-100 rounded-lg h-80">
@@ -855,7 +797,7 @@
       <div
         class="px-4 py-3 text-end bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
 
-        <button type="button" (click)="sendSMS(selectedRetailer)"
+        <button type="button" (click)="sendSMS()"
           class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-gray-800 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
           Send Sms
         </button>

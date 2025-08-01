@@ -251,6 +251,13 @@ export class InactiveDetailsComponent implements OnInit {
 
   }
   allData: any[] = []
+
+
+  withdrawalThreshold: any;
+  mainAccountThreshold: any;
+  inactiveDays: any;
+
+
   filterData() {
     if (!this.selectDate) {
       console.warn("Aucune date sélectionnée !");

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -27,5 +27,7 @@ export class DailyTrackingService {
     const today = new Date().toISOString().split('T')[0];
     return this.httpClient.get(`http://localhost:8080/agent-tracking/api/data/all-snapshots?snapshotDate=${today}`);
   }
+
+
 
 }
