@@ -1,6 +1,7 @@
 <div class="min-h-screen p-6 bg-gray-50">
   <!-- Header with date -->
-  <div class="flex flex-col items-start justify-between mb-8 md:flex-row md:items-center">
+  <div
+    class="flex flex-col items-start justify-between mb-8 md:flex-row md:items-center">
     <div class="mb-4">
       <h1 class="text-2xl font-bold text-[#002c6b] inline-block mr-2">
         Daily Tracking Statistics
@@ -11,7 +12,8 @@
 
       <p class="mt-1 text-gray-600">Monitor cash flow and agent performance</p>
 
-      <div class="mt-3 inline-block px-4 py-1 bg-[#fff4eb] border-l-4 border-[#cc5200] rounded-md shadow-sm">
+      <div
+        class="mt-3 inline-block px-4 py-1 bg-[#fff4eb] border-l-4 border-[#cc5200] rounded-md shadow-sm">
         <p class="text-[#cc5200] text-sm font-semibold tracking-wide uppercase">
           🌍 GLOBAL VIEW — Subsection of Daily Tracking
         </p>
@@ -22,43 +24,56 @@
       <div class="flex flex-wrap items-end justify-between gap-4">
         <!-- Status Filter -->
         <div class="relative">
-          <label for="statusFilter" class="block mb-1 text-sm font-semibold text-gray-700">Status</label>
-          <select id="statusFilter" [(ngModel)]="selectedStatus" (change)="applyFilters()"
+          <label for="statusFilter"
+            class="block mb-1 text-sm font-semibold text-gray-700">Status</label>
+          <select id="statusFilter" [(ngModel)]="selectedStatus"
+            (change)="applyFilters()"
             class="w-40 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
             <option *ngFor="let option of statusOptions" [value]="option.value">
               {{ option.label }}
             </option>
           </select>
           <!-- Dropdown arrow -->
-          <div class="absolute inset-y-0 flex items-center pointer-events-none right-3">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+          <div
+            class="absolute inset-y-0 flex items-center pointer-events-none right-3">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6 9l6 6 6-6"></path>
             </svg>
           </div>
         </div>
 
         <!-- Category Filter -->
         <div class="relative">
-          <label for="categoryFilter" class="block mb-1 text-sm font-semibold text-gray-700">Category</label>
-          <select id="categoryFilter" [(ngModel)]="selectedCategory" (change)="applyFilters()"
+          <label for="categoryFilter"
+            class="block mb-1 text-sm font-semibold text-gray-700">Category</label>
+          <select id="categoryFilter" [(ngModel)]="selectedCategory"
+            (change)="applyFilters()"
             class="w-44 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
             <option value>All Categories</option>
-            <option *ngFor="let category of categoryOptions" [value]="category.value">
+            <option *ngFor="let category of categoryOptions"
+              [value]="category.value">
               {{ category.label }}
             </option>
           </select>
           <!-- Dropdown arrow -->
-          <div class="absolute inset-y-0 flex items-center pointer-events-none right-3">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+          <div
+            class="absolute inset-y-0 flex items-center pointer-events-none right-3">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6 9l6 6 6-6"></path>
             </svg>
           </div>
         </div>
 
         <!-- Zone Filter -->
         <div class="relative">
-          <label for="zoneFilter" class="block mb-1 text-sm font-semibold text-gray-700">Zone</label>
-          <select id="zoneFilter" [(ngModel)]="selectedZone" (change)="filterByZoneAndSubzone()"
+          <label for="zoneFilter"
+            class="block mb-1 text-sm font-semibold text-gray-700">Zone</label>
+          <select id="zoneFilter" [(ngModel)]="selectedZone"
+            (change)="filterByZoneAndSubzone()"
             class="w-40 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
             <option value>All Zones</option>
             <option *ngFor="let zone of zones" [value]="zone.name">
@@ -66,35 +81,46 @@
             </option>
           </select>
           <!-- Dropdown arrow -->
-          <div class="absolute inset-y-0 flex items-center pointer-events-none right-3">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+          <div
+            class="absolute inset-y-0 flex items-center pointer-events-none right-3">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6 9l6 6 6-6"></path>
             </svg>
           </div>
         </div>
 
         <!-- Subzone Filter (conditionnel) -->
         <div *ngIf="hasSubzones()" class="relative">
-          <label for="subzoneFilter" class="block mb-1 text-sm font-semibold text-gray-700">Subzone</label>
-          <select id="subzoneFilter" [(ngModel)]="selectedSubzone" (change)="applyFilters()"
+          <label for="subzoneFilter"
+            class="block mb-1 text-sm font-semibold text-gray-700">Subzone</label>
+          <select id="subzoneFilter" [(ngModel)]="selectedSubzone"
+            (change)="applyFilters()"
             class="w-36 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
             <option value>All Subzones</option>
-            <option *ngFor="let subzone of zonesWithSub[selectedZone]" [value]="subzone">
+            <option *ngFor="let subzone of zonesWithSub[selectedZone]"
+              [value]="subzone">
               {{ subzone }}
             </option>
           </select>
           <!-- Dropdown arrow -->
-          <div class="absolute inset-y-0 flex items-center pointer-events-none right-3">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+          <div
+            class="absolute inset-y-0 flex items-center pointer-events-none right-3">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6 9l6 6 6-6"></path>
             </svg>
           </div>
         </div>
 
         <!-- Date Filter -->
         <div>
-          <label for="dateFilter" class="block mb-1 text-sm font-semibold text-gray-700">Date</label>
-          <input id="dateFilter" type="date" [(ngModel)]="selectDate" (change)="filterData()"
+          <label for="dateFilter"
+            class="block mb-1 text-sm font-semibold text-gray-700">Date</label>
+          <input id="dateFilter" type="date" [(ngModel)]="selectDate"
+            (change)="filterData()"
             class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]" />
         </div>
 
@@ -102,7 +128,8 @@
         <div>
           <button (click)="exportReport()"
             class="flex items-center gap-2 px-5 py-2 text-white bg-[#FF6600] rounded-lg hover:bg-[#FF6614] transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:ring-opacity-50">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+              viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd"
                 d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
                 clip-rule="evenodd" />
@@ -121,8 +148,10 @@
       class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
       <div class="flex items-center">
         <div class="p-3 mr-4 text-blue-600 bg-blue-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
         <div>
@@ -144,7 +173,8 @@
       class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
       <div class="flex items-center">
         <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
@@ -168,8 +198,10 @@
       class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
       <div class="flex items-center">
         <div class="p-3 mr-4 text-green-600 bg-green-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          <svg class="w-8 h-8" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
         </div>
         <div>
@@ -191,7 +223,8 @@
   <div class="p-6 mb-8 bg-white border border-gray-100 rounded-lg shadow-sm">
     <!-- Status Legend -->
 
-    <div class="flex flex-wrap items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
+    <div
+      class="flex flex-wrap items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
       <span class="text-sm font-medium text-white">Agent status:</span>
 
       <div class="flex items-center">
@@ -211,19 +244,24 @@
     </div>
 
     <!-- Table Header with Filters -->
-    <div class="flex flex-col items-start justify-between mb-4 space-y-4 md:flex-row md:items-center md:space-y-0">
+    <div
+      class="flex flex-col items-start justify-between mb-4 space-y-4 md:flex-row md:items-center md:space-y-0">
       <h3 class="text-lg font-semibold text-[#002c6b]">
         Agents Status List: {{ selectedZone ? selectedZone : "All Zone" }} /
-        {{ selectedDate ? (selectedDate | date:'dd MMMM yyyy') : (today | date:'dd MMMM yyyy') }}
+        {{ selectedDate ? (selectedDate | date:'dd MMMM yyyy') : (today |
+        date:'dd MMMM yyyy') }}
       </h3>
 
-      <div class="flex flex-col w-full space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 md:w-auto">
+      <div
+        class="flex flex-col w-full space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 md:w-auto">
         <!-- Bulk SMS Button -->
         <button *ngIf="selectedRetailer.length > 0" (click)="openBulkSMSModal()"
           class="flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2"
+            fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            <path stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"
               d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
           Send SMS ({{ selectedRetailer.length }})
@@ -237,9 +275,11 @@
         <!-- Table header -->
         <thead class="bg-[#004080] sticky top-0 z-10">
           <tr>
-            <th scope="col" class="relative px-3 py-3 text-center bg-[#004080] text-white">
-              <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll($event)"
-                class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500"/>
+            <th scope="col"
+              class="relative px-3 py-3 text-center bg-[#004080] text-white">
+              <input type="checkbox" [checked]="allSelected"
+                (change)="toggleSelectAll($event)"
+                class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
             </th>
             <th scope="col"
               class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase bg-[#004080]">
@@ -270,33 +310,44 @@
 
         <!-- Corps du tableau -->
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let agent of snapshots" class="transition-colors duration-150 cursor-pointer hover:bg-gray-50"
+          <tr *ngFor="let agent of snapshots  trackBy: trackByCode"
+            class="transition-colors duration-150 cursor-pointer hover:bg-gray-50"
             (click)="openAgentModal(agent)">
             <!-- Checkbox pour sélectionner l'agent (éviter la propagation du clic) -->
-            <td class="px-3 py-4 text-center whitespace-nowrap" (click)="$event.stopPropagation()">
-              <input type="checkbox" [checked]="isAgentSelected(agent)" (change)="toggleAgentSelection(agent, $event)"
+            <td class="px-3 py-4 text-center whitespace-nowrap"
+              (click)="$event.stopPropagation()">
+              <input type="checkbox" [checked]="isAgentSelected(agent)"
+                (change)="toggleAgentSelection(agent, $event)"
                 class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
             </td>
 
             <!-- Affichage de la zone, ou "-" si nul -->
-            <td class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+            <td
+              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
               {{ agent.zone ?? "-" }}
             </td>
 
             <!-- Affichage de la subzone avec gestion null, '[NULL]' et chaîne vide -->
-            <td class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+            <td
+              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
               {{ sanitizeValue(agent.subZone) }}
             </td>
 
             <!-- Indicateurs de statut sous forme de points colorés -->
             <td class="px-3 py-4 text-center whitespace-nowrap">
               <div class="flex items-center justify-center gap-2">
-                <span *ngIf="agent.agentStatus?.toUpperCase() === 'NEED_CASHING'"
-                  class="inline-block w-5 h-5 bg-blue-500 rounded-full" title="Need Cashing"></span>
-                <span *ngIf="agent.agentStatus?.toUpperCase() === 'NEED_CASHOUT'"
-                  class="inline-block w-5 h-5 bg-purple-500 rounded-full" title="Need Cashout"></span>
-                <span *ngIf="agent.agentStatus?.toUpperCase() === 'AUTO_TRANSFER'"
-                  class="inline-block w-5 h-5 bg-yellow-500 rounded-full" title="Eligible for Auto Transfer"></span>
+                <span
+                  *ngIf="agent.agentStatus?.toUpperCase() === 'NEED_CASHING'"
+                  class="inline-block w-5 h-5 bg-blue-500 rounded-full"
+                  title="Need Cashing"></span>
+                <span
+                  *ngIf="agent.agentStatus?.toUpperCase() === 'NEED_CASHOUT'"
+                  class="inline-block w-5 h-5 bg-purple-500 rounded-full"
+                  title="Need Cashout"></span>
+                <span
+                  *ngIf="agent.agentStatus?.toUpperCase() === 'AUTO_TRANSFER'"
+                  class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
+                  title="Eligible for Auto Transfer"></span>
 
                 <!-- Si aucun statut, affiche un tiret -->
                 <span *ngIf="!agent.agentStatus">-</span>
@@ -304,7 +355,8 @@
             </td>
 
             <!-- Affichage de la catégorie avec mapping des valeurs -->
-            <td class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+            <td
+              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
               <ng-container [ngSwitch]="agent.category">
                 <span *ngSwitchCase="'650'">650</span>
                 <span *ngSwitchCase="'Premium'">Premium</span>
@@ -316,12 +368,14 @@
             </td>
 
             <!-- Code de l'agent, ou "-" si nul -->
-            <td class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
+            <td
+              class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
               {{ agent.shortCode ?? "-" }}
             </td>
 
             <!-- Numéro de téléphone, ou "-" si nul -->
-            <td class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
+            <td
+              class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
               {{ agent.msisdn ?? "-" }}
             </td>
           </tr>
@@ -332,23 +386,27 @@
     <!-- Pagination -->
     <!-- Résumé + Chargement + Pagination -->
     <!-- Pagination Summary and Controls -->
-    <div class="flex flex-col-reverse md:flex-row md:items-center md:justify-between px-4 mt-4 space-y-4 md:space-y-0">
+    <div
+      class="flex flex-col-reverse px-4 mt-4 space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
       <!-- Left: Summary and Loading -->
       <div>
         <div class="text-sm text-gray-500">
           Page {{ currentPage }} of {{ totalPages }} — {{ totalElements }} items
           found
         </div>
-        <div *ngIf="loading" class="text-sm text-blue-500 mt-1">
+        <div *ngIf="loading" class="mt-1 text-sm text-blue-500">
           Loading in progress...
         </div>
       </div>
       <!-- Right: Items per page selector and navigation buttons -->
-      <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+      <div
+        class="flex flex-col items-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
         <!-- Items per page dropdown -->
         <div class="flex items-center space-x-2">
-          <label for="itemsPerPage" class="text-sm font-medium text-gray-700">Items per page:</label>
-          <select id="itemsPerPage" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()"
+          <label for="itemsPerPage"
+            class="text-sm font-medium text-gray-700">Items per page:</label>
+          <select id="itemsPerPage" [(ngModel)]="itemsPerPage"
+            (change)="onItemsPerPageChange()"
             class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option *ngFor="let option of itemsPerPageOptions" [value]="option">
               {{ option }}
@@ -358,26 +416,30 @@
 
         <!-- Navigation buttons -->
         <div class="flex items-center space-x-1">
-          <button class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-            [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+          <button
+            class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            [disabled]="currentPage === 1"
+            (click)="changePage(currentPage - 1)">
             &laquo; Previous
           </button>
 
-          <button *ngFor="let page of getPageNumbers()" class="px-3 py-1 text-sm rounded hover:bg-gray-300" [ngClass]="{
+          <button *ngFor="let page of getPageNumbers()"
+            class="px-3 py-1 text-sm rounded hover:bg-gray-300" [ngClass]="{
               'bg-blue-600 text-white': currentPage === page,
               'bg-gray-200': currentPage !== page
             }" (click)="changePage(page)">
             {{ page }}
           </button>
 
-          <button class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-            [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+          <button
+            class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            [disabled]="currentPage === totalPages"
+            (click)="changePage(currentPage + 1)">
             Next &raquo;
           </button>
         </div>
       </div>
     </div>
-
 
   </div>
 </div>
@@ -385,7 +447,8 @@
 <!-- agent Details Modal -->
 <div *ngIf="agentModal" class="fixed inset-0 z-50 overflow-y-auto">
 
-  <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+  <div
+    class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
     <!-- Background overlay -->
     <div class="fixed inset-0 transition-opacity" aria-hidden="true">
       <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -393,7 +456,7 @@
 
     <!-- Modal content -->
     <div
-      class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl border-2 border-blue-800 sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+      class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white border-2 border-blue-800 rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
       <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
         <div class="sm:flex sm:items-start">
           <div class="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -402,9 +465,12 @@
                 Agent Details - {{ selectedRetailer.shortCode }}
               </h3>
 
-              <button (click)="closeModal()" class="text-gray-400 hover:text-gray-500">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              <button (click)="closeModal()"
+                class="text-gray-400 hover:text-gray-500">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
@@ -418,7 +484,9 @@
                   <button (click)="
                       setActiveTab('retailer') ;
                       loadAgentStatusChart(selectedRetailer.agentId)
-                    " class="px-3 text-lg font-medium border-b-2 whitespace-nowrap" [ngClass]="{
+                    "
+                    class="px-3 text-lg font-medium border-b-2 whitespace-nowrap"
+                    [ngClass]="{
                       'text-orange-600 border-blue-600':
                         activeTab === 'retailer',
                       'text-blue-800 border-transparent hover:border-blue-400 hover:text-orange-500':
@@ -442,7 +510,8 @@
               <!-- agent Info Tab -->
               <div *ngIf="activeTab === 'retailer'" class="mt-6 space-y-6">
                 <!-- General Info Section -->
-                <fieldset class="p-6 bg-white border border-gray-300 rounded-xl shadow-sm">
+                <fieldset
+                  class="p-6 bg-white border border-gray-300 shadow-sm rounded-xl">
                   <legend class="px-3 text-xl font-medium text-gray-700">
                     General Information
                   </legend>
@@ -489,21 +558,23 @@
                 </fieldset>
 
                 <!-- Current Balances Section -->
-                <fieldset class="p-6 border border-gray-300 rounded-xl bg-gray-50">
+                <fieldset
+                  class="p-6 border border-gray-300 rounded-xl bg-gray-50">
                   <legend class="px-3 text-lg font-medium text-gray-700">
                     Current Account Balance
                   </legend>
-                  <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-3 text-center">
+                  <div
+                    class="grid grid-cols-1 gap-6 mt-4 text-center sm:grid-cols-3">
                     <div>
                       <p class="text-sm font-medium text-gray-600">
                         Main Account
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                          selectedRetailer.mainAccountBalance
-                            ? (selectedRetailer.mainAccountBalance | number) +
-                            " XAF"
-                            : "N/A"
+                        selectedRetailer.mainAccountBalance
+                        ? (selectedRetailer.mainAccountBalance | number) +
+                        " XAF"
+                        : "N/A"
                         }}
                       </p>
                     </div>
@@ -513,10 +584,10 @@
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                          selectedRetailer.cashoutAccountBalance != null
-                            ? (selectedRetailer.cashoutAccountBalance
-                            | number) + " XAF"
-                            : "N/A"
+                        selectedRetailer.cashoutAccountBalance != null
+                        ? (selectedRetailer.cashoutAccountBalance
+                        | number) + " XAF"
+                        : "N/A"
                         }}
                       </p>
                     </div>
@@ -526,10 +597,10 @@
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                          selectedRetailer.commissionAccountBalance
-                            ? (selectedRetailer.commissionAccountBalance
-                            | number) + " XAF"
-                            : "N/A"
+                        selectedRetailer.commissionAccountBalance
+                        ? (selectedRetailer.commissionAccountBalance
+                        | number) + " XAF"
+                        : "N/A"
                         }}
                       </p>
                     </div>
@@ -537,18 +608,20 @@
                 </fieldset>
 
                 <!-- Account Limits Section -->
-                <fieldset class="p-6 border border-gray-300 rounded-xl bg-gray-50">
+                <fieldset
+                  class="p-6 border border-gray-300 rounded-xl bg-gray-50">
                   <legend class="px-3 text-lg font-medium text-gray-700">
                     Account Limits
                   </legend>
-                  <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2 text-center">
+                  <div
+                    class="grid grid-cols-1 gap-6 mt-4 text-center sm:grid-cols-2">
                     <div>
                       <p class="text-sm font-medium text-gray-600">Ceiling</p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                          selectedRetailer.ceilingAmount
-                            ? (selectedRetailer.ceilingAmount | number) + " XAF"
-                            : "N/A"
+                        selectedRetailer.ceilingAmount
+                        ? (selectedRetailer.ceilingAmount | number) + " XAF"
+                        : "N/A"
                         }}
                       </p>
                     </div>
@@ -556,10 +629,10 @@
                       <p class="text-sm font-medium text-gray-600">Threshold</p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                          selectedRetailer.thresholdAmount
-                            ? (selectedRetailer.thresholdAmount | number) +
-                            " XAF"
-                            : "N/A"
+                        selectedRetailer.thresholdAmount
+                        ? (selectedRetailer.thresholdAmount | number) +
+                        " XAF"
+                        : "N/A"
                         }}
                       </p>
                     </div>
@@ -586,17 +659,29 @@
                       </p>
                       <div class="flex items-center space-x-4">
                         <ng-container [ngSwitch]="selectedRetailer.agentStatus">
-                          <div *ngSwitchCase="'NEED_CASHING'" class="flex items-center">
-                            <span class="w-4 h-4 mr-2 bg-blue-500 rounded-full"></span>
-                            <span class="text-base text-gray-800 font-medium">Need Cash In</span>
+                          <div *ngSwitchCase="'NEED_CASHING'"
+                            class="flex items-center">
+                            <span
+                              class="w-4 h-4 mr-2 bg-blue-500 rounded-full"></span>
+                            <span
+                              class="text-base font-medium text-gray-800">Need
+                              Cash In</span>
                           </div>
-                          <div *ngSwitchCase="'NEED_CASHOUT'" class="flex items-center">
-                            <span class="w-4 h-4 mr-2 bg-purple-500 rounded-full"></span>
-                            <span class="text-base text-gray-800 font-medium">Need Cash Out</span>
+                          <div *ngSwitchCase="'NEED_CASHOUT'"
+                            class="flex items-center">
+                            <span
+                              class="w-4 h-4 mr-2 bg-purple-500 rounded-full"></span>
+                            <span
+                              class="text-base font-medium text-gray-800">Need
+                              Cash Out</span>
                           </div>
-                          <div *ngSwitchCase="'AUTO_TRANSFER'" class="flex items-center">
-                            <span class="w-4 h-4 mr-2 bg-yellow-500 rounded-full"></span>
-                            <span class="text-base text-gray-800 font-medium">Auto Transfer</span>
+                          <div *ngSwitchCase="'AUTO_TRANSFER'"
+                            class="flex items-center">
+                            <span
+                              class="w-4 h-4 mr-2 bg-yellow-500 rounded-full"></span>
+                            <span
+                              class="text-base font-medium text-gray-800">Auto
+                              Transfer</span>
                           </div>
                         </ng-container>
                       </div>
@@ -615,13 +700,14 @@
                               selectedRetailer.category === '650_and_Premium',
                             'bg-blue-200 text-blue-900':
                               selectedRetailer.category === 'Ordinary'
-                          }" class="inline-flex px-3 py-1 text-sm font-bold rounded-full">
+                          }"
+                          class="inline-flex px-3 py-1 text-sm font-bold rounded-full">
                           {{
-                            selectedRetailer.category === "650_and_Premium"
-                              ? "650 & Premium"
-                              : selectedRetailer.category
-                                ? selectedRetailer.category.toUpperCase()
-                                : "N/A"
+                          selectedRetailer.category === "650_and_Premium"
+                          ? "650 & Premium"
+                          : selectedRetailer.category
+                          ? selectedRetailer.category.toUpperCase()
+                          : "N/A"
                           }}
                         </span>
                       </div>
@@ -637,10 +723,10 @@
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                          selectedRetailer.estimateCashingAmount
-                            ? (selectedRetailer.estimateCashingAmount
-                            | number) + " XAF"
-                            : "N/A"
+                        selectedRetailer.estimateCashingAmount
+                        ? (selectedRetailer.estimateCashingAmount
+                        | number) + " XAF"
+                        : "N/A"
                         }}
                       </p>
                     </div>
@@ -655,10 +741,10 @@
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                          selectedRetailer.estimateCashoutAmount
-                            ? (selectedRetailer.estimateCashoutAmount
-                            | number) + " XAF"
-                            : "N/A"
+                        selectedRetailer.estimateCashoutAmount
+                        ? (selectedRetailer.estimateCashoutAmount
+                        | number) + " XAF"
+                        : "N/A"
                         }}
                       </p>
                     </div>
@@ -666,7 +752,7 @@
                 </fieldset>
 
                 <!-- Agent History Chart -->
-                <div class="p-6 bg-white rounded-xl shadow-sm mt-6">
+                <div class="p-6 mt-6 bg-white shadow-sm rounded-xl">
                   <h3 class="mb-4 text-xl font-medium text-gray-700">
                     Agent Status Over Time
                   </h3>
@@ -675,49 +761,56 @@
                       chartOptions &&
                       chartOptions.series &&
                       chartOptions.series.length
-                    " [series]="chartOptions.series || []" [chart]="chartOptions.chart || { type: 'line' }"
-                             [xaxis]="chartOptions.xaxis || { categories: [] }" [yaxis]="chartOptions.yaxis || {}"
-                             [stroke]="chartOptions.stroke || {}" [tooltip]="chartOptions.tooltip || {}"
-                             [legend]="chartOptions.legend || {}" [colors]="chartOptions.colors || []">
+                    " [series]="chartOptions.series || []"
+                    [chart]="chartOptions.chart || { type: 'line' }"
+                    [xaxis]="chartOptions.xaxis || { categories: [] }"
+                    [yaxis]="chartOptions.yaxis || {}"
+                    [stroke]="chartOptions.stroke || {}"
+                    [tooltip]="chartOptions.tooltip || {}"
+                    [legend]="chartOptions.legend || {}"
+                    [colors]="chartOptions.colors || []">
                   </apx-chart>
-                  <div *ngIf="!chartOptions || !chartOptions.series?.length" class="text-gray-400 text-sm mt-4">
+                  <div *ngIf="!chartOptions || !chartOptions.series?.length"
+                    class="mt-4 text-sm text-gray-400">
                     No status data available for this agent.
                   </div>
                 </div>
 
                 <!--Boutons pour l'agent-->
                 <div class="agent-actions">
-                  <button mat-raised-button class="btn-blue" matTooltip="Send an SMS to this agent"
-                          (click)="sendSmsToAgent(selectedRetailer)">
+                  <button mat-raised-button class="btn-blue"
+                    matTooltip="Send an SMS to this agent"
+                    (click)="sendSmsToAgent(selectedRetailer)">
                     <mat-icon>sms</mat-icon>
                     Send SMS
                   </button>
 
-                  <button mat-raised-button class="btn-green" matTooltip="Track the agent's location"
-                          (click)="openLocationModal(selectedRetailer)">
+                  <button mat-raised-button class="btn-green"
+                    matTooltip="Track the agent's location"
+                    (click)="openLocationModal(selectedRetailer)">
                     <mat-icon>location_on</mat-icon>
                     Locate
                   </button>
                 </div>
               </div>
 
-
               <!-- Aggregator Info Tabs -->
               <div *ngIf="activeTab === 'aggregators'" class="mt-6 space-y-6">
 
                 <!-- Top Aggregator Card -->
-                <fieldset class="p-6 bg-white border-2 border-blue-500 rounded-xl shadow-sm">
+                <fieldset
+                  class="p-6 bg-white border-2 border-blue-500 shadow-sm rounded-xl">
                   <legend
-                    class="px-3 text-xl font-medium text-gray-700 flex items-center"
+                    class="flex items-center px-3 text-xl font-medium text-gray-700"
                     matTooltip="The top aggregator is the one who usually serves the retailer agent"
-                    matTooltipPosition="above"
-                  >
+                    matTooltipPosition="above">
                     Top Aggregator
                   </legend>
 
                   <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
                     <div>
-                      <p class="text-sm font-medium text-gray-600">Agent Code</p>
+                      <p class="text-sm font-medium text-gray-600">Agent
+                        Code</p>
                       <p class="mt-1 text-base font-semibold text-gray-900">
                         {{ aggregators.topAggregator?.shortCode || 'N/A' }}
                       </p>
@@ -735,7 +828,8 @@
                       </p>
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-gray-600">Phone Number</p>
+                      <p class="text-sm font-medium text-gray-600">Phone
+                        Number</p>
                       <p class="mt-1 text-base font-semibold text-gray-900">
                         {{ aggregators.topAggregator?.msisdn || 'N/A' }}
                       </p>
@@ -744,18 +838,19 @@
                 </fieldset>
 
                 <!-- Main Aggregator Card -->
-                <fieldset class="p-6 bg-white border-2 border-orange-500 rounded-xl shadow-sm">
+                <fieldset
+                  class="p-6 bg-white border-2 border-orange-500 shadow-sm rounded-xl">
                   <legend
-                    class="px-3 text-xl font-medium text-gray-700 flex items-center"
+                    class="flex items-center px-3 text-xl font-medium text-gray-700"
                     matTooltip="The main aggregator is the one assigned to the agent when the account was opened by Gabon Telecom"
-                    matTooltipPosition="above"
-                  >
+                    matTooltipPosition="above">
                     Main Aggregator
                   </legend>
 
                   <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
                     <div>
-                      <p class="text-sm font-medium text-gray-600">Agent Code</p>
+                      <p class="text-sm font-medium text-gray-600">Agent
+                        Code</p>
                       <p class="mt-1 text-base font-semibold text-gray-900">
                         {{ aggregators.mainAggregator?.shortCode || 'N/A' }}
                       </p>
@@ -773,33 +868,29 @@
                       </p>
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-gray-600">Phone Number</p>
+                      <p class="text-sm font-medium text-gray-600">Phone
+                        Number</p>
                       <p class="mt-1 text-base font-semibold text-gray-900">
                         {{ aggregators.mainAggregator?.msisdn || 'N/A' }}
                       </p>
                     </div>
                   </div>
 
-
                 </fieldset>
 
                 <!-- Single Action button at the bottom -->
-                <div class="mt-6 flex justify-center">
+                <div class="flex justify-center mt-6">
                   <button
                     mat-raised-button
                     class="btn-blue"
                     matTooltip="Send an SMS to both aggregators"
-                    (click)="sendSmsToBothAggregators()"
-                  >
+                    (click)="sendSmsToBothAggregators()">
                     <mat-icon>sms</mat-icon>
                     Send SMS
                   </button>
                 </div>
 
               </div>
-
-
-
 
             </div>
           </div>
@@ -809,18 +900,22 @@
   </div>
 
   <!-- Modal MAP Fullscreen -->
-  <div *ngIf="showLocationModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
-    <div class="relative bg-white rounded-lg w-[95vw] max-w-6xl h-[80vh] shadow-lg flex flex-col overflow-hidden">
+  <div *ngIf="showLocationModal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+    <div
+      class="relative bg-white rounded-lg w-[95vw] max-w-6xl h-[80vh] shadow-lg flex flex-col overflow-hidden">
 
       <!-- Header -->
       <div
         class="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-[#FF6600]/10 to-white">
-        <h2 class="text-xl font-medium text-[#002c6b] tracking-widest uppercase">
+        <h2
+          class="text-xl font-medium text-[#002c6b] tracking-widest uppercase">
           Geolocation of Agent (Short Code: {{ selectedRetailer.shortCode }})
         </h2>
-        <button (click)="closeLocationModal()" class="text-[#FF6600] hover:text-red-600 transition-colors"
-                aria-label="Close modal" ngbTooltip="Close this map window">
-          <i class="bi bi-x-lg text-2xl"></i>
+        <button (click)="closeLocationModal()"
+          class="text-[#FF6600] hover:text-red-600 transition-colors"
+          aria-label="Close modal" ngbTooltip="Close this map window">
+          <i class="text-2xl bi bi-x-lg"></i>
         </button>
       </div>
 
@@ -834,62 +929,68 @@
       </div>
 
       <!-- Body -->
-      <div class="flex-1 p-6 overflow-auto flex flex-col gap-4">
+      <div class="flex flex-col flex-1 gap-4 p-6 overflow-auto">
 
         <!-- Tracking Mode -->
-        <div class="flex items-center gap-4 flex-wrap">
-          <span class="font-medium text-sm text-gray-700">Tracking Mode:</span>
+        <div class="flex flex-wrap items-center gap-4">
+          <span class="text-sm font-medium text-gray-700">Tracking Mode:</span>
           <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-            <input type="radio" class="form-radio text-[#002c6b]" name="trackingMode" value="live"
-                   [(ngModel)]="trackingMode"/>
+            <input type="radio" class="form-radio text-[#002c6b]"
+              name="trackingMode" value="live"
+              [(ngModel)]="trackingMode" />
             Live
           </label>
           <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-            <input type="radio" class="form-radio text-[#002c6b]" name="trackingMode" value="static"
-                   [(ngModel)]="trackingMode"/>
+            <input type="radio" class="form-radio text-[#002c6b]"
+              name="trackingMode" value="static"
+              [(ngModel)]="trackingMode" />
             Static
           </label>
         </div>
 
         <!-- Location Source (if multiple available) -->
-        <div *ngIf="availableLocations.length > 1" class="flex items-center flex-wrap gap-4">
-          <span class="font-medium text-sm text-gray-700">Source:</span>
-          <label *ngFor="let loc of availableLocations" class="flex items-center gap-2 text-sm text-gray-600">
-            <input type="radio" name="locationType" class="form-radio text-[#FF6600]" [value]="loc.type"
-                   [(ngModel)]="locationSource"/>
+        <div *ngIf="availableLocations.length > 1"
+          class="flex flex-wrap items-center gap-4">
+          <span class="text-sm font-medium text-gray-700">Source:</span>
+          <label *ngFor="let loc of availableLocations"
+            class="flex items-center gap-2 text-sm text-gray-600">
+            <input type="radio" name="locationType"
+              class="form-radio text-[#FF6600]" [value]="loc.type"
+              [(ngModel)]="locationSource" />
             {{ loc.type === 'box' ? 'Box Location' : 'Cell Location' }}
           </label>
         </div>
 
         <!-- Map Container -->
-        <div id="map" class="flex-1 border border-gray-300 rounded-lg overflow-hidden bg-gray-100"></div>
+        <div id="map"
+          class="flex-1 overflow-hidden bg-gray-100 border border-gray-300 rounded-lg"></div>
       </div>
 
       <!-- Footer -->
-      <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-4">
+      <div
+        class="flex items-center justify-end gap-4 px-6 py-4 border-t border-gray-200 bg-gray-50">
         <!-- Refresh -->
         <button (click)="refreshMap()"
-                class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#002c6b] border border-[#002c6b] rounded hover:bg-[#002c6b]/10 transition"
-                ngbTooltip="Refresh the map">
-          <i class="bi bi-arrow-clockwise text-lg"></i> Refresh
+          class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#002c6b] border border-[#002c6b] rounded hover:bg-[#002c6b]/10 transition"
+          ngbTooltip="Refresh the map">
+          <i class="text-lg bi bi-arrow-clockwise"></i> Refresh
         </button>
 
         <!-- Center on agent -->
         <button (click)="centerMapOnAgent()"
-                class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#002c6b] rounded hover:bg-[#001f4a] transition"
-                ngbTooltip="Center map on agent">
-          <i class="bi bi-geo-alt-fill text-lg"></i> Center
+          class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#002c6b] rounded hover:bg-[#001f4a] transition"
+          ngbTooltip="Center map on agent">
+          <i class="text-lg bi bi-geo-alt-fill"></i> Center
         </button>
 
         <!-- Close -->
         <button (click)="closeLocationModal()"
-                class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#FF6600] rounded hover:bg-[#e85c00] transition"
-                ngbTooltip="Close the map">
-          <i class="bi bi-x-circle text-lg"></i> Close
+          class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#FF6600] rounded hover:bg-[#e85c00] transition"
+          ngbTooltip="Close the map">
+          <i class="text-lg bi bi-x-circle"></i> Close
         </button>
       </div>
     </div>
   </div>
 
 </div>
-

@@ -14,7 +14,7 @@ import {
   AggregatorsResponse,
   DailyTrackingService
 } from 'src/app/services/dailyTracking-Service/daily-tracking.service';
-import {catchError, of} from "rxjs";
+import { catchError, of } from "rxjs";
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -177,7 +177,7 @@ export class DailyTrackingComponent
     this.dailyTrackingService
       .getFilteredSnapshots(params)
       .subscribe((response: any) => {
-        this.snapshots = response.content;
+        this.snapshots = [...response.content];
         this.totalPages = response.totalPages;
         this.totalElements = response.totalElements;
         this.loading = false;
@@ -740,7 +740,7 @@ export class DailyTrackingComponent
   }
 
   // Envoyer des messages aux agrega
-  sendSmsToBothAggregators() {}
+  sendSmsToBothAggregators() { }
 
 
 
@@ -771,6 +771,11 @@ export class DailyTrackingComponent
   isAgentSelected(agent: any): boolean {
     return this.selectedAgents.some((a) => a.code === agent.code);
   }
+
+  trackByCode(index: number, agent: any): string {
+    return agent.code;
+  }
+
 
   toggleSelectAll(event: Event): void {
     const isChecked = (event.target as HTMLInputElement).checked;
