@@ -1,17 +1,21 @@
 <div class="min-h-screen p-6 bg-gray-50">
   <!-- En-tête -->
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between mb-6"
+  >
     <div class="mb-4">
       <h1 class="text-2xl font-bold text-[#002c6b] inline-block mr-2">
         Daily Tracking Statistics
       </h1>
       <span class="text-sm text-[#002c6b]">{{
-        today | date : "fullDate"
+          today | date : "fullDate"
         }}</span>
 
       <p class="mt-1 text-gray-600">Monitor cash flow and agent performance</p>
 
-      <div class="mt-3 inline-block px-4 py-1 bg-[#fff4eb] border-l-4 border-[#cc5200] rounded-md shadow-sm">
+      <div
+        class="mt-3 inline-block px-4 py-1 bg-[#fff4eb] border-l-4 border-[#cc5200] rounded-md shadow-sm"
+      >
         <p class="text-[#cc5200] text-sm font-semibold tracking-wide uppercase">
           🔍 INACTIVE DETAILS — Breakdown of Inactive Agents
         </p>
@@ -20,63 +24,138 @@
 
     <!-- Filtres en 2 lignes alignés à droite -->
     <div class="p-4 bg-white rounded-lg shadow-md">
+
       <!-- Ligne 1 -->
       <div class="flex flex-wrap items-end justify-between gap-4">
         <!-- Status Filter -->
-        <div class="flex flex-col">
-          <label for="statusFilter" class="block mb-1 text-sm font-semibold text-gray-700">Status</label>
-          <select id="statusFilter" [(ngModel)]="selectedStatus"
-            class="w-40 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
+        <div class="flex flex-col relative">
+          <label
+            for="statusFilter"
+            class="block mb-1 text-sm font-semibold text-gray-700"
+          >Account Status</label
+          >
+
+          <select
+            id="statusFilter"
+            [(ngModel)]="selectedStatus"
+            (ngModelChange)="applyFilters()"
+            class="w-40 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
+          >
             <option *ngFor="let option of statusOptions" [value]="option.value">
               {{ option.label }}
             </option>
           </select>
-          <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+
+          <div
+            class="absolute inset-y-0 right-3 flex items-center pointer-events-none"
+          >
+            <svg
+              class="w-4 h-4 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 9l6 6 6-6"
+              ></path>
             </svg>
           </div>
         </div>
 
         <!-- Zone Filter -->
         <div class="flex flex-col">
-          <label for="zoneFilter" class="block mb-1 text-sm font-semibold text-gray-700">Zone</label>
-          <select id="zoneFilter" [(ngModel)]="selectedZone"
-            class="w-40 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
+          <label
+            for="zoneFilter"
+            class="block mb-1 text-sm font-semibold text-gray-700"
+          >Zone</label
+          >
+          <select
+            id="zoneFilter"
+            [(ngModel)]="selectedZone"
+            (ngModelChange)="filterByZoneAndSubzone()"
+            class="w-40 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
+          >
             <option value>All Zones</option>
             <option *ngFor="let zone of zones" [value]="zone.name">
               {{ zone.name }}
             </option>
           </select>
-          <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+          <div
+            class="absolute inset-y-0 right-3 flex items-center pointer-events-none"
+          >
+            <svg
+              class="w-4 h-4 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 9l6 6 6-6"
+              ></path>
             </svg>
           </div>
         </div>
 
         <!-- Subzone Filter -->
         <div *ngIf="hasSubzones()" class="flex flex-col">
-          <label for="subzoneFilter" class="block mb-1 text-sm font-semibold text-gray-700">Subzone</label>
-          <select id="subzoneFilter" [(ngModel)]="selectedSubzone"
-            class="w-36 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
+          <label
+            for="subzoneFilter"
+            class="block mb-1 text-sm font-semibold text-gray-700"
+          >Subzone</label
+          >
+          <select
+            id="subzoneFilter"
+            [(ngModel)]="selectedSubzone"
+            (ngModelChange)="applyFilters()"
+            class="w-36 appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
+          >
             <option value>All Subzones</option>
-            <option *ngFor="let subzone of zonesWithSub[selectedZone]" [value]="subzone">
+            <option
+              *ngFor="let subzone of zonesWithSub[selectedZone]"
+              [value]="subzone"
+            >
               {{ subzone }}
             </option>
           </select>
-          <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+          <div
+            class="absolute inset-y-0 right-3 flex items-center pointer-events-none"
+          >
+            <svg
+              class="w-4 h-4 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 9l6 6 6-6"
+              ></path>
             </svg>
           </div>
         </div>
 
         <!-- Date Filter -->
         <div class="flex flex-col">
-          <label for="dateFilter" class="block mb-1 text-sm font-semibold text-gray-700">Date</label>
-          <input id="dateFilter" type="date" [(ngModel)]="selectDate"
-            class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]" />
+          <label
+            for="dateFilter"
+            class="block mb-1 text-sm font-semibold text-gray-700"
+          >Date</label
+          >
+          <input
+            id="dateFilter"
+            type="date"
+            [(ngModel)]="selectedDate"
+            (ngModelChange)="applyFilters()"
+            class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
+          />
         </div>
       </div>
 
@@ -84,229 +163,314 @@
       <div class="flex flex-wrap items-end justify-between gap-4 mt-5">
         <!-- Inactive Days -->
         <div class="relative">
-          <label for="inactiveDays" class="block mb-1 text-sm font-semibold text-gray-700">Inactive Days</label>
-          <input id="inactiveDays" type="number" min="1"
+          <label
+            for="inactiveDays"
+            class="block mb-1 text-sm font-semibold text-gray-700"
+          >Inactive Days</label
+          >
+          <input
+            id="inactiveDays"
+            type="number"
+            min="1"
+            [(ngModel)]="inactiveDays"
+            (ngModelChange)="applyFilters()"
             class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
-            placeholder="e.g. 5" />
+            placeholder="e.g. 5"
+          />
         </div>
 
         <!-- Main Account -->
         <div class="relative">
-          <label for="mainAccountAmount" class="block mb-1 text-sm font-semibold text-gray-700">Min Main Account</label>
-          <input id="mainAccountAmount" type="number" min="0"
+          <label
+            for="mainAccountAmount"
+            class="block mb-1 text-sm font-semibold text-gray-700"
+          >Min Main Ammount</label
+          >
+          <input
+            id="mainAccountAmount"
+            type="number"
+            min="0"
+            [(ngModel)]="minMainAccount"
+            (ngModelChange)="applyFilters()"
             class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
-            placeholder="e.g. 10000" />
+            placeholder="e.g. 10000"
+          />
         </div>
 
-        <!-- Commission Account -->
+        <!-- Cashout Account -->
         <div class="relative">
-          <label for="withdrawalAmount" class="block mb-1 text-sm font-semibold text-gray-700">Min Commission
-            Account</label>
-          <input id="withdrawalAmount" type="number" min="0"
+          <label
+            for="cashoutAccountAmount"
+            class="block mb-1 text-sm font-semibold text-gray-700"
+          >Min Cashout Amount</label
+          >
+
+          <input
+            id="cashoutAccountAmount"
+            type="number"
+            min="0"
+            [(ngModel)]="minCashoutAccount"
+            (ngModelChange)="applyFilters()"
             class="w-40 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
-            placeholder="e.g. 5000" />
+            placeholder="e.g. 5000"
+          />
         </div>
       </div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-2 xl:grid-cols-5">
+  <div class="flex flex-wrap gap-4 justify-between mb-4 my-12 ">
     <!-- Premium Agent Card -->
     <div
-      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FFD70044] hover:border-amber-400">
+      class="group relative w-[15%] min-w-[180px] p-4  bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_10px_1px_#FFD70044] hover:border-amber-400"
+    >
       <div class="flex items-center">
-        <div class="p-3 mr-4 rounded-lg text-amber-500 bg-amber-50">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <!-- SVG Crown Icon for Premium -->
+        <div class="p-2 mr-3 rounded-lg text-xl text-amber-500 bg-amber-50">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-              d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
           </svg>
         </div>
         <div>
-          <p class="text-sm text-amber-800">Premium Agents</p>
-          <h3 class="text-2xl font-bold text-amber-600 counter" data-target="12">
-            0
-          </h3>
+          <p class="text-xl text-amber-800">Premium Agents</p>
+          <h3 class="text-3xl font-bold text-amber-600 counter" data-target="12">{{ totalPremium || 0 }}</h3>
         </div>
       </div>
-      <!-- Tooltip -->
       <div
-        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-amber-600 text-white text-xs rounded px-3 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        class="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-amber-600 text-white text-lg rounded px-2 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
         Our Premium agents who are supposed to never run out of cashout
       </div>
     </div>
 
     <!-- Agents 650 Card -->
     <div
-      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#8B5CF644] hover:border-purple-500">
+      class="group relative w-[15%] min-w-[180px] p-4 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_10px_1px_#8B5CF644] hover:border-purple-500"
+    >
       <div class="flex items-center">
-        <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <!-- SVG User Group Icon -->
+        <div class="p-2 mr-3 text-purple-600 bg-purple-100 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
           </svg>
         </div>
         <div>
-          <p class="text-sm text-purple-800">Agents 650</p>
-          <h3 class="text-2xl font-bold text-purple-600 counter" data-target="25">
-            0
-          </h3>
+          <p class="text-xl text-purple-800">Agents 650</p>
+          <h3 class="text-3xl font-bold text-purple-600 counter" data-target="25">{{ totalAgents650  || 0 }}</h3>
         </div>
       </div>
-      <!-- Tooltip -->
       <div
-        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-purple-600 text-white text-xs rounded px-3 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        class="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-purple-600 text-white text-lg rounded px-2 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
         Our agent who use the 650 platform
       </div>
     </div>
 
-    <!-- Agents 650 and Premium Agents Card -->
+    <!-- Premium & Agents 650 -->
     <div
-      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#8B5CF644] hover:border-purple-500">
+      class="group relative w-[15%] min-w-[180px] p-4 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_10px_1px_#8B5CF644] hover:border-indigo-500"
+    >
       <div class="flex items-center">
-        <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <!-- SVG User Group Icon -->
+        <div class="p-2 mr-3 text-indigo-600 bg-indigo-100 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7M12 2l3 7h7l-5.5 4.5L18 22l-6-4-6 4 1.5-8.5L2 9h7z"/>
           </svg>
         </div>
         <div>
-          <p class="text-sm text-purple-800">Premium & Agents 650</p>
-          <h3 class="text-2xl font-bold text-purple-600 counter" data-target="25">
-            0
-          </h3>
+          <p class="text-xl text-indigo-800">Premium & Agents 650</p>
+          <h3 class="text-3xl font-bold text-indigo-600 counter" data-target="25">{{ totalPremiumAnd650 || 0 }}</h3>
         </div>
       </div>
-      <!-- Tooltip -->
       <div
-        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-purple-600 text-white text-xs rounded px-3 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
-        Our agent who belong to the both categories : 650 & Premium.
+        class="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-indigo-600 text-white text-lg rounded px-2 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Agents in both categories: 650 & Premium.
       </div>
     </div>
 
-    <!-- Cashout Required Card -->
+    <!-- Cashout Required -->
     <div
-      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+      class="group relative w-[15%] min-w-[180px] p-4 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_10px_1px_#FF660044] hover:border-orange-500"
+    >
       <div class="flex items-center">
-        <div class="p-3 mr-4 text-purple-600 bg-purple-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div class="p-2 mr-3 text-orange-600 bg-orange-100 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2"/>
           </svg>
         </div>
         <div>
-          <p class="text-sm text-[#002c6b]">Inactive with Cashout Amount</p>
-          <h3 class="text-2xl font-bold text-[#002c6b] counter" data-target="18">
-            0
-          </h3>
+          <p class="text-xl text-orange-800">Inactive with Cashout Amount</p>
+          <h3 class="text-3xl font-bold text-orange-600 counter" data-target="18">{{ totalInactiveCashout }}</h3>
         </div>
       </div>
-      <!-- Tooltip -->
       <div
-        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
-        Inactive Agents who have a positive balance on their Cashout Account
+        class="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-orange-600 text-white text-lg rounded px-2 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Inactive Agents with positive cashout balance
       </div>
     </div>
 
-    <!-- Inactive Agents Card -->
+    <!-- Inactive Main Account -->
     <div
-      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+      class="group relative w-[15%] min-w-[180px] p-4 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_10px_1px_#FF660044] hover:border-yellow-500"
+    >
       <div class="flex items-center">
-        <div class="p-3 mr-4 text-yellow-600 bg-yellow-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div class="p-2 mr-3 text-yellow-600 bg-yellow-100 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7h1m-4 0h1m5 4v3m0 0v3m0-3h-3m3 0h-3" />
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
           </svg>
         </div>
-        <div class="flex-1">
-          <p class="text-sm text-[#002c6b]">Inactive with Main Account</p>
-          <h3 class="text-2xl font-bold text-[#002c6b]">
-            <span class="counter">0</span>
-          </h3>
+        <div>
+          <p class="text-xl text-yellow-800">Inactive with Main Account</p>
+          <h3 class="text-3xl font-bold text-yellow-600 counter">{{ totalInactiveMain }}</h3>
         </div>
       </div>
-      <!-- Tooltip -->
       <div
-        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
-        Inactive Agents who have a positive balance on their Main Account.
+        class="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-yellow-600 text-white text-lg rounded px-2 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Inactive Agents with positive main account balance
       </div>
     </div>
 
-    <!-- Inactive Agents Card -->
+    <!-- Inactive Both Accounts -->
     <div
-      class="group relative p-6 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_15px_2px_#FF660044] hover:border-orange-500">
+      class="group relative w-[15%] min-w-[180px] p-4 bg-white border border-gray-100 rounded-xl transition duration-300 transform hover:scale-105 hover:shadow-[0_0_10px_1px_#FF660044] hover:border-red-500"
+    >
       <div class="flex items-center">
-        <div class="p-3 mr-4 text-yellow-600 bg-yellow-100 rounded-lg">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div class="p-2 mr-3 text-red-600 bg-red-100 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  d="M3 10h18M4 6h16M6 10v8m4-8v8m4-8v8m4-8v8"/>
           </svg>
         </div>
-        <div class="flex-1">
-          <p class="text-sm text-[#002c6b]">
-            Inactive Agents with Both Balance
-          </p>
-          <h3 class="text-2xl font-bold text-[#002c6b]">
-            <span class="counter">0</span>
-          </h3>
+        <div>
+          <p class="text-xl text-red-800">Inactive with Both Balances</p>
+          <h3 class="text-3xl font-bold text-red-600 counter">{{ totalInactiveBoth }}</h3>
         </div>
       </div>
-      <!-- Tooltip -->
       <div
-        class="absolute bottom-[-36px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-[#002c6b] text-white text-xs rounded px-3 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
-        Our agents who have positive balance on their both accounts.
+        class="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-red-600 text-white text-lg rounded px-2 py-1 shadow-md whitespace-nowrap z-50 transition-opacity duration-300 pointer-events-none">
+        Agents with positive balance on both accounts
       </div>
     </div>
   </div>
 
+
   <!-- Alerts Table Section -->
   <div class="p-6 mb-8 bg-white border border-gray-100 rounded-lg shadow-sm">
-    <div class="flex flex-wrap items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
-      <span class="text-sm font-medium text-white">Agent Status:</span>
+    <div class="flex flex-wrap justify-between items-center gap-4 p-3 mb-4 rounded-lg bg-[#004080]">
 
-      <div class="flex items-center">
-        <span class="w-3 h-3 mr-2 bg-blue-500 rounded-full"></span>
-        <span class="text-sm text-white">Inactive – Main Account Only</span>
+      <!-- Section gauche : Agent Account Status -->
+      <div class="flex flex-wrap items-center gap-4">
+        <span class="text-sm font-medium text-white">Agent Account Status:</span>
+
+        <div class="flex items-center">
+          <span class="w-4 h-4 mr-2 bg-blue-500 rounded-full"></span>
+          <span class="text-sm text-white">Inactive – Main Account Only</span>
+        </div>
+
+        <div class="flex items-center">
+          <span class="w-4 h-4 mr-2 bg-purple-500 rounded-full"></span>
+          <span class="text-sm text-white">Inactive – Cashout Account Only</span>
+        </div>
+
+        <div class="flex items-center">
+          <span class="w-4 h-4 mr-2 bg-yellow-500 rounded-full"></span>
+          <span class="text-sm text-white">Inactive – Both Accounts</span>
+        </div>
+
+        <div class="flex items-center">
+          <span class="w-4 h-4 mr-2 bg-gray-500 rounded-full"></span>
+          <span class="text-sm text-white">Inactive – No Active Account</span>
+        </div>
       </div>
 
-      <div class="flex items-center">
-        <span class="w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
-        <span class="text-sm text-white">Inactive – Cashout Account Only</span>
+      <!-- Section droite : Agent Status -->
+      <div class="flex flex-wrap items-center gap-4">
+        <span class="text-sm font-medium text-white">Agent Status:</span>
+
+        <div class="flex items-center">
+          <span class="w-4 h-4 mr-2 bg-orange-500 rounded-full"></span>
+          <span class="text-sm text-white">Inactive</span>
+        </div>
+
+        <div class="flex items-center">
+          <span class="w-4 h-4 mr-2 bg-red-500 rounded-full"></span>
+          <span class="text-sm text-white">Dormant</span>
+        </div>
       </div>
 
-      <div class="flex items-center">
-        <span class="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></span>
-        <span class="text-sm text-white">Inactive – Both Accounts</span>
-      </div>
     </div>
 
+
     <!-- Table Header with Filters -->
-    <div class="flex flex-col items-start justify-between mb-4 space-y-4 md:flex-row md:items-center md:space-y-0">
+    <div
+      class="flex flex-col items-start justify-between mb-4 space-y-4 md:flex-row md:items-center md:space-y-0"
+    >
       <h3 class="text-lg font-semibold text-[#002c6b]">
         Inactive Agents Alerts List:
         {{ selectedZone ? selectedZone : "All Zone" }} /
-        {{ selectDate ? selectDate : (today | date : "fullDate") }}
+        {{ selectedDate ? (selectedDate | date:'dd MMMM yyyy') : (today | date:'dd MMMM yyyy') }}
+
       </h3>
 
       <div class="flex flex-col w-full space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 md:w-auto">
-        <div class="relative w-40">
-          <select id="categoryFilter" [(ngModel)]="selectedCategory"
-            class="w-full appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]">
-            <option value="">All Categories</option>
-            <option *ngFor="let category of categories" [value]="category">
-              {{ category }}
-            </option>
-          </select>
-          <!-- Icône du dropdown correctement positionnée -->
-          <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
-            </svg>
+
+        <div class="flex flex-wrap gap-4">
+          <!-- Sélecteur Catégorie -->
+          <div class="relative w-40">
+            <select
+              id="categoryFilter"
+              [(ngModel)]="selectedCategory"
+              (ngModelChange)="applyFilters()"
+              class="w-full appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
+            >
+              <option value="">All Categories</option>
+              <option *ngFor="let category of categories" [value]="category">
+                {{ category }}
+              </option>
+            </select>
+            <!-- Icône du dropdown -->
+            <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+              <svg
+                class="w-4 h-4 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Sélecteur Statut -->
+          <div class="relative w-40">
+            <select
+              id="statusFilter"
+              [(ngModel)]="selectedAgentStatus"
+              (ngModelChange)="applyFilters()"
+              class="w-full appearance-none px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004080] focus:border-[#004080]"
+            >
+              <option value="">All Agent Statuses</option>
+              <option value="INACTIF">Inactive</option>
+              <option value="DORMANT">Dormant</option>
+            </select>
+            <!-- Icône du dropdown -->
+            <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+              <svg
+                class="w-4 h-4 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+              </svg>
+            </div>
           </div>
         </div>
+
+
+
       </div>
     </div>
 
@@ -314,106 +478,208 @@
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#004080] sticky top-0 z-10">
-          <tr>
-            <th scope="col" class="relative px-3 py-3 text-center">
-              <input type="checkbox"
-                class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-            </th>
+        <tr>
 
-            <th scope="col" class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Last Zone
-            </th>
-            <th scope="col" class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Last Subzone
-            </th>
-            <th scope="col" class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Status
-            </th>
-            <th scope="col" class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Category
-            </th>
-            <th scope="col" class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Agent Code
-            </th>
-            <th scope="col" class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Main Account
-            </th>
-            <th scope="col" class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Cashout Account
-            </th>
-            <th scope="col" class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Inactive Days
-            </th>
-            <th scope="col" class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase">
-              Phone Number
-            </th>
-          </tr>
+          <!-- Checkbox "Select All" -->
+          <th class="px-3 py-3 text-center">
+            <input
+              type="checkbox"
+              [checked]="isAllSelected()"
+              (change)="toggleSelectAll($event)"
+            />
+          </th>
+
+          <th
+            scope="col"
+            class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase"
+          >
+            Last Zone
+          </th>
+          <th
+            scope="col"
+            class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase"
+          >
+            Last Subzone
+          </th>
+
+          <th
+            scope="col"
+            class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase"
+          >
+            Agent Status
+          </th>
+
+          <th
+            scope="col"
+            class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase"
+          >
+            Agent Account Status
+          </th>
+          <th
+            scope="col"
+            class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase"
+          >
+            Category
+          </th>
+          <th
+            scope="col"
+            class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase"
+          >
+            Agent Code
+          </th>
+          <th
+            scope="col"
+            class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase"
+          >
+            Last Main Account
+          </th>
+          <th
+            scope="col"
+            class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase"
+          >
+            Last Cashout Account
+          </th>
+          <th
+            scope="col"
+            class="px-3 py-3 text-xs font-medium tracking-wider text-center text-white uppercase"
+          >
+            Phone Number
+          </th>
+        </tr>
         </thead>
 
         <!-- Corps du tableau -->
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let agent of snapshots" class="transition-colors duration-150 cursor-pointer hover:bg-gray-50"
-            (click)="openAgentModal(agent)">
-            <!-- Checkbox pour sélectionner l'agent (éviter la propagation du clic) -->
-            <td class="px-3 py-4 text-center whitespace-nowrap" (click)="$event.stopPropagation()">
-              <input type="checkbox" [checked]="isAgentSelected(agent)"
-                class="w-4 h-4 mx-auto text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-            </td>
 
-            <!-- Affichage de la zone, ou "-" si nul -->
-            <td class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{ agent.zone ?? "-" }}
-            </td>
+        <tr
+          *ngFor="let agent of snapshots"
+          class="transition-colors duration-150 cursor-pointer hover:bg-gray-50"
+          (click)="openAgentModal(agent)"
+        >
 
-            <!-- Affichage de la subzone avec gestion null, '[NULL]' et chaîne vide -->
-            <td class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{ sanitizeValue(agent.subZone) }}
-            </td>
+          <!-- Checkbox de sélection individuelle -->
+          <td class="px-3 py-4 text-center">
+            <input
+              type="checkbox"
+              [checked]="isSelected(agent.id)"
+              (change)="toggleSelection(agent.id, $event)"
+              (click)="$event.stopPropagation()"
+            />
+          </td>
 
-            <!-- Indicateurs de statut sous forme de points colorés -->
-            <td class="px-3 py-4 text-center whitespace-nowrap">
-              <div class="flex items-center justify-center gap-2">
-                <span *ngIf="agent.agentStatus?.toUpperCase() === 'NEED_CASHING'"
-                  class="inline-block w-5 h-5 bg-blue-500 rounded-full" title="Need Cashing"></span>
-                <span *ngIf="agent.agentStatus?.toUpperCase() === 'NEED_CASHOUT'"
-                  class="inline-block w-5 h-5 bg-purple-500 rounded-full" title="Need Cashout"></span>
-                <span *ngIf="agent.agentStatus?.toUpperCase() === 'AUTO_TRANSFER'"
-                  class="inline-block w-5 h-5 bg-yellow-500 rounded-full" title="Eligible for Auto Transfer"></span>
+          <!-- Affichage de la zone, ou "-" si nul -->
+          <td
+            class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap"
+          >
+            {{ agent.zone ?? "-" }}
+          </td>
 
-                <!-- Si aucun statut, affiche un tiret -->
-                <span *ngIf="!agent.agentStatus">-</span>
-              </div>
-            </td>
+          <!-- Affichage de la subzone avec gestion null, '[NULL]' et chaîne vide -->
+          <td
+            class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap"
+          >
+            {{ sanitizeValue(agent.subZone) }}
+          </td>
 
-            <!-- Affichage de la catégorie avec mapping des valeurs -->
-            <td class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              <ng-container [ngSwitch]="agent.category">
-                <span *ngSwitchCase="'650'">650</span>
-                <span *ngSwitchCase="'Premium'">Premium</span>
-                <span *ngSwitchCase="'650_and_Premium'">650 & Premium</span>
-                <span *ngSwitchCase="'Ordinary'">Ordinary</span>
-                <!-- Valeur par défaut si null ou inconnue -->
+          <!-- Indicateurs de statut de l'agent sous forme de points colorés -->
+          <td class="px-3 py-4 text-center whitespace-nowrap">
+            <div class="flex items-center justify-center gap-2">
+              <ng-container [ngSwitch]="agent.agentStatus">
+                  <span
+                    *ngSwitchCase="'INACTIF'"
+                    class="inline-block w-5 h-5 bg-orange-500 rounded-full"
+                    title="Inactive Agent"
+                  ></span>
+                <span
+                  *ngSwitchCase="'DORMANT'"
+                  class="inline-block w-5 h-5 bg-red-500 rounded-full"
+                  title="Dormant Agent"
+                ></span>
                 <span *ngSwitchDefault>-</span>
               </ng-container>
-            </td>
+            </div>
+          </td>
 
-            <!-- Code de l'agent, ou "-" si nul -->
-            <td class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap">
-              {{ agent.shortCode ?? "-" }}
-            </td>
+          <!-- Indicateurs de statut sous forme de points colorés -->
+          <td class="px-3 py-4 text-center whitespace-nowrap">
+            <div class="flex items-center justify-center gap-2">
+              <ng-container [ngSwitch]="agent.accountType">
+                  <span
+                    *ngSwitchCase="'BOTH'"
+                    class="inline-block w-5 h-5 bg-yellow-500 rounded-full"
+                    title="Inactive – Both Accounts"
+                  ></span>
+                <span
+                  *ngSwitchCase="'MAIN_ONLY'"
+                  class="inline-block w-5 h-5 bg-blue-500 rounded-full"
+                  title="Inactive – Main Account Only"
+                ></span>
+                <span
+                  *ngSwitchCase="'CASHOUT_ONLY'"
+                  class="inline-block w-5 h-5 bg-purple-500 rounded-full"
+                  title="Inactive – Cashout Account Only"
+                ></span>
+                <span
+                  *ngSwitchCase="'NONE'"
+                  class="inline-block w-5 h-5 bg-gray-500 rounded-full"
+                  title="Inactive – No Active Account"
+                ></span>
+                <span *ngSwitchDefault>-</span>
+              </ng-container>
+            </div>
+          </td>
 
-            <!-- Numéro de téléphone, ou "-" si nul -->
-            <td class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap">
-              {{ agent.msisdn ?? "-" }}
-            </td>
-          </tr>
+          <!-- Affichage de la catégorie avec mapping des valeurs -->
+          <td
+            class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap"
+          >
+            <ng-container [ngSwitch]="agent.category">
+              <span *ngSwitchCase="'650'">650</span>
+              <span *ngSwitchCase="'Premium'">Premium</span>
+              <span *ngSwitchCase="'650_and_Premium'">650 & Premium</span>
+              <span *ngSwitchCase="'Ordinary'">Ordinary</span>
+              <!-- Valeur par défaut si null ou inconnue -->
+              <span *ngSwitchDefault>-</span>
+            </ng-container>
+          </td>
+
+          <!-- Code de l'agent, ou "-" si nul -->
+          <td
+            class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap"
+          >
+            {{ agent.shortCode ?? "-" }}
+          </td>
+
+          <!-- Solde du compte principal -->
+          <td
+            class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap"
+          >
+            {{ agent.mainAccountBalance != null ? (agent.mainAccountBalance + ' XAF') : '-' }}
+          </td>
+
+          <!-- Solde du compte cashout -->
+          <td
+            class="px-3 py-4 text-sm font-medium text-center text-gray-900 whitespace-nowrap"
+          >
+            {{ agent.cashoutAccountBalance != null ? (agent.cashoutAccountBalance + ' XAF') : '-' }}
+          </td>
+
+          <!-- Numéro de téléphone, ou "-" si nul -->
+          <td
+            class="px-3 py-4 text-sm text-center text-gray-500 whitespace-nowrap"
+          >
+            {{ agent.msisdn ?? "-" }}
+          </td>
+        </tr>
         </tbody>
       </table>
     </div>
 
     <!-- Pagination -->
     <!-- Pagination Summary and Controls -->
-    <div class="flex flex-col-reverse md:flex-row md:items-center md:justify-between px-4 mt-4 space-y-4 md:space-y-0">
+    <div
+      class="flex flex-col-reverse md:flex-row md:items-center md:justify-between px-4 mt-4 space-y-4 md:space-y-0"
+    >
       <!-- Left: Summary and Loading -->
       <div>
         <div class="text-sm text-gray-500">
@@ -425,12 +691,20 @@
         </div>
       </div>
       <!-- Right: Items per page selector and navigation buttons -->
-      <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+      <div
+        class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4"
+      >
         <!-- Items per page dropdown -->
         <div class="flex items-center space-x-2">
-          <label for="itemsPerPage" class="text-sm font-medium text-gray-700">Items per page:</label>
-          <select id="itemsPerPage" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()"
-            class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label for="itemsPerPage" class="text-sm font-medium text-gray-700"
+          >Items per page:</label
+          >
+          <select
+            id="itemsPerPage"
+            [(ngModel)]="itemsPerPage"
+            (change)="onItemsPerPageChange()"
+            class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             <option *ngFor="let option of itemsPerPageOptions" [value]="option">
               {{ option }}
             </option>
@@ -439,22 +713,442 @@
 
         <!-- Navigation buttons -->
         <div class="flex items-center space-x-1">
-          <button class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-            [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+          <button
+            class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            [disabled]="currentPage === 1"
+            (click)="changePage(currentPage - 1)"
+          >
             &laquo; Previous
           </button>
 
-          <button *ngFor="let page of getPageNumbers()" class="px-3 py-1 text-sm rounded hover:bg-gray-300" [ngClass]="{
+          <button
+            *ngFor="let page of getPageNumbers()"
+            class="px-3 py-1 text-sm rounded hover:bg-gray-300"
+            [ngClass]="{
               'bg-blue-600 text-white': currentPage === page,
               'bg-gray-200': currentPage !== page
-            }" (click)="changePage(page)">
+            }"
+            (click)="changePage(page)"
+          >
             {{ page }}
           </button>
 
-          <button class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-            [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+          <button
+            class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            [disabled]="currentPage === totalPages"
+            (click)="changePage(currentPage + 1)"
+          >
             Next &raquo;
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- agent Details Modal -->
+<div *ngIf="agentModal" class="fixed inset-0 z-50 overflow-y-auto">
+  <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Background overlay -->
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <!-- Modal content -->
+    <div
+      class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl border-2 border-blue-800 sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+      <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-medium leading-6 text-gray-900">
+                Agent Details - {{ selectedRetailer.shortCode }}
+              </h3>
+
+              <button (click)="closeModal()" class="text-gray-400 hover:text-gray-500">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="mt-4">
+              <!-- Tabs -->
+              <div class="border-b border-gray-200">
+                <!--  Menu  -->
+                <nav class="flex -mb-px space-x-8">
+                  <!-- Agent Info Tab -->
+                  <button (click)="
+                    setActiveTab('retailer') ;
+                    " class="px-3 text-lg font-medium border-b-2 whitespace-nowrap" [ngClass]="{
+                      'text-orange-600 border-blue-600':
+                        activeTab === 'retailer',
+                      'text-blue-800 border-transparent hover:border-blue-400 hover:text-orange-500':
+                        activeTab !== 'retailer'
+                    }">
+                    Agent Info
+                  </button>
+
+                  <!-- Aggregators Info Tab -->
+                  <button (click)="setActiveTab('aggregators')"
+                          class="px-3 text-lg font-medium border-b-2 whitespace-nowrap" [ngClass]="{
+                      'text-orange-600 border-blue-600':
+                        activeTab === 'aggregator',
+                      'text-blue-800 border-transparent hover:border-blue-400 hover:text-orange-500':
+                        activeTab !== 'aggregator'
+                    }">
+                    Aggregators Infos
+                  </button>
+                </nav>
+              </div>
+
+              <!-- agent Info Tab -->
+              <div *ngIf="activeTab === 'retailer'" class="mt-6 space-y-6">
+
+                <!-- General Info Section -->
+                <fieldset class="p-6 bg-white border border-gray-300 rounded-xl shadow-sm">
+                  <legend class="px-3 text-xl font-medium text-gray-700">
+                    General Information
+                  </legend>
+
+                  <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-3">
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Full Name</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ agentFound?.name || "N/A" }}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">
+                        Phone Number
+                      </p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ agentFound?.msisdn || "N/A"}}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Category</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ agentFound?.type || "N/A"}}
+                      </p>
+                    </div>
+
+                  </div>
+                </fieldset>
+
+                <!-- Status and Type Section -->
+                <fieldset
+                  class="p-6 border rounded-xl bg-gray-50"
+                  [ngClass]="{
+    'border-yellow-500': selectedRetailer.accountType === 'BOTH',
+    'border-blue-500': selectedRetailer.accountType === 'MAIN_ONLY',
+    'border-purple-500': selectedRetailer.accountType === 'CASHOUT_ONLY',
+    'border-gray-400': selectedRetailer.accountType === 'NONE' || !selectedRetailer.accountType
+  }">
+
+                  <legend class="px-3 text-lg font-medium text-gray-700">
+                    Agent Status & Category
+                  </legend>
+
+                  <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-3">
+
+                    <!-- Agent Status -->
+                    <div>
+                      <p class="mb-2 text-sm font-medium text-gray-600">Agent Status</p>
+                      <div class="flex items-center space-x-2">
+                        <ng-container [ngSwitch]="selectedRetailer.agentStatus">
+
+                          <div *ngSwitchCase="'INACTIF'" class="flex items-center">
+                            <span class="w-4 h-4 mr-2 bg-orange-500 rounded-full"></span>
+                            <span class="text-base font-medium uppercase text-orange-500">Inactive</span>
+                          </div>
+
+                          <div *ngSwitchCase="'DORMANT'" class="flex items-center">
+                            <span class="w-4 h-4 mr-2 bg-red-500 rounded-full"></span>
+                            <span class="text-base font-medium uppercase text-red-500">Dormant</span>
+                          </div>
+
+                          <div *ngSwitchDefault class="flex items-center">
+                            <span class="w-4 h-4 mr-2 bg-gray-300 rounded-full"></span>
+                            <span class="text-base font-medium uppercase text-gray-500">N/A</span>
+                          </div>
+
+                        </ng-container>
+                      </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Agent Category</p>
+                      <div class="flex items-center space-x-2 mt-2">
+                        <ng-container [ngSwitch]="selectedRetailer.category">
+
+                          <div *ngSwitchCase="'Premium'" class="flex items-center">
+                            <span class="w-4 h-4 mr-2 bg-purple-500 rounded-full"></span>
+                            <span class="text-base font-medium uppercase text-purple-500">Premium</span>
+                          </div>
+
+                          <div *ngSwitchCase="'650'" class="flex items-center">
+                            <span class="w-4 h-4 mr-2 bg-indigo-500 rounded-full"></span>
+                            <span class="text-base font-medium uppercase text-indigo-500">650</span>
+                          </div>
+
+                          <div *ngSwitchCase="'650_and_Premium'" class="flex items-center">
+                            <span class="w-4 h-4 mr-2 bg-teal-500 rounded-full"></span>
+                            <span class="text-base font-medium uppercase text-teal-500">650 & Premium</span>
+                          </div>
+
+                          <div *ngSwitchCase="'Ordinary'" class="flex items-center">
+                            <span class="w-4 h-4 mr-2 bg-blue-500 rounded-full"></span>
+                            <span class="text-base font-medium uppercase text-blue-500">Ordinary</span>
+                          </div>
+
+                          <div *ngSwitchDefault class="flex items-center">
+                            <span class="w-4 h-4 mr-2 bg-gray-300 rounded-full"></span>
+                            <span class="text-base font-medium uppercase text-gray-500">N/A</span>
+                          </div>
+
+                        </ng-container>
+                      </div>
+                    </div>
+
+                    <!-- Account Status -->
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Account Status</p>
+                      <div class="flex items-center space-x-2 mt-2">
+                        <ng-container [ngSwitch]="selectedRetailer.accountType">
+
+                          <span *ngSwitchCase="'BOTH'" class="w-4 h-4 mr-2 bg-yellow-500 rounded-full"></span>
+                          <span *ngSwitchCase="'MAIN_ONLY'" class="w-4 h-4 mr-2 bg-blue-500 rounded-full"></span>
+                          <span *ngSwitchCase="'CASHOUT_ONLY'" class="w-4 h-4 mr-2 bg-purple-500 rounded-full"></span>
+                          <span *ngSwitchCase="'NONE'" class="w-4 h-4 mr-2 bg-gray-400 rounded-full"></span>
+                          <span *ngSwitchDefault class="w-4 h-4 mr-2 bg-gray-300 rounded-full"></span>
+
+                        </ng-container>
+
+                        <span
+                          class="text-base font-medium uppercase"
+                          [ngClass]="{
+            'text-yellow-500': selectedRetailer.accountType === 'BOTH',
+            'text-blue-500': selectedRetailer.accountType === 'MAIN_ONLY',
+            'text-purple-500': selectedRetailer.accountType === 'CASHOUT_ONLY',
+            'text-gray-500': selectedRetailer.accountType === 'NONE' || !selectedRetailer.accountType
+          }">
+          {{
+                            selectedRetailer.accountType
+                              ? getAccountTypeLabel(selectedRetailer.accountType)
+                              : 'N/A'
+                          }}
+        </span>
+                      </div>
+                    </div>
+
+                  </div>
+                </fieldset>
+
+
+
+
+
+
+                <!-- Last Known Activity -->
+                <fieldset
+                  class="p-6 rounded-xl"
+                  [ngClass]="{
+    'border-red-500 bg-red-50': selectedRetailer.agentStatus === 'INACTIF',
+    'border-yellow-500 bg-yellow-50': selectedRetailer.agentStatus === 'DORMANT',
+    'border-gray-300 bg-gray-50': selectedRetailer.agentStatus !== 'INACTIF' && selectedRetailer.agentStatus !== 'DORMANT'
+  }"
+                >
+                  <legend
+                    class="px-3 text-lg font-medium text-gray-700"
+                    [ngClass]="{
+      'text-red-600': selectedRetailer.agentStatus === 'INACTIF',
+      'text-yellow-600': selectedRetailer.agentStatus === 'DORMANT',
+      'text-gray-700': selectedRetailer.agentStatus !== 'INACTIF' && selectedRetailer.agentStatus !== 'DORMANT'
+    }"
+                  >
+                    Last Known Activity
+                  </legend>
+
+                  <!-- Row 1: Activity Info -->
+                  <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-3 text-left">
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Last Seen Date</p>
+                      <p class="mt-2 text-xl font-bold text-gray-900">
+                        {{ getLastActivityDate(selectedRetailer.momoInactiveDays) || "N/A" }}
+                      </p>
+                    </div>
+                    <!-- Colonne vide -->
+                    <div></div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Days Inactive</p>
+                      <p class="mt-2 text-xl font-bold text-gray-900">
+                        {{ selectedRetailer.momoInactiveDays != null ? selectedRetailer.momoInactiveDays + " days" : "N/A" }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Row 2: Last Known Location -->
+                  <div class="grid grid-cols-1 gap-6 mt-6 sm:grid-cols-3 text-left">
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Last Zone</p>
+                      <p class="mt-2 text-xl font-bold text-gray-900">{{ selectedRetailer.zone || "N/A" }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Last Subzone</p>
+                      <p class="mt-2 text-xl font-bold text-gray-900">{{ selectedRetailer.subZone || "N/A" }}</p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Last Site</p>
+                      <p class="mt-2 text-xl font-bold text-gray-900">{{ selectedRetailer.siteName || "N/A" }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Row 3: Last Known Balances -->
+                  <div class="grid grid-cols-1 gap-6 mt-6 sm:grid-cols-3 text-left">
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Last Main Balance</p>
+                      <p class="mt-2 text-xl font-bold text-gray-900">
+                        {{ selectedRetailer.mainAccountBalance != null ? (selectedRetailer.mainAccountBalance | number) + " XAF" : "N/A" }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Last Cashout Balance</p>
+                      <p class="mt-2 text-xl font-bold text-gray-900">
+                        {{ selectedRetailer.cashoutAccountBalance != null ? (selectedRetailer.cashoutAccountBalance | number) + " XAF" : "N/A" }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Last Commission Balance</p>
+                      <p class="mt-2 text-xl font-bold text-gray-900">
+                        {{ selectedRetailer.commissionAccountBalance != null ? (selectedRetailer.commissionAccountBalance | number) + " XAF" : "N/A" }}
+                      </p>
+                    </div>
+                  </div>
+                </fieldset>
+
+
+                <!--Boutons pour l'agent-->
+                <div class="agent-actions">
+                  <button mat-raised-button class="btn-blue" matTooltip="Send an SMS to this agent"
+                          (click)="sendSmsToAgent(selectedRetailer)">
+                    <mat-icon>sms</mat-icon>
+                    Send SMS
+                  </button>
+
+                  <button mat-raised-button class="btn-green" matTooltip="Track the agent's location"
+                          (click)="openLocationModal(selectedRetailer)">
+                    <mat-icon>location_on</mat-icon>
+                    Locate
+                  </button>
+                </div>
+              </div>
+
+              <!-- Aggregator Info Tabs -->
+              <div *ngIf="activeTab === 'aggregators'" class="mt-6 space-y-6">
+
+                <!-- Top Aggregator Card -->
+                <fieldset class="p-6 bg-white border-2 border-blue-500 rounded-xl shadow-sm">
+                  <legend
+                    class="px-3 text-xl font-medium text-gray-700 flex items-center"
+                    matTooltip="The top aggregator is the one who usually serves the retailer agent"
+                    matTooltipPosition="above"
+                  >
+                    Top Aggregator
+                  </legend>
+
+                  <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Agent Code</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.topAggregator?.shortCode || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Full Name</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.topAggregator?.name || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Type</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.topAggregator?.type || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Phone Number</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.topAggregator?.msisdn || 'N/A' }}
+                      </p>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <!-- Main Aggregator Card -->
+                <fieldset class="p-6 bg-white border-2 border-orange-500 rounded-xl shadow-sm">
+                  <legend
+                    class="px-3 text-xl font-medium text-gray-700 flex items-center"
+                    matTooltip="The main aggregator is the one assigned to the agent when the account was opened by Gabon Telecom"
+                    matTooltipPosition="above"
+                  >
+                    Main Aggregator
+                  </legend>
+
+                  <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Agent Code</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.mainAggregator?.shortCode || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Full Name</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.mainAggregator?.name || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Type</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.mainAggregator?.type || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Phone Number</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.mainAggregator?.msisdn || 'N/A' }}
+                      </p>
+                    </div>
+                  </div>
+
+
+                </fieldset>
+
+                <!-- Single Action button at the bottom -->
+                <div class="mt-6 flex justify-center">
+                  <button
+                    mat-raised-button
+                    class="btn-blue"
+                    matTooltip="Send an SMS to both aggregators"
+                    (click)="sendSmsToBothAggregators()"
+                  >
+                    <mat-icon>sms</mat-icon>
+                    Send SMS
+                  </button>
+                </div>
+
+              </div>
+
+
+
+
+            </div>
+          </div>
         </div>
       </div>
     </div>

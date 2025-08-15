@@ -213,8 +213,8 @@
     <!-- Table Header with Filters -->
     <div class="flex flex-col items-start justify-between mb-4 space-y-4 md:flex-row md:items-center md:space-y-0">
       <h3 class="text-lg font-semibold text-[#002c6b]">
-        Agents Status List: {{ selectedZone ? selectedZone : "All Zone" }}
-        {{ selectedDate ? selectedDate : (today | date : "fullDate") }}
+        Agents Status List: {{ selectedZone ? selectedZone : "All Zone" }} /
+        {{ selectedDate ? (selectedDate | date:'dd MMMM yyyy') : (today | date:'dd MMMM yyyy') }}
       </h3>
 
       <div class="flex flex-col w-full space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 md:w-auto">
@@ -384,6 +384,7 @@
 
 <!-- agent Details Modal -->
 <div *ngIf="agentModal" class="fixed inset-0 z-50 overflow-y-auto">
+
   <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
     <!-- Background overlay -->
     <div class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -403,7 +404,7 @@
 
               <button (click)="closeModal()" class="text-gray-400 hover:text-gray-500">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
               </button>
             </div>
@@ -415,9 +416,9 @@
                 <nav class="flex -mb-px space-x-8">
                   <!-- Agent Info Tab -->
                   <button (click)="
-                      activeTab = 'retailer';
+                      setActiveTab('retailer') ;
                       loadAgentStatusChart(selectedRetailer.agentId)
-                    " class="px-3 text-lg font-semibold border-b-2 whitespace-nowrap" [ngClass]="{
+                    " class="px-3 text-lg font-medium border-b-2 whitespace-nowrap" [ngClass]="{
                       'text-orange-600 border-blue-600':
                         activeTab === 'retailer',
                       'text-blue-800 border-transparent hover:border-blue-400 hover:text-orange-500':
@@ -427,13 +428,12 @@
                   </button>
 
                   <!-- Aggregators Info Tab -->
-                  <button (click)="activeTab = 'aggregator'"
-                    class="px-3 text-lg font-semibold border-b-2 whitespace-nowrap" [ngClass]="{
-                      'text-orange-600 border-blue-600':
-                        activeTab === 'aggregator',
-                      'text-blue-800 border-transparent hover:border-blue-400 hover:text-orange-500':
-                        activeTab !== 'aggregator'
-                    }">
+                  <button
+                    (click)="setActiveTab('aggregators')"
+                    class="px-3 text-lg font-medium border-b-2 whitespace-nowrap"
+                    [ngClass]="{'text-orange-600 border-blue-600': activeTab === 'aggregators',
+                                'text-blue-800 border-transparent hover:border-blue-400 hover:text-orange-500': activeTab !== 'aggregators'
+                              }">
                     Aggregators Infos
                   </button>
                 </nav>
@@ -443,7 +443,7 @@
               <div *ngIf="activeTab === 'retailer'" class="mt-6 space-y-6">
                 <!-- General Info Section -->
                 <fieldset class="p-6 bg-white border border-gray-300 rounded-xl shadow-sm">
-                  <legend class="px-3 text-xl font-bold text-gray-700">
+                  <legend class="px-3 text-xl font-medium text-gray-700">
                     General Information
                   </legend>
                   <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-3">
@@ -490,7 +490,7 @@
 
                 <!-- Current Balances Section -->
                 <fieldset class="p-6 border border-gray-300 rounded-xl bg-gray-50">
-                  <legend class="px-3 text-lg font-bold text-gray-700">
+                  <legend class="px-3 text-lg font-medium text-gray-700">
                     Current Account Balance
                   </legend>
                   <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-3 text-center">
@@ -500,10 +500,10 @@
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                        selectedRetailer.mainAccountBalance
-                        ? (selectedRetailer.mainAccountBalance | number) +
-                        " XAF"
-                        : "N/A"
+                          selectedRetailer.mainAccountBalance
+                            ? (selectedRetailer.mainAccountBalance | number) +
+                            " XAF"
+                            : "N/A"
                         }}
                       </p>
                     </div>
@@ -513,10 +513,10 @@
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                        selectedRetailer.cashoutAccountBalance != null
-                        ? (selectedRetailer.cashoutAccountBalance
-                        | number) + " XAF"
-                        : "N/A"
+                          selectedRetailer.cashoutAccountBalance != null
+                            ? (selectedRetailer.cashoutAccountBalance
+                            | number) + " XAF"
+                            : "N/A"
                         }}
                       </p>
                     </div>
@@ -526,10 +526,10 @@
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                        selectedRetailer.commissionAccountBalance
-                        ? (selectedRetailer.commissionAccountBalance
-                        | number) + " XAF"
-                        : "N/A"
+                          selectedRetailer.commissionAccountBalance
+                            ? (selectedRetailer.commissionAccountBalance
+                            | number) + " XAF"
+                            : "N/A"
                         }}
                       </p>
                     </div>
@@ -538,7 +538,7 @@
 
                 <!-- Account Limits Section -->
                 <fieldset class="p-6 border border-gray-300 rounded-xl bg-gray-50">
-                  <legend class="px-3 text-lg font-bold text-gray-700">
+                  <legend class="px-3 text-lg font-medium text-gray-700">
                     Account Limits
                   </legend>
                   <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2 text-center">
@@ -546,9 +546,9 @@
                       <p class="text-sm font-medium text-gray-600">Ceiling</p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                        selectedRetailer.ceilingAmount
-                        ? (selectedRetailer.ceilingAmount | number) + " XAF"
-                        : "N/A"
+                          selectedRetailer.ceilingAmount
+                            ? (selectedRetailer.ceilingAmount | number) + " XAF"
+                            : "N/A"
                         }}
                       </p>
                     </div>
@@ -556,10 +556,10 @@
                       <p class="text-sm font-medium text-gray-600">Threshold</p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                        selectedRetailer.thresholdAmount
-                        ? (selectedRetailer.thresholdAmount | number) +
-                        " XAF"
-                        : "N/A"
+                          selectedRetailer.thresholdAmount
+                            ? (selectedRetailer.thresholdAmount | number) +
+                            " XAF"
+                            : "N/A"
                         }}
                       </p>
                     </div>
@@ -575,7 +575,7 @@
                     'border-yellow-500':
                       selectedRetailer.agentStatus === 'AUTO_TRANSFER'
                   }">
-                  <legend class="px-3 text-lg font-bold text-gray-700">
+                  <legend class="px-3 text-lg font-medium text-gray-700">
                     Agent Status & Category
                   </legend>
                   <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
@@ -617,11 +617,11 @@
                               selectedRetailer.category === 'Ordinary'
                           }" class="inline-flex px-3 py-1 text-sm font-bold rounded-full">
                           {{
-                          selectedRetailer.category === "650_and_Premium"
-                          ? "650 & Premium"
-                          : selectedRetailer.category
-                          ? selectedRetailer.category.toUpperCase()
-                          : "N/A"
+                            selectedRetailer.category === "650_and_Premium"
+                              ? "650 & Premium"
+                              : selectedRetailer.category
+                                ? selectedRetailer.category.toUpperCase()
+                                : "N/A"
                           }}
                         </span>
                       </div>
@@ -637,10 +637,10 @@
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                        selectedRetailer.estimateCashingAmount
-                        ? (selectedRetailer.estimateCashingAmount
-                        | number) + " XAF"
-                        : "N/A"
+                          selectedRetailer.estimateCashingAmount
+                            ? (selectedRetailer.estimateCashingAmount
+                            | number) + " XAF"
+                            : "N/A"
                         }}
                       </p>
                     </div>
@@ -655,10 +655,10 @@
                       </p>
                       <p class="mt-2 text-xl font-bold text-gray-900">
                         {{
-                        selectedRetailer.estimateCashoutAmount
-                        ? (selectedRetailer.estimateCashoutAmount
-                        | number) + " XAF"
-                        : "N/A"
+                          selectedRetailer.estimateCashoutAmount
+                            ? (selectedRetailer.estimateCashoutAmount
+                            | number) + " XAF"
+                            : "N/A"
                         }}
                       </p>
                     </div>
@@ -667,7 +667,7 @@
 
                 <!-- Agent History Chart -->
                 <div class="p-6 bg-white rounded-xl shadow-sm mt-6">
-                  <h3 class="mb-4 text-xl font-bold text-gray-700">
+                  <h3 class="mb-4 text-xl font-medium text-gray-700">
                     Agent Status Over Time
                   </h3>
 
@@ -676,9 +676,9 @@
                       chartOptions.series &&
                       chartOptions.series.length
                     " [series]="chartOptions.series || []" [chart]="chartOptions.chart || { type: 'line' }"
-                    [xaxis]="chartOptions.xaxis || { categories: [] }" [yaxis]="chartOptions.yaxis || {}"
-                    [stroke]="chartOptions.stroke || {}" [tooltip]="chartOptions.tooltip || {}"
-                    [legend]="chartOptions.legend || {}" [colors]="chartOptions.colors || []">
+                             [xaxis]="chartOptions.xaxis || { categories: [] }" [yaxis]="chartOptions.yaxis || {}"
+                             [stroke]="chartOptions.stroke || {}" [tooltip]="chartOptions.tooltip || {}"
+                             [legend]="chartOptions.legend || {}" [colors]="chartOptions.colors || []">
                   </apx-chart>
                   <div *ngIf="!chartOptions || !chartOptions.series?.length" class="text-gray-400 text-sm mt-4">
                     No status data available for this agent.
@@ -688,18 +688,119 @@
                 <!--Boutons pour l'agent-->
                 <div class="agent-actions">
                   <button mat-raised-button class="btn-blue" matTooltip="Send an SMS to this agent"
-                    (click)="sendSmsToAgent(selectedRetailer)">
+                          (click)="sendSmsToAgent(selectedRetailer)">
                     <mat-icon>sms</mat-icon>
                     Send SMS
                   </button>
 
                   <button mat-raised-button class="btn-green" matTooltip="Track the agent's location"
-                    (click)="openLocationModal(selectedRetailer)">
+                          (click)="openLocationModal(selectedRetailer)">
                     <mat-icon>location_on</mat-icon>
                     Locate
                   </button>
                 </div>
               </div>
+
+
+              <!-- Aggregator Info Tabs -->
+              <div *ngIf="activeTab === 'aggregators'" class="mt-6 space-y-6">
+
+                <!-- Top Aggregator Card -->
+                <fieldset class="p-6 bg-white border-2 border-blue-500 rounded-xl shadow-sm">
+                  <legend
+                    class="px-3 text-xl font-medium text-gray-700 flex items-center"
+                    matTooltip="The top aggregator is the one who usually serves the retailer agent"
+                    matTooltipPosition="above"
+                  >
+                    Top Aggregator
+                  </legend>
+
+                  <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Agent Code</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.topAggregator?.shortCode || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Full Name</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.topAggregator?.name || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Type</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.topAggregator?.type || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Phone Number</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.topAggregator?.msisdn || 'N/A' }}
+                      </p>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <!-- Main Aggregator Card -->
+                <fieldset class="p-6 bg-white border-2 border-orange-500 rounded-xl shadow-sm">
+                  <legend
+                    class="px-3 text-xl font-medium text-gray-700 flex items-center"
+                    matTooltip="The main aggregator is the one assigned to the agent when the account was opened by Gabon Telecom"
+                    matTooltipPosition="above"
+                  >
+                    Main Aggregator
+                  </legend>
+
+                  <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Agent Code</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.mainAggregator?.shortCode || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Full Name</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.mainAggregator?.name || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Type</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.mainAggregator?.type || 'N/A' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-600">Phone Number</p>
+                      <p class="mt-1 text-base font-semibold text-gray-900">
+                        {{ aggregators.mainAggregator?.msisdn || 'N/A' }}
+                      </p>
+                    </div>
+                  </div>
+
+
+                </fieldset>
+
+                <!-- Single Action button at the bottom -->
+                <div class="mt-6 flex justify-center">
+                  <button
+                    mat-raised-button
+                    class="btn-blue"
+                    matTooltip="Send an SMS to both aggregators"
+                    (click)="sendSmsToBothAggregators()"
+                  >
+                    <mat-icon>sms</mat-icon>
+                    Send SMS
+                  </button>
+                </div>
+
+              </div>
+
+
+
+
             </div>
           </div>
         </div>
@@ -714,11 +815,11 @@
       <!-- Header -->
       <div
         class="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-[#FF6600]/10 to-white">
-        <h2 class="text-xl font-bold text-[#002c6b] tracking-widest uppercase">
+        <h2 class="text-xl font-medium text-[#002c6b] tracking-widest uppercase">
           Geolocation of Agent (Short Code: {{ selectedRetailer.shortCode }})
         </h2>
         <button (click)="closeLocationModal()" class="text-[#FF6600] hover:text-red-600 transition-colors"
-          aria-label="Close modal" ngbTooltip="Close this map window">
+                aria-label="Close modal" ngbTooltip="Close this map window">
           <i class="bi bi-x-lg text-2xl"></i>
         </button>
       </div>
@@ -740,12 +841,12 @@
           <span class="font-medium text-sm text-gray-700">Tracking Mode:</span>
           <label class="inline-flex items-center gap-2 text-sm text-gray-700">
             <input type="radio" class="form-radio text-[#002c6b]" name="trackingMode" value="live"
-              [(ngModel)]="trackingMode" />
+                   [(ngModel)]="trackingMode"/>
             Live
           </label>
           <label class="inline-flex items-center gap-2 text-sm text-gray-700">
             <input type="radio" class="form-radio text-[#002c6b]" name="trackingMode" value="static"
-              [(ngModel)]="trackingMode" />
+                   [(ngModel)]="trackingMode"/>
             Static
           </label>
         </div>
@@ -755,7 +856,7 @@
           <span class="font-medium text-sm text-gray-700">Source:</span>
           <label *ngFor="let loc of availableLocations" class="flex items-center gap-2 text-sm text-gray-600">
             <input type="radio" name="locationType" class="form-radio text-[#FF6600]" [value]="loc.type"
-              [(ngModel)]="locationSource" />
+                   [(ngModel)]="locationSource"/>
             {{ loc.type === 'box' ? 'Box Location' : 'Cell Location' }}
           </label>
         </div>
@@ -768,24 +869,27 @@
       <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-4">
         <!-- Refresh -->
         <button (click)="refreshMap()"
-          class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#002c6b] border border-[#002c6b] rounded hover:bg-[#002c6b]/10 transition"
-          ngbTooltip="Refresh the map">
+                class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#002c6b] border border-[#002c6b] rounded hover:bg-[#002c6b]/10 transition"
+                ngbTooltip="Refresh the map">
           <i class="bi bi-arrow-clockwise text-lg"></i> Refresh
         </button>
 
         <!-- Center on agent -->
         <button (click)="centerMapOnAgent()"
-          class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#002c6b] rounded hover:bg-[#001f4a] transition"
-          ngbTooltip="Center map on agent">
+                class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#002c6b] rounded hover:bg-[#001f4a] transition"
+                ngbTooltip="Center map on agent">
           <i class="bi bi-geo-alt-fill text-lg"></i> Center
         </button>
 
         <!-- Close -->
         <button (click)="closeLocationModal()"
-          class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#FF6600] rounded hover:bg-[#e85c00] transition"
-          ngbTooltip="Close the map">
+                class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#FF6600] rounded hover:bg-[#e85c00] transition"
+                ngbTooltip="Close the map">
           <i class="bi bi-x-circle text-lg"></i> Close
         </button>
       </div>
     </div>
   </div>
+
+</div>
+

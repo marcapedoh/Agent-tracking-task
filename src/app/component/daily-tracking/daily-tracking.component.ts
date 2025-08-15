@@ -9,7 +9,12 @@ import {
   ApexStroke,
   ApexTooltip,
 } from 'ng-apexcharts';
-import { DailyTrackingService } from 'src/app/services/dailyTracking-Service/daily-tracking.service';
+import {
+  Aggregator,
+  AggregatorsResponse,
+  DailyTrackingService
+} from 'src/app/services/dailyTracking-Service/daily-tracking.service';
+import {catchError, of} from "rxjs";
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -35,13 +40,10 @@ export type ChartOptions = {
 })
 export class DailyTrackingComponent
   implements OnInit, OnDestroy, AfterViewInit {
-  // Services et Constantes
-  Math = Math;
+
   // Donnees brutes et Utilisateurs
-  retailers: any[] = [];
   agents: any[] = [];
   datas: any[] = [];
-  allData: any[] = [];
 
   // Date et Filtres
   today: Date = new Date();
@@ -56,9 +58,7 @@ export class DailyTrackingComponent
   chartOptions!: Partial<ChartOptions>;
 
   // Alertes
-  showInactivityAlert = false;
   alertInterval: any;
-  inactivityAlertInterval: any;
 
   // Zones et SubZones
   zones: any[] = [];
@@ -91,6 +91,7 @@ export class DailyTrackingComponent
 
     this.getZoneAndSubZone();
     this.getAllAgent();
+
   }
 
   getAllAgent() {
@@ -277,31 +278,43 @@ export class DailyTrackingComponent
 
   selectedBulkMessage: string = '';
   bulkMessageContent: string = '';
-  activeTab: 'retailer' | 'aggregator' | 'location' = 'retailer';
+  activeTab: string = 'retailer';
 
-  openAgentModal(agent: any): void {
+
+  openAgentModal(agent: { agentId: string }): void {
+
+    if (!agent || !agent.agentId) {
+      console.warn('Agent ID manquant ou invalide.');
+      return;
+    }
+
+    // Réinitialiser les données du modal avant l'appel API
     this.selectedRetailer = agent;
-    this.agentModal = true;
+    this.agentFound = null;
+    this.agentModal = false;
 
-    this.agentFound = this.agents.find((a: any) => a.id === agent.agentId);
-    console.log('Agent Found:', this.selectedRetailer.agentId);
-    this.loadAgentStatusChart(this.selectedRetailer.agentId);
+    this.dailyTrackingService.getAgentById(agent.agentId)
+      .pipe(
+        catchError(err => {
+          console.error(`Erreur lors de la récupération de l'agent ${agent.agentId}`, err);
+          return of(null);
+        })
+      )
+      .subscribe(agentData => {
 
-    this.dailyTrackingService
-      .getMainAggregator(agent.agentId)
-      .subscribe((res) => {
-        this.mainAggregator = res;
+        if (agentData) {
+          this.agentFound = agentData ?? agentData;
+
+          console.log('Agent Found:', this.selectedRetailer);
+          console.log('Aggregators id', this.selectedRetailer.topAggregatorId, this.selectedRetailer.mainAggregatorId);
+
+          this.agentModal = true;
+          console.log('Agent récupéré :', this.agentFound);
+        } else {
+          console.warn(`Agent ${agent.agentId} introuvable.`);
+        }
       });
 
-    this.initMap();
-    this.mapOptions = {
-      layers: getLayers(),
-      zoom: 6,
-      center: L.latLng(
-        +agent.boxLatitude || +agent.cellLatitude,
-        +agent.boxLongitude || +agent.cellLongitude
-      ),
-    };
   }
 
   closeModal(): void {
@@ -309,6 +322,7 @@ export class DailyTrackingComponent
     this.selectedRetailer = {};
     this.agentFound = null;
     this.mainAggregator = null;
+    this.setActiveTab('retailer');
   }
 
   openBulkSMSModal(): void {
@@ -594,7 +608,7 @@ export class DailyTrackingComponent
       this.routeLayer = L.polyline(latlngs, { color: '#FF6600', weight: 4, opacity: 0.7 }).addTo(this.mapInstance);
 
     } else {
-      // Si pas de user ou agent, centre sur Gabon
+      // Si pas d'utilisateur ou agent, centre sur le Gabon
       this.mapInstance.setView([0.5, 11.5], 7);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -606,7 +620,7 @@ export class DailyTrackingComponent
   // Icônes personnalisées
   agentIcon(): L.Icon {
     return L.icon({
-      iconUrl: 'assets/icons/marker-agent.png', // à créer (ou remplacer par une icône dispo)
+      iconUrl: 'assets/icons/marker-agent.png', // à créer (ou remplacer par une icône disponible)
       iconSize: [32, 37],
       iconAnchor: [16, 37],
       popupAnchor: [0, -37],
@@ -633,22 +647,6 @@ export class DailyTrackingComponent
   }
 
 
-
-  getIconForStatus(status: string): L.Icon {
-    const iconUrl =
-      status === 'active'
-        ? 'assets/marker-green.png'
-        : status === 'inactive'
-          ? 'assets/marker-red.png'
-          : 'assets/marker-orange.png';
-
-    return L.icon({
-      iconUrl,
-      iconSize: [40, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-    });
-  }
 
   // Utilitaires
   sanitizeValue(value: string | null | undefined): string {
@@ -695,9 +693,59 @@ export class DailyTrackingComponent
     return this.datas.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
-  // -----------------------Modal Agent----------------------------------------
+  // -----------------------Partie pour les Aggregators----------------------------------------
+  aggregators: { mainAggregator: Aggregator | null; topAggregator: Aggregator | null } = {
+    mainAggregator: null,
+    topAggregator: null
+  };
 
-  // ----------------------------Bulk SMS------------------------------------
+  loadAgentAggregators(mainAggregatorId: string, topAggregatorId: string) {
+    // Récupération de l'agrégateur principal
+    this.dailyTrackingService.getAggregatorById(mainAggregatorId).subscribe({
+      next: (mainData) => {
+        this.aggregators.mainAggregator = mainData;
+      },
+      error: (err) => {
+        console.error('Failed to load main aggregator', err);
+        this.aggregators.mainAggregator = null;
+      }
+    });
+
+    // Récupération du top agrégateur
+    this.dailyTrackingService.getAggregatorById(topAggregatorId).subscribe({
+      next: (topData) => {
+        this.aggregators.topAggregator = topData;
+      },
+      error: (err) => {
+        console.error('Failed to load top aggregator', err);
+        this.aggregators.topAggregator = null;
+      }
+    });
+  }
+
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+
+    if (
+      tab === 'aggregators' &&
+      this.selectedRetailer?.mainAggregatorId &&
+      this.selectedRetailer?.topAggregatorId
+    ) {
+
+      this.loadAgentAggregators(
+        this.selectedRetailer.mainAggregatorId,
+        this.selectedRetailer.topAggregatorId
+      );
+    }
+  }
+
+  // Envoyer des messages aux agrega
+  sendSmsToBothAggregators() {}
+
+
+
+
+
 
   // -------------------------Sélections agents-------------------------------
   selectedAgents: any[] = [];
@@ -735,6 +783,8 @@ export class DailyTrackingComponent
   }
 
   exportReport() { }
+
+
 }
 
 export function getLayers(): L.Layer[] {

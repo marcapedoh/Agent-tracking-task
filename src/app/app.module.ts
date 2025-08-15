@@ -22,6 +22,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import {MatCardModule} from "@angular/material/card";
 
 
 
@@ -39,20 +40,21 @@ import { MatButtonModule } from '@angular/material/button';
     ReportComponent,
     HistoryComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    NgApexchartsModule,
-    HttpClientModule,
-    LeafletModule,
-    FormsModule,
-    BrowserAnimationsModule,
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        NgApexchartsModule,
+        HttpClientModule,
+        LeafletModule,
+        FormsModule,
+        BrowserAnimationsModule,
 
-    // 👉 Modules Angular Material nécessaires
-    MatTooltipModule,
-    MatIconModule,
-    MatButtonModule
-  ],
+        // 👉 Modules Angular Material nécessaires
+        MatTooltipModule,
+        MatIconModule,
+        MatButtonModule,
+        MatCardModule
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

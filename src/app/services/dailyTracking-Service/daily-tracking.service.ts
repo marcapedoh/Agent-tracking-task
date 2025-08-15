@@ -9,6 +9,30 @@ export interface SummaryData {
   auto_transfer: number;
 }
 
+export interface Aggregator {
+  id: string;
+  shortCode: string;
+  msisdn: string;
+  name: string;
+  type: string;
+}
+
+export interface AggregatorsResponse {
+  mainAggregator: Aggregator;
+  topAggregator: Aggregator;
+}
+
+export interface Agent {
+  id: string;
+  shortCode: string;
+  isGabCel: boolean;
+  isPremium: boolean;
+  msisdn: string;
+  name: string;
+  type: string;
+  aggregator: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -42,7 +66,7 @@ export class DailyTrackingService {
     // 6. Résumé global (summary), avec ou sans filtres
     getSummaryForCart(date: string, zone?: string, subZone?: string, category?: string) {
       let params = new HttpParams().set('date', date);
-      
+
       if (date) params = params.set('date', date)
       if (zone) params = params.set('zone', zone);
       if (subZone) params = params.set('subZone', subZone);
@@ -51,8 +75,9 @@ export class DailyTrackingService {
       return this.httpClient.get<{ [key: string]: number }>(`${this.baseUrl}/summary`, { params });
     }
 
-    // 7. Recuperation des agents inactifs pour le filtage 
+    // 7. Recuperation des agents inactifs pour le filtage
     getInactiveAndDormantFiltredSnapshot(params: HttpParams): Observable<any>{
+      console.log('Filtre appliqué:', params.toString());
       return this.httpClient.get(`${this.baseUrl}/inactive-dormant/filtered`, { params })
     }
 
@@ -67,5 +92,24 @@ export class DailyTrackingService {
         `${this.baseUrl}/${agentId}/status-history`
       );
     }
+
+    // 10. Récupérer les 2 agrégateurs d'un agent
+    getAgentAggregators(agentId: string, snapshotDate: string): Observable<AggregatorsResponse> {
+      const params = new HttpParams()
+        .set('agentId', agentId)
+        .set('snapshotDate', snapshotDate);
+      return this.httpClient.get<AggregatorsResponse>(`${this.baseUrl}/agent/aggregators`, { params });
+    }
+
+  // 11. Récupérer un agrégateur par son ID
+  getAggregatorById(aggregatorId: string): Observable<Aggregator> {
+    return this.httpClient.get<Aggregator>(`${this.baseUrl}/aggregators/${aggregatorId}`);
+  }
+
+  // 12. Recuperer un agent via son id :
+  getAgentById(agentId: string): Observable<Agent> {
+    return this.httpClient.get<Agent>(`${this.baseUrl}/agents/${agentId}`);
+  }
+
 
 }
